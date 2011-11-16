@@ -1,0 +1,11 @@
+{% container ItemsList %}
+
+{% if items|length == 0 %}
+	prazdno
+{% else %} 
+<table>
+	{% for item in items %}
+		<tr><td>{% slot item with [ 'item' : item ] %}</td></tr>
+	{% endfor %}
+</table>
+{% endif %}

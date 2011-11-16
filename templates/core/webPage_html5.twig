@@ -1,0 +1,30 @@
+{% container WebPage %}
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>WebBuilder test</title>
+	
+	<style>
+		.block { border: 2px solid red; margin: 1px; padding: 1px; }
+		.block > .name { background-color: red; }
+		
+		.slot { border: 2px solid lime; margin: 1px; padding: 1px; }
+		.slot > .name { background-color: lime; }
+		
+		.block, .slot { margin: 1px; padding: 16 3 3 3; }
+		.name { font-size: 9px; font-weight: bold; padding: 2px 5px; margin: -16 1 1 -3; float: left; }
+		
+		span.name > .data { float: right; display: none; background: #ddd; }
+		span.name:hover > .data { display: block; }
+		
+		.content div { display: inline; }
+	</style>
+</head>
+
+<body>
+	{% set cc = 5 %}
+	{% slot masterContent with [ 'a' : 3, 'b' : cc ] %}
+</body>
+</html>
