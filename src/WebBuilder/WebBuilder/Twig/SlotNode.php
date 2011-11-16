@@ -8,7 +8,7 @@ class SlotNode extends \Twig_Node
 		parent::__construct( array( 'parameters' => $parameters ), array( 'name' => $slot ), $lineno, $tag );
 	}
 
-	public function compile( $compiler )
+	public function compile( \Twig_Compiler $compiler )
 	{
         $compiler->addDebugInfo( $this );
 

@@ -16,7 +16,7 @@ class SlotTokenParser extends \Twig_TokenParser
 
         $this->parser->getStream()->expect( \Twig_Token::BLOCK_END_TYPE );
 
-		return new tSlotNode( $name, $parameters, $token->getLine(), $this->getTag() );
+		return new SlotNode( $name, $parameters, $token->getLine(), $this->getTag() );
 	}
 
 	public function getTag()
