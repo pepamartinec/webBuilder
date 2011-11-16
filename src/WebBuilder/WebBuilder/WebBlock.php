@@ -1,6 +1,8 @@
 <?php
 namespace WebBuilder\WebBuilder;
 
+use Inspirio\Database\cDatabase;
+
 /**
  * Web block prototype
  *
@@ -21,7 +23,7 @@ abstract class WebBlock implements WebBlockInterface
 	 *
 	 * @param \Database $database
 	 */
-	public final function __construct( \Database $database )
+	public final function __construct( cDatabase $database )
 	{
 		$this->database = $database;
 	}

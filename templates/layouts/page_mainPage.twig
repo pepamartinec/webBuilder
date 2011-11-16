@@ -1,16 +1,21 @@
 {% container Page %}
-
 <div id="header-container">
 	<header class="wrapper">
 		<h1 id="title">Your title</h1>
-		{% slot head %}
+		<nav>
+			<ul>
+				<li><a href="#">Some</a></li>
+				<li><a href="#">navigation</a></li>
+				<li><a href="#">links</a></li>
+			</ul>
+		</nav>
 	</header>
 </div>
 <div id="main" class="wrapper">
-	{% slot content %}
+	{% slot masterContent %}
 </div>
 <div id="footer-container">
 	<footer class="wrapper">
-		{% slot footer %}
+		<h3>{% slot footer %}</h3>
 	</footer>
 </div>

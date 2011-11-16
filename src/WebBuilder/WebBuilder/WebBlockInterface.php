@@ -1,6 +1,8 @@
 <?php
 namespace WebBuilder\WebBuilder;
 
+use Inspirio\Database\cDatabase;
+
 /**
  * Web block interface
  *
@@ -15,7 +17,7 @@ interface WebBlockInterface
 	 *
 	 * @param \Database $database
 	 */
-	public function __construct( \Database $database );
+	public function __construct( cDatabase $database );
 
 	/**
 	 * Setups data
