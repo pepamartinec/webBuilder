@@ -60,10 +60,6 @@ class BlocksSet extends aDataObject
 		'blocks' => array(
 			'type' => 'array[ \WebBuilder\WebBuilder\DataObjects\Block ]',
 		),
-	
-		'rootBlock' => array(
-			'type' => '\WebBuilder\WebBuilder\DataObjects\Block',
-		),
 	);
 	
 	/**
@@ -75,4 +71,25 @@ class BlocksSet extends aDataObject
 		'tableName' => 'blocks_sets',
 	);
 	
+	/**
+	 * Returns root block of set
+	 *
+	 * @return \inspirio\webBuilder\cBlockInstance
+	 */
+	public function getRootBlock()
+	{
+		if( $this->has( 'blocks' ) === false ) {
+			return null;
+		}
+	
+		foreach( $this->get( 'blocks' ) as $block ) {
+			/* @var $block Block */
+			
+			if( $block->parent === null ) {
+				return $block;
+			}
+		}
+	
+		return null;
+	}	
 }

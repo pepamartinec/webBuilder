@@ -1,6 +1,7 @@
 <?php
 namespace WebBuilder\WebBuilder;
 
+use WebBuilder\WebBuilder\DataDependencies\ConstantData;
 use WebBuilder\WebBuilder\DataObjects\WebStructureItem;
 use WebBuilder\WebBuilder\Twig\WebBuilderExtension;
 

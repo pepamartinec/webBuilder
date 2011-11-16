@@ -15,8 +15,8 @@ class WebBuilderExtension extends \Twig_Extension
 	public function getTokenParsers()
 	{
 		return array(
-			new tSlotTokenParser(),
-			new tContainerTokenParser()
+			new SlotTokenParser(),
+			new ContainerTokenParser()
 		);
 	}
 
