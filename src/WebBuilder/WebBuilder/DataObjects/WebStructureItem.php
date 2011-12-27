@@ -39,6 +39,11 @@ class WebStructureItem extends aDataObject
 			'sanitize' => 'foreingKey',
 		),
 		
+		'title' => array(
+			'dbColumn' => 'title',
+			'type' => 'string',
+		),
+		
 		'urlName' => array(
 			'dbColumn' => 'url_name',
 			'type' => 'string',
@@ -63,6 +68,10 @@ class WebStructureItem extends aDataObject
 			'dbColumn' => 'edited_by',
 			'type' => 'integer',
 		),
+		
+		'descendants' => array(
+			'type' => 'array[ WebStructureItem ]'
+		)
 	);
 	
 	/**

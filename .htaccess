@@ -485,3 +485,5 @@ Options -Indexes
 	php_value session.cookie_httponly true
 </IfModule>
 
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^.*$ index.php?route=$0 [L,QSA]

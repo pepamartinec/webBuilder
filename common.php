@@ -2,7 +2,7 @@
 
 define( 'HOST', 'localhost' );
 define( 'USER', 'root' );
-define( 'PASSWORD', 'joker123' );
+define( 'PASSWORD', '' );
 define( 'DATABASE', 'webBuilder' );
 define( 'AUTH_DATABASE_NAME', 'webBuilder' );
 

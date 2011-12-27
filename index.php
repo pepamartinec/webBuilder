@@ -5,7 +5,7 @@ include_once 'common.php';
 $database = new Inspirio\Database\cDatabase( DATABASE, HOST, USER, PASSWORD );
 
 $wsFeeder = new Inspirio\Database\cDBFeederBase( 'WebBuilder\WebBuilder\DataObjects\WebStructureItem', $database );
-$wsItem = $wsFeeder->whereColumnEq( 'url_name', '/' )->getOne();
+$wsItem = $wsFeeder->whereColumnEq( 'url_name', $_GET['route'] )->getOne();
 
 if( $wsItem == null ) {
 	echo '<h1 style="color:red;">404 - Page not found</h1>';

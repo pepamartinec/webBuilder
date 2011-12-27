@@ -1,0 +1,8 @@
+{% container Menu %}
+<nav>
+	<ul>
+	{% for item in menuItems %}
+		<li><a href="{{ item.urlName }}" title="{{ item.title }}">{{ item.title }}</a></li>
+	{% endfor %}
+	</ul>
+</nav>
