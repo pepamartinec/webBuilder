@@ -133,8 +133,9 @@ class TemplatesList implements ModuleInterface
 		
 		return new DataListResponse( true, $data, $count, function( BlocksSet $record ) {
 			return array(
-				'ID'   => $record->getID(),
-				'name' => $record->getName()
+				'ID'    => $record->getID(),
+				'name'  => $record->getName(),
+				'image' => 'images/templateThumb.png'
 			);
 		} );		
 	}

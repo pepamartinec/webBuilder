@@ -5,10 +5,13 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
 	<title>Administration</title>
+	<base href="http://dev-local/webBuilder/public/" />
 	
 	<!-- STYLESHEETS -->
 	<link rel="stylesheet" type="text/css" href="http://dev-cdn/ExtJS_4.0/resources/css/ext-all.css" />
 	<link rel="stylesheet" type="text/css" href="http://dev-cdn/extAdmin/resources/css/extAdmin.css" />
+	
+	<link rel="stylesheet" type="text/css" href="css/WebAdmin.css" />
 </head>
 <body>	
 	<!-- JS LIBS -->
@@ -50,7 +53,7 @@
 			env.init({
 				serverEndpoint  : '../extAdminEndpoint.php',
 				
-				baseHref      : 'http://http://dev-local/webBuilder/',
+				baseHref      : 'http://http://dev-local/webBuilder/public',
 				localizations : [ 'en' ],
 				debug         : true
 				

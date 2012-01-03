@@ -13,7 +13,7 @@ Ext.define( 'WebBuilder.module.TemplatesManager.TemplatesList',
 		me.store = me.module.createStore({
 			action : 'loadListData',
 			
-			model : 'WebBuilder.module.TemplatesManager.TemplatesList.Template',
+			model : 'WebBuilder.module.TemplatesManager.TemplatesList.Template'
 			
 //			sorters       : {
 //				property  : viewConfig.sort.column,
@@ -24,8 +24,12 @@ Ext.define( 'WebBuilder.module.TemplatesManager.TemplatesList',
 		me.dataList = Ext.create( 'Ext.view.View', {
 			xtype : 'dataview',
 			
-			itemCls : 'template',
-			itemTpl : ['{name}'],
+			componentCls : 'x-templates-list',
+			itemCls : 'x-item',
+			itemTpl : [
+				'<div class="thumb"><img src="{image}" title="{name}" alt="{name}" /></div>',
+				'<div class="name">{name}</div>'
+			],
 			
 			store : me.store
 		});
@@ -39,7 +43,8 @@ Ext.define( 'WebBuilder.module.TemplatesManager.TemplatesList',
 		extend : 'extAdmin.component.dataBrowser.Model',
 		
 		fields : [
-			{ name : 'name' }
+			{ name : 'name',  type : 'string' },
+			{ name : 'image', type : 'string' }
 		]
 	});
 });
