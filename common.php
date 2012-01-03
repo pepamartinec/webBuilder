@@ -11,6 +11,8 @@ define( 'PATH_TO_ROOT', __DIR__.'/' );
 define( 'PATH_TO_WEBSERVER_ROOT', __DIR__.'/../' );
 define( 'PATH_FROM_ROOT_TO_BASE', 'webBuilder/' );
 
+define( 'BASE_HREF', 'http://dev-local/'. PATH_FROM_ROOT_TO_BASE );
+
 require __DIR__.'/vendor/.composer/autoload.php';
 
 function autoload( $className )

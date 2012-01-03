@@ -8,6 +8,13 @@
 /composer.lock
 /vendor
 
+##### NON-COMPOSER LIBS #####
+/src/ExtAdmin
+/src/Inspirio
+
+##### JS LIBS #####
+/public/js/lib/extAdmin
+/public/js/lib/inspirio
 
 *.bak
 /tmp
