@@ -1,27 +1,24 @@
 <?php
 namespace WebBuilder\WebBuilder\ExtAdmin\TemplatesManager;
 
-use ExtAdmin\ModuleInterface;
-
-use ExtAdmin\Request\DataRequest;
-
+use ExtAdmin\Module\DataBrowser\GridList;
 use WebBuilder\WebBuilder\DataObjects\BlocksSet;
+use ExtAdmin\Request\DataRequest;
 use ExtAdmin\Response\DataListResponse;
-use ExtAdmin\Module\DataList\DataList;
 use ExtAdmin\RequestInterface;
 use Inspirio\Database\cDBFeederBase;
 use Inspirio\Database\cDatabase;
 
-class TemplatesList implements ModuleInterface
+class TemplatesList extends GridList
 {
 	/**
 	 * @var cDatabase
 	 */
 	protected $database;
-	
+
 	/**
 	 * Module constructor
-	 * 
+	 *
 	 * @param cDatabase $database
 	 * @param \SimpleXMLElement $labels
 	 */
@@ -29,7 +26,7 @@ class TemplatesList implements ModuleInterface
 	{
 		$this->database = $database;
 	}
-	
+
 	/**
 	 * Returns module actions definition
 	 *
@@ -48,6 +45,7 @@ class TemplatesList implements ModuleInterface
 				'dataDep' => false,
 				'params'  => array(
 					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
+					'mode' => 'inline',
 					'data' => 'empty'
 				),
 				'enabled' => true
@@ -59,6 +57,7 @@ class TemplatesList implements ModuleInterface
 				'dataDep' => true,
 				'params'  => array(
 					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
+					'mode' => 'inline',
 					'data' => 'copy'
 				),
 				'enabled' => true
@@ -70,22 +69,24 @@ class TemplatesList implements ModuleInterface
 				'dataDep' => true,
 				'params'  => array(
 					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
+					'mode' => 'inline',
 					'data' => 'inherited'
 				),
 				'enabled' => true
 			),
-			
+
 			'edit' => array(
 				'title'   => 'Upravit',
 				'type'    => 'form',
 				'dataDep' => true,
 				'params'  => array(
 					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
+					'mode' => 'inline',
 					'data' => 'record'
 				),
 				'enabled' => true
 			),
-			
+
 			'remove' => array(
 				'title'   => 'Smazat',
 				'type'    => 'remove',
@@ -93,18 +94,15 @@ class TemplatesList implements ModuleInterface
 			),
 		);
 	}
-	
+
 	/**
-	 * Returns module UI definition
-	 *
-	 * Used for defining UI within concrete modules implementations
+	 * Module UI definition
 	 *
 	 * @return array
 	 */
-	public function getViewConfiguration()
+	public function viewConfiguration()
 	{
 		return array(
-			'type' => 'WebBuilder.module.TemplatesManager.TemplatesList',
 			'barActions' => array(
 				array(
 					'type'  => 'splitButton',
@@ -114,9 +112,15 @@ class TemplatesList implements ModuleInterface
 				'edit',
 				'remove'
 			),
+
+			'fields' => array(
+				'name' => array(
+					'title' => 'Název'
+				)
+			),
 		);
 	}
-	
+
 	/**
 	 * Loads data for dataList
 	 *
@@ -124,30 +128,30 @@ class TemplatesList implements ModuleInterface
 	 * @return DataListResponse
 	 */
 	public function loadListData( RequestInterface $request )
-	{		
+	{
 		$request = new DataRequest( $request );
-		
+
 		$dataFeeder = new cDBFeederBase( 'WebBuilder\\WebBuilder\\DataObjects\\BlocksSet', $this->database );
 		$data       = $dataFeeder->get();
 		$count      = $dataFeeder->getCount();
-		
+
 		return new DataListResponse( true, $data, $count, function( BlocksSet $record ) {
 			return array(
 				'ID'    => $record->getID(),
 				'name'  => $record->getName(),
 				'image' => 'images/templateThumb.png'
 			);
-		} );		
+		} );
 	}
-	
+
 	/**
 	 * Removes selected items
-	 * 
+	 *
 	 * @param  RequestInterface $request
 	 * @return Response
 	 */
 	public function remove( RequestInterface $request )
 	{
-		
+
 	}
 }

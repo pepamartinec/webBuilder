@@ -35,7 +35,7 @@ Ext.define( 'WebBuilder.module.TemplatesManager.TemplatesList',
 		});
 		
 		me.callParent( arguments );
-	},
+	}
 	
 }, function() {
 	

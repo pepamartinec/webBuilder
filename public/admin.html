@@ -42,11 +42,15 @@
 		}
 		
 		Ext.require([
+		 	'extAdmin.ErrorHandler',
 			'extAdmin.Environment',
 			'extAdmin.Desktop'
 		]);
 		
 		Ext.onReady( function() {
+			// setup error handling
+			extAdmin.ErrorHandler.setDebug( true );
+			
 			// create & init environment
 			var env = Ext.create( 'extAdmin.Environment' );
 			
