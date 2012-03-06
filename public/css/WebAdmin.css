@@ -3,3 +3,36 @@
 .x-templates-list {  }
 .x-templates-list > .x-item { display : inline-block; margin: 10px; padding: 5px; text-align: center; }
 .x-templates-list > .x-item > .name { padding: 3px; }
+
+.i-application-form { background-image: url('../images/icons/application_form.png'); }
+.i-application-form-add { background-image: url('../images/icons/application_form_add.png'); }
+.i-application-form-edit { background-image: url('../images/icons/application_form_edit.png'); }
+.i-application-go { background-image: url('../images/icons/application_go.png'); }
+.i-application-osx-terminal { background-image: url('../images/icons/application_osx_terminal.png'); }
+.i-arrow-refresh { background-image: url('../images/icons/arrow_refresh.png'); }
+.i-arrow-rotate-anticlockwise { background-image: url('../images/icons/arrow_rotate_anticlockwise.png'); }
+.i-cancel { background-image: url('../images/icons/cancel.png'); }
+.i-chart-bar-error { background-image: url('../images/icons/chart_bar_error.png'); }
+.i-clock-go { background-image: url('../images/icons/clock_go.png'); }
+.i-coins { background-image: url('../images/icons/coins.png'); }
+.i-delete { background-image: url('../images/icons/delete.png'); }
+.i-delete-email { background-image: url('../images/icons/delete_email.png'); }
+.i-disk { background-image: url('../images/icons/disk.png'); }
+.i-email { background-image: url('../images/icons/email.png'); }
+.i-email-add { background-image: url('../images/icons/email_add.png'); }
+.i-email-delete { background-image: url('../images/icons/email_delete.png'); }
+.i-email-edit { background-image: url('../images/icons/email_edit.png'); }
+.i-email-go { background-image: url('../images/icons/email_go.png'); }
+.i-error { background-image: url('../images/icons/error.png'); }
+.i-error-go { background-image: url('../images/icons/error_go.png'); }
+.i-lorry-add { background-image: url('../images/icons/lorry_add.png'); }
+.i-lorry-go { background-image: url('../images/icons/lorry_go.png'); }
+.i-money { background-image: url('../images/icons/money.png'); }
+.i-money-go { background-image: url('../images/icons/money_go.png'); }
+.i-money-magnify { background-image: url('../images/icons/money_magnify.png'); }
+.i-package-go { background-image: url('../images/icons/package_go.png'); }
+.i-page-white-acrobat { background-image: url('../images/icons/page_white_acrobat.png'); }
+.i-page-white-excel { background-image: url('../images/icons/page_white_excel.png'); }
+.i-table-add { background-image: url('../images/icons/table_add.png'); }
+.i-table-edit { background-image: url('../images/icons/table_edit.png'); }
+.i-time-go { background-image: url('../images/icons/time_go.png'); }

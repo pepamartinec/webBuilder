@@ -4,7 +4,7 @@ namespace WebBuilder\WebBuilder\ExtAdmin\TemplatesManager;
 use ExtAdmin\Module\DataBrowser\GridList;
 use WebBuilder\WebBuilder\DataObjects\BlocksSet;
 use ExtAdmin\Request\DataRequest;
-use ExtAdmin\Response\DataListResponse;
+use ExtAdmin\Response\DataBrowserResponse;
 use ExtAdmin\RequestInterface;
 use Inspirio\Database\cDBFeederBase;
 use Inspirio\Database\cDatabase;
@@ -34,69 +34,83 @@ class TemplatesList extends GridList
 	 *
 	 * @return array
 	 */
-	public function getActions()
+	public function actions()
 	{
 		return array(
 			'loadListData' => true,
 
 			'createEmpty' => array(
 				'title'   => 'Vytvořit prázdnou',
-				'type'    => 'form',
+				'type'    => 'edit',
 				'dataDep' => false,
 				'params'  => array(
-					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
-					'mode' => 'inline',
-					'data' => 'empty'
+					'editor'     => 'TemplateEditor',
+					'loadAction' => array( 'createTemplate' )
 				),
-				'enabled' => true
 			),
 
-			'createCopy' => array(
-				'title'   => 'Vytvořit kopii',
-				'type'    => 'form',
-				'dataDep' => true,
-				'params'  => array(
-					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
-					'mode' => 'inline',
-					'data' => 'copy'
-				),
-				'enabled' => true
-			),
 
-			'createInherited' => array(
-				'title'   => 'Vytvořit poděděnou',
-				'type'    => 'form',
-				'dataDep' => true,
-				'params'  => array(
-					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
-					'mode' => 'inline',
-					'data' => 'inherited'
-				),
-				'enabled' => true
-			),
+// 			array(
+// 				'title'   => 'Vytvořit prázdnou',
+// 				'type'    => 'form',
+// 				'dataDep' => false,
+// 				'params'  => array(
+// 					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
+// 					'mode' => 'inline',
+// 					'data' => 'empty'
+// 				),
+// 				'enabled' => true
+// 			),
 
-			'edit' => array(
-				'title'   => 'Upravit',
-				'type'    => 'form',
-				'dataDep' => true,
-				'params'  => array(
-					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
-					'mode' => 'inline',
-					'data' => 'record'
-				),
-				'enabled' => true
-			),
+// 			'createCopy' => array(
+// 				'title'   => 'Vytvořit kopii',
+// 				'type'    => 'form',
+// 				'dataDep' => true,
+// 				'params'  => array(
+// 					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
+// 					'mode' => 'inline',
+// 					'data' => 'copy'
+// 				),
+// 				'enabled' => true
+// 			),
 
-			'remove' => array(
+// 			'createInherited' => array(
+// 				'title'   => 'Vytvořit poděděnou',
+// 				'type'    => 'form',
+// 				'dataDep' => true,
+// 				'params'  => array(
+// 					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
+// 					'mode' => 'inline',
+// 					'data' => 'inherited'
+// 				),
+// 				'enabled' => true
+// 			),
+
+// 			'edit' => array(
+// 				'title'   => 'Upravit',
+// 				'type'    => 'form',
+// 				'dataDep' => true,
+// 				'params'  => array(
+// 					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
+// 					'mode' => 'inline',
+// 					'data' => 'record'
+// 				),
+// 				'enabled' => true
+// 			),
+
+			'delete' => array(
 				'title'   => 'Smazat',
-				'type'    => 'remove',
-				'enabled' => true
+				'type'    => 'delete',
+				'enabled' => true,
+// 				'enabled' => function( BlocksSet $record ) {
+// 					return ( $record->getID() % 2 ) == 0;
+// 				}
 			),
 		);
 	}
 
 	/**
-	 * Module UI definition
+	 * Module viewConfiguration
 	 *
 	 * @return array
 	 */
@@ -110,12 +124,17 @@ class TemplatesList extends GridList
 					'items' => array( 'createEmpty', 'createCopy', 'createInherited' )
 				),
 				'edit',
-				'remove'
+				'delete'
 			),
 
 			'fields' => array(
 				'name' => array(
 					'title' => 'Název'
+				),
+
+				'algo' => array(
+					'type'  => 'actioncolumn',
+					'items' => array( 'edit', 'delete' )
 				)
 			),
 		);
@@ -125,7 +144,7 @@ class TemplatesList extends GridList
 	 * Loads data for dataList
 	 *
 	 * @param  RequestInterface $request
-	 * @return DataListResponse
+	 * @return DataBrowserResponse
 	 */
 	public function loadListData( RequestInterface $request )
 	{
@@ -135,11 +154,11 @@ class TemplatesList extends GridList
 		$data       = $dataFeeder->get();
 		$count      = $dataFeeder->getCount();
 
-		return new DataListResponse( true, $data, $count, function( BlocksSet $record ) {
+		return new DataBrowserResponse( true, $data, $count, function( BlocksSet $record ) {
 			return array(
 				'ID'    => $record->getID(),
 				'name'  => $record->getName(),
-				'image' => 'images/templateThumb.png'
+				'image' => 'images/templateThumb.png',
 			);
 		} );
 	}
@@ -150,8 +169,12 @@ class TemplatesList extends GridList
 	 * @param  RequestInterface $request
 	 * @return Response
 	 */
-	public function remove( RequestInterface $request )
+	public function delete( RequestInterface $request )
 	{
-
+		var_dump( $request->getParameter( 'recordID', 'int' ) );
+exit;
+// 		$dataFeeder = new cDBFeederBase( 'WebBuilder\\WebBuilder\\DataObjects\\BlocksSet', $this->database );
+// 		$data       = $dataFeeder->get();
+// 		$count      = $dataFeeder->getCount();
 	}
 }

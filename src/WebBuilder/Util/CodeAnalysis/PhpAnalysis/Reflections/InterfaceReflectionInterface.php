@@ -6,14 +6,14 @@ use WebBuilder\Util\CodeAnalysis\ReflectionInterface;
 interface InterfaceReflectionInterface extends ReflectionInterface
 {
 	/**
-	 * Returns definition file name
+	 * Returns viewConfiguration file name
 	 *
 	 * @return string|null
 	 */
 	public function getDefinitionFile();
 
 	/**
-	 * Returns line number within definition file
+	 * Returns line number within viewConfiguration file
 	 *
 	 * @return int|null
 	 */

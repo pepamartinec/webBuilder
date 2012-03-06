@@ -51,6 +51,9 @@
 			// setup error handling
 			extAdmin.ErrorHandler.setDebug( true );
 			
+			// enable qTips
+			Ext.tip.QuickTipManager.init();
+			
 			// create & init environment
 			var env = Ext.create( 'extAdmin.Environment' );
 			
