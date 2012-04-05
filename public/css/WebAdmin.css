@@ -76,10 +76,11 @@
 }
 
 .x-template-canvas .x-block {
-	border : 2px dotted #000;
-	border-radius : 7px;
-	margin : 7px;
-	padding : 7px;
+	background-color : #fff;
+	border           : 2px dotted #000;
+	border-radius    : 7px;
+	margin           : 7px;
+	padding          : 0px;
 }
 
 .x-template-canvas .x-block.x-over {
@@ -87,11 +88,15 @@
 }
 	
 .x-template-canvas .x-block > .x-title {
-	float       : left;
-	font-weight : bold;
+	font-size        : 12px;
+	font-weight      : bold;
+	background-color : #F0F2FE;
+	padding          : 7px;
+	
+	cursor : pointer;
 }
 		
-.x-template-canvas .x-block > .x-tools {
+.x-template-canvas .x-block .x-tools {
 	float : right;
 }
 
@@ -119,15 +124,17 @@
 }
 		
 .x-template-canvas .x-slot {
-	clear  : both;
-	border : 1px dotted #999;
-	border-radius : 7px;
-	margin-top : 7px;
-	padding : 7px;
+	clear            : both;
+	background-color : #fafafa;
+	border           : 1px dotted #999;
+	border-radius    : 7px;
+	margin           : 7px;
+	padding          : 0px;
 }
 
 .x-template-canvas .x-slot > .x-title {
 	font-size: 9px;
+	margin-bottom : 7px;
 }
 
 .x-template-canvas .x-slot.x-over {

@@ -495,19 +495,25 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 				children : [{
 					tag  : 'div',
 					cls  : [ me.titleCls, me.blockTitleCls ].join(' '),
-					html : block.get('title')
-				},{
-			    	tag : 'div',
-			    	cls : me.blockToolsCls,
 
-			    	children : [{
-			    		tag : 'div',
-			    		cls : [ me.blockToolCls, me.configToolCls ].join(' ')
-			    	},{
-			    		tag : 'div',
-			    		cls : [ me.blockToolCls, me.removeToolCls ].join(' ')
-			    	}]
-			    }]
+					children : [{
+						tag  : 'span',
+						html : block.get('title')
+
+					},{
+				    	tag : 'div',
+				    	cls : me.blockToolsCls,
+
+				    	children : [{
+				    		tag : 'div',
+				    		cls : [ me.blockToolCls, me.configToolCls ].join(' ')
+
+				    	},{
+				    		tag : 'div',
+				    		cls : [ me.blockToolCls, me.removeToolCls ].join(' ')
+				    	}]
+				    }]
+				}]
 			};
 
 		// create slots DOM nodes definition
