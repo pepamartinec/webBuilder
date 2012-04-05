@@ -18,4 +18,18 @@ class WebPage extends WebBlock
 			'pageObject' => 'iDataObject'
 		);
 	}
+
+	public static function config()
+	{
+		return array(
+			'stylesheet' => array(
+				'type'      => 'combo',
+				'default'   => 'public/css/style.css',
+				'allowNull' => false,
+				'items'     => array(
+					'public/css/style.css' => 'Standard'
+				),
+			)
+		);
+	}
 }

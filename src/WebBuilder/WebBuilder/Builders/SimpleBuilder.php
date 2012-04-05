@@ -45,17 +45,17 @@ class SimpleBuilder implements BlocksBuilderInterface
 
 			$block->data[ $property ] = $dependency->getTargetData();
 		}
-		
+
 		// setup provided data
 		if( method_exists( $block->blockName, 'setupData' ) ) {
 			$blockObj = $this->blocksFactory->createBlock( $block->blockName );
 
 			$block->data += call_user_func_array( array( $blockObj, 'setupData' ), $block->data );
 		}
-		
+
 		/* @var $template \WebBuilder\WebBuilder\Twig\WebBuilderTemplate */
 		$template = $this->twig->loadTemplate( $block->template );
-		
+
 		// TODO ugly hack
 		$template->setBuilder( $this );
 		$template->setBlock( $block );
@@ -80,7 +80,7 @@ class SimpleBuilder implements BlocksBuilderInterface
 		if( !isset( $block->slots[ $slotName ] ) ) {
 			return;
 		}
-		
+
 		$originalData = null;
 		if( $runtimeData !== null ) {
 			$originalData =& $block->data;
@@ -92,7 +92,7 @@ class SimpleBuilder implements BlocksBuilderInterface
 			echo $this->renderBlock( $innerBlock );
 		}
 		echo '</div>';
-		
+
 		if( $originalData !== null ) {
 			$block->data =& $originalData;
 		}

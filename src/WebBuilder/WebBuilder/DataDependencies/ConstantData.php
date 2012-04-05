@@ -10,12 +10,12 @@ class ConstantData implements DataDependencyInterface
 	 * @var string
 	 */
 	protected $property;
-	
+
 	/**
 	 * @var mixed
 	 */
 	protected $value;
-	
+
 	/**
 	 * Constructor
 	 *
@@ -27,7 +27,7 @@ class ConstantData implements DataDependencyInterface
 		$this->property = $property;
 		$this->value    = $value;
 	}
-	
+
 	/**
 	 * Returns target block property name
 	 *
@@ -37,7 +37,7 @@ class ConstantData implements DataDependencyInterface
 	{
 		return $this->property;
 	}
-	
+
 	/**
 	 * Returns data provider
 	 *
@@ -47,7 +47,7 @@ class ConstantData implements DataDependencyInterface
 	{
 		return null;
 	}
-	
+
 	/**
 	 * Returns dependency target data
 	 *

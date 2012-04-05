@@ -3,7 +3,7 @@ Ext.define( 'WebBuilder.module.TemplatesManager.TemplateEditor',
 	extend : 'Ext.tab.Panel',
 	
 	mixins : {
-		editor : 'extAdmin.component.editor.EditorFeature'
+		editor : 'extAdmin.component.editor.DataEditorFeature'
 	},
 	
 	requires : [
@@ -13,12 +13,6 @@ Ext.define( 'WebBuilder.module.TemplatesManager.TemplateEditor',
 	
 	width  : 800,
 	height : 600,
-	
-	/**
-	 * @required
-	 * @cfg {extAdmin.Environment} env
-	 */
-	env : null,
 	
 	/**
 	 * Editor initialization
@@ -46,14 +40,29 @@ Ext.define( 'WebBuilder.module.TemplatesManager.TemplateEditor',
 		
 		
 		me.border = false;
-		me.items = [ generalTab, canvasTab ];
+		me.items  = [ generalTab, canvasTab ];
 		
 		
-		me.title = 'Úprava šablony';
+		me.title   = 'Úprava šablony';
 		me.iconCls = 'i-delete';
 		
 		me.mixins.editor.constructor.call( me );
 		
 		me.callParent( arguments );
+	},
+	
+	setData : function( data )
+	{
+		console.log( 'set data ', data );
+	},
+	
+	getData : function()
+	{
+		return {};
+	},
+	
+	isDirty : function()
+	{
+		return true;
 	}
 });

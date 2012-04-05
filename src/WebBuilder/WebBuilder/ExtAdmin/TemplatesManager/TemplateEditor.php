@@ -1,12 +1,16 @@
 <?php
 namespace WebBuilder\WebBuilder\ExtAdmin\TemplatesManager;
 
+use WebBuilder\WebBuilder\WebBuilderInterface;
+use WebBuilder\WebBuilder\DataObjects\WebStructureItem;
+use ExtAdmin\Response\HtmlResponse;
+use WebBuilder\WebBuilder\Twig\WebBuilderExtension;
+use ExtAdmin\Response\CssResponse;
+use WebBuilder\WebBuilder\DataObjects\BlocksCategory;
 use ExtAdmin\Response\DataStoreResponse;
-
 use ExtAdmin\Response\DataBrowserResponse;
-
 use Inspirio\Database\cDBFeederBase;
-use ExtAdmin\Response\Response;
+use ExtAdmin\Response\ActionResponse;
 use ExtAdmin\RequestInterface;
 use ExtAdmin\ResponseInterface;
 use Inspirio\Database\cDatabase;
@@ -51,7 +55,7 @@ class TemplateEditor extends DataEditor
 			'loadData_copy'      => true,
 			'loadData_inherited' => true,
 
-			'submitData' => array(
+			'saveData' => array(
 				'type' => 'save'
 			),
 
@@ -59,7 +63,9 @@ class TemplateEditor extends DataEditor
 				'type' => 'cancel'
 			),
 
-			'loadAvailableBlocks' => true
+			'loadBlocks' => true,
+			'loadSimplifiedStylesheet' => true,
+			'loadMasterBlockTemplate' => true,
 		);
 	}
 
@@ -71,15 +77,21 @@ class TemplateEditor extends DataEditor
 	public function viewConfiguration()
 	{
 		return array(
-			'type'         => 'WebBuilder.module.TemplatesManager.TemplateEditor',
-			'loadAction'   => 'loadData_record',
-			'submitAction' => 'submitData',
+			'type'       => 'WebBuilder.module.TemplatesManager.TemplateEditor',
+			'loadAction' => 'loadData_record',
+			'saveAction' => 'saveData',
 
 			'buttons' => array(
 				array(
 					'type'   => 'button',
+					'text'   => 'Dum dum',
+					'action' => 'dumAction'
+				),
+
+				array(
+					'type'   => 'button',
 					'text'   => 'Uložit',
-					'action' => 'submitData'
+					'action' => 'saveData'
 				),
 
 				array(
@@ -127,7 +139,9 @@ class TemplateEditor extends DataEditor
 	 */
 	public function loadData_new( RequestInterface $request )
 	{
-		return new Response( true );
+		$response = new ActionResponse( true );
+
+		return $response;
 	}
 
 	/**
@@ -138,8 +152,8 @@ class TemplateEditor extends DataEditor
 	 */
 	public function loadData_record( RequestInterface $request )
 	{
-		$templateID = $request->getData( 'recordID', 'int' );
-		$response   = new Response( true );
+		$templateID = $request->getData( 'ID', 'int' );
+		$response   = new ActionResponse( true );
 
 		$template = $this->loadTemplate( $templateID, $response );
 
@@ -160,8 +174,8 @@ class TemplateEditor extends DataEditor
 	 */
 	public function loadData_copy( RequestInterface $request )
 	{
-		$templateID = $request->getData( 'recordID', 'int' );
-		$response   = new Response( true );
+		$templateID = $request->getData( 'ID', 'int' );
+		$response   = new ActionResponse( true );
 
 		$template = $this->loadTemplate( $templateID, $response );
 
@@ -170,7 +184,7 @@ class TemplateEditor extends DataEditor
 		}
 
 		$template->setID( null );
-		$template->setTitle( "{$template->getTitle()} (kopie)" );
+		$template->setName( "{$template->getName()} (kopie)" );
 
 		$response->setData( $template->getInnerValues() );
 
@@ -185,8 +199,8 @@ class TemplateEditor extends DataEditor
 	 */
 	public function loadData_inherited( RequestInterface $request )
 	{
-		$templateID = $request->getData( 'recordID', 'int' );
-		$response   = new Response( true );
+		$templateID = $request->getData( 'ID', 'int' );
+		$response   = new ActionResponse( true );
 
 		$template = $this->loadTemplate( $templateID, $response );
 
@@ -208,19 +222,226 @@ class TemplateEditor extends DataEditor
 	 * @param RequestInterface $request
 	 * @return DataStoreResponse
 	 */
-	public function loadAvailableBlocks( RequestInterface $request )
+	public function loadBlocks( RequestInterface $request )
 	{
-		$blocksFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\Block', $this->database );
-		$blocks       = $blocksFeeder->getRaw();
+		$categoriesFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\BlocksCategory', $this->database );
+		$categories       = $categoriesFeeder->get();
 
-		$categories = array(
-			array( 'title' => 'Obecné', 'blocks' => $blocks ),
-			array( 'title' => 'Layout' ),
-			array( 'title' => 'Galerie obrázků' ),
-			array( 'title' => 'Stránky' ),
-			array( 'title' => 'Diskuze' ),
+		$blocksFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\Block', $this->database );
+		$blocks       = $blocksFeeder->groupBy( 'category_ID' )->get();
+
+		$templatesFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\BlockTemplate', $this->database );
+		$templates       = $templatesFeeder->groupBy( 'block_ID' )->get();
+
+		$slotsFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\BlockTemplateSlot', $this->database );
+		$slots       = $slotsFeeder->groupBy( 'template_ID' )->get();
+
+		$data = array();
+
+		foreach( $categories as $category ) {
+			/* @var $category BlocksCategory */
+			$categoryID = $category->getID();
+
+			$categoryData = array(
+				'ID'     => $categoryID,
+				'title'  => $category->getTitle(),
+				'blocks' => array(),
+			);
+
+			if( isset( $blocks[ $categoryID ] ) ) {
+				foreach( $blocks[ $categoryID ] as $block ) {
+					/* @var $block Block */
+					$blockID = $block->getID();
+
+					$blockData = array(
+						'ID'         => $blockID,
+						'categoryID' => $categoryID,
+						'title'      => $block->getTitle(),
+						'codeName'   => $block->getCodeName(),
+						'templates'  => array(),
+					);
+
+					if( isset( $templates[ $blockID ] ) ) {
+						foreach( $templates[ $blockID ] as $template ) {
+							/* @var $template BlockTemplate */
+							$templateID = $template->getID();
+
+							$templateData = array(
+								'ID'        => $templateID,
+								'blockID'   => $blockID,
+								'filename'  => $template->getFilename(),
+								'slots' => array(),
+							);
+
+							if( isset( $slots[ $templateID ] ) ) {
+								foreach( $slots[ $templateID ] as $slot ) {
+									/* @var $template BlockTemplate */
+									$slotID = $slot->getID();
+
+									$slotData = array(
+										'ID'         => $slotID,
+										'templateID' => $templateID,
+										'codeName'   => $slot->getCodeName(),
+									);
+
+									$templateData['slots'][] = $slotData;
+								}
+							}
+
+							$blockData['templates'][] = $templateData;
+						}
+					}
+
+					$categoryData['blocks'][] = $blockData;
+				}
+			}
+
+			$data[] = $categoryData;
+		}
+
+// 		$extractor = function( array $dataObjects ) {
+// 			$data = array();
+
+// 			foreach( $dataObjects as $dataObject ) {
+// 				$data[] = $dataObject->getInnerValues();
+// 			}
+
+// 			return $data;
+// 		};
+
+// 		$data = array(
+// 				'categories' => $extractor( $categories ),
+// 				'blocks'     => $extractor( $blocks ),
+// 				'templates'  => $extractor( $templates ),
+// 				'slots'      => $extractor( $slots ),
+// 		);
+
+		$response = new ActionResponse( true );
+		$response->setData( $data );
+
+		return $response;
+	}
+
+	/**
+	 * Loads simplified stylesheet
+	 *
+	 * @param RequestInterface $request
+	 * @return ResponseInterface
+	 */
+	public function loadSimplifiedStylesheet( RequestInterface $request )
+	{
+		echo $sheetFile = PATH_TO_ROOT . $request->getParameter( 'stylesheet', 'string' );
+
+		// file not found
+		if( is_file( $sheetFile ) === false ) {
+			$response = new CssResponse( '' );
+			$response->setStatus( CssResponse::S_NOT_FOUND );
+
+			return $response;
+		}
+
+		$sheetContent = file_get_contents( $sheetFile );
+
+		$parser = new \CSSParser( $sheetContent );
+		$css    = $parser->parse();
+
+		$rulesWhiteList = array(
+			'width',  'min-width',  'max-width',
+			'height', 'min-height', 'max-height',
+			'margin',
+			'float', 'clear',
+			'display'
 		);
 
-		return new DataStoreResponse( true, $categories, sizeof( $categories ) );
+		foreach( $css->getAllRuleSets() as $ruleSet ) {
+			/* @var $ruleSet \CSSDeclarationBlock */
+
+			foreach( $ruleSet->getRules() as $rule ) {
+				/* @var $rule \CSSRule */
+				if( in_array( $rule->getRule(), $rulesWhiteList ) === false ) {
+					$ruleSet->removeRule( $rule );
+				}
+			}
+
+			if( sizeof( $ruleSet->getRules() ) === 0 ) {
+				$css->remove( $ruleSet );
+			}
+		}
+
+		$response = new CssResponse( $css->__toString() );
+		$response->setLastModified( filemtime( $sheetFile ) );
+
+		return $response;
+	}
+
+	/**
+	 * Loads block template
+	 *
+	 * @param RequestInterface $request
+	 * @return ResponseInterface
+	 */
+	public function loadMasterBlockTemplate( RequestInterface $request )
+	{
+// 		$templateID = $request->getParameter( 'templateID', 'int' );
+// 		$template   = null;
+// 		$response   = new ActionResponse( true );
+
+// 		if( $templateID ) {
+// 			$templatesFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObject\\BlockTemplate', $this->database );
+// 			$template        = $templatesFeeder->whereID( $tempateID )->getID();
+// 		}
+
+// 		if( $template === null ) {
+// 			$response->setSuccess( false )
+// 			         ->setMessage( "No template with ID '{$templateID}' found" );
+
+// 			return $response;
+// 		}
+
+		// init Twig
+		$loader = new \Twig_Loader_Filesystem( PATH_TO_ROOT );
+		$twig   = new \Twig_Environment( $loader, array(
+//			'cache'               => './tmp/',
+//			'base_template_class' => '\WebBuilder\WebBuilder\Twig\WebBuilderTemplate'
+		) );
+
+		$builder = new DummyBuilder();
+		$twig->addExtension( new WebBuilderExtension( $builder ) );
+
+		/* @var $template \WebBuilder\WebBuilder\Twig\WebBuilderTemplate */
+		$template = $twig->loadTemplate( 'templates/core/webPage_html5.twig' );
+
+		// TODO ugly hack
+
+
+		$html = $template->render( array(
+			'config' => array(
+				'stylesheet' => 'public/css/style.css'
+			)
+		) );
+
+		return new HtmlResponse( $html );
+	}
+
+	/**
+	 * Saves submitted template data
+	 *
+	 * @param RequestInterface $request
+	 * @return DataStoreResponse
+	 */
+	public function saveData( RequestInterface $request )
+	{
+		$response = new ActionResponse( true );
+		$response->setMessage( 'Eeee, tohe teda ne' );
+sleep(5);
+		return $response;
+	}
+}
+
+class DummyBuilder implements WebBuilderInterface
+{
+	public function render( WebStructureItem $structureItem )
+	{
+
 	}
 }

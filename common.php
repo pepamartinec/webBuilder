@@ -15,29 +15,10 @@ define( 'BASE_HREF', 'http://dev-local/'. PATH_FROM_ROOT_TO_BASE );
 
 require __DIR__.'/vendor/.composer/autoload.php';
 
-function autoload( $className )
-{
-	if( strpos( $className, '\\' ) ) {
-		
-		switch( substr( $className, 0, 1 ) ) {
-	//		case 'b': $dir = 'blocks'; break;
-	//		case 'd': $dir = 'classes/DataObjects'; break;
-			default:  $dir = 'classes'; break;
-		}
-	
-		$nameParts = explode( '\\', $className );
-		$filePath  = __DIR__ . '/'. $dir .'/'. implode( '/', $nameParts ) .'.php';
-	
-		include $filePath;
-		
-	} else {
-		include __DIR__.'/classes/'.$className.'.inc.php';
-	}
+function exception_error_handler($errno, $errstr, $errfile, $errline ) {
+	throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 }
-
-//spl_autoload_register( 'autoload' );
-
-
+set_error_handler("exception_error_handler");
 
 
 

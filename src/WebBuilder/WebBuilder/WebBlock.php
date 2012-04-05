@@ -77,4 +77,16 @@ abstract class WebBlock implements WebBlockInterface
 
 		return $data;
 	}
+
+	/**
+	 * Block wireframe definition
+	 *
+	 * Wireframe is used for rendering block in templates administration canvas.
+	 *
+	 * @return string|null
+	 */
+	public static function config()
+	{
+		return null;
+	}
 }

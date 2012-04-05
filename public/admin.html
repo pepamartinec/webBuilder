@@ -9,6 +9,7 @@
 	
 	<!-- STYLESHEETS -->
 	<link rel="stylesheet" type="text/css" href="http://dev-cdn/ExtJS_4.1/resources/css/ext-all-debug.css" />
+	<link rel="stylesheet" type="text/css" href="http://dev-cdn/dumpJS/dump.css" />
 	<link rel="stylesheet" type="text/css" href="http://dev-cdn/extAdmin/resources/css/extAdmin.css" />
 	
 	<link rel="stylesheet" type="text/css" href="css/WebAdmin.css" />
@@ -17,21 +18,22 @@
 	<!-- JS LIBS -->
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="http://dev-cdn/tinyMce_jq_3.4/tiny_mce.js"></script>
-	<script type="text/javascript" src="http://dev-cdn/ExtJS_4.1/ext-debug.js"></script>
+	<script type="text/javascript" src="http://dev-local/ExtJS_4.1/ext-debug.js"></script>
 	
 	<!-- SETUP extAdmin -->
 	<script type="text/javascript">
 		Ext.Loader.setConfig({
-			enabled  : true,
+			enabled        : true,
 			disableCaching : false,
 			paths : {
-				'extAdmin'   : 'http://dev-cdn/extAdmin/lib',
+				'extAdmin'   : 'http://dev-local/extAdmin/lib',
 				'WebBuilder' : './js/WebBuilder/lib'
 			}
 		});
 	</script>
 	
-	<script type="text/javascript" src="http://dev-cdn/extAdmin/extAdmin.js"></script>
+	<script type="text/javascript" src="http://dev-cdn/dumpJS/dump.js"></script>
+	<script type="text/javascript" src="http://dev-local/extAdmin/extAdmin.js"></script>
 	<script type="text/javascript">	
 		// FireBug console emulation
 		if( window.console === undefined ) {
@@ -44,7 +46,9 @@
 		Ext.require([
 		 	'extAdmin.ErrorHandler',
 			'extAdmin.Environment',
-			'extAdmin.Desktop'
+			'extAdmin.Desktop',
+			
+			'WebBuilder.widget.TemplateCanvas'
 		]);
 		
 		Ext.onReady( function() {
@@ -64,9 +68,7 @@
 				localizations : [ 'en' ],
 				debug         : true
 				
-			}, function() {
-				console.log('inited');
-				
+			}, function() {				
 				// launch desktop app
 				var admin = Ext.create( 'extAdmin.Desktop', {
 					env : env

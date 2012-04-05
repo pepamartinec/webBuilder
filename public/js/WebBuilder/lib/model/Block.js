@@ -2,6 +2,11 @@ Ext.define( 'WebBuilder.model.Block',
 {
 	extend : 'extAdmin.Model',
 	
+	uses : [
+		'WebBuilder.model.BlocksCategory',
+		'WebBuilder.model.BlockTemplate'
+	],
+	
 	fields : [{
 		name : 'title',
 		type : 'string'
@@ -10,7 +15,16 @@ Ext.define( 'WebBuilder.model.Block',
 		type : 'string'
 	},{
 		name : 'codeName',
-		type : 'string',
-		mapping : 'code_name'
+		type : 'string'
+	}],
+	
+	belongsTo : [{
+		model : 'WebBuilder.model.BlocksCategory',
+		name  : 'category'
+	}],
+	
+	hasMany : [{
+		model : 'WebBuilder.model.BlockTemplate',
+		name  : 'templates'
 	}]
 });

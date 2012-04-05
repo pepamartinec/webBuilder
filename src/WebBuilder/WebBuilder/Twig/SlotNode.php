@@ -5,7 +5,7 @@ class SlotNode extends \Twig_Node
 {
 	public function __construct( $slot, $parameters, $lineNo, $tag )
 	{
-		parent::__construct( array( 'parameters' => $parameters ), array( 'name' => $slot ), $lineno, $tag );
+		parent::__construct( array( 'parameters' => $parameters ), array( 'name' => $slot ), $lineNo, $tag );
 	}
 
 	public function compile( \Twig_Compiler $compiler )

@@ -53,4 +53,13 @@ interface WebBlockInterface
 	 * @return array|null
 	 */
 	public static function contextedProvides( array $context );
+
+	/**
+	 * Block wireframe definition
+	 *
+	 * Wireframe is used for rendering block in templates administration canvas.
+	 *
+	 * @return string|null
+	 */
+	public static function wireframe();
 }

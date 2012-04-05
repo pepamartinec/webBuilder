@@ -1,8 +1,8 @@
-Ext.define( 'WebBuilder.model.BlockCategory',
+Ext.define( 'WebBuilder.model.BlocksCategory',
 {
-	extend : 'Ext.data.Model',
+	extend : 'extAdmin.component.Model',
 	
-	requires : [
+	uses : [
 		'WebBuilder.model.Block'
 	],
 	

@@ -41,67 +41,45 @@ class TemplatesList extends GridList
 
 			'createEmpty' => array(
 				'title'   => 'Vytvořit prázdnou',
-				'type'    => 'edit',
-				'dataDep' => false,
+				'type'    => 'create',
 				'params'  => array(
-					'editor'     => 'TemplateEditor',
-					'loadAction' => array( 'createTemplate' )
+					'editor'      => 'TemplateEditor',
+					'loadDefault' => 'loadData_new'
 				),
 			),
 
+			'createCopy' => array(
+				'title'   => 'Vytvořit kopii',
+				'type'    => 'create',
+				'dataDep' => true,
+				'params'  => array(
+					'editor'      => 'TemplateEditor',
+					'loadDefault' => 'loadData_copy'
+				),
+			),
 
-// 			array(
-// 				'title'   => 'Vytvořit prázdnou',
-// 				'type'    => 'form',
-// 				'dataDep' => false,
-// 				'params'  => array(
-// 					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
-// 					'mode' => 'inline',
-// 					'data' => 'empty'
-// 				),
-// 				'enabled' => true
-// 			),
+			'createInherited' => array(
+				'title'   => 'Vytvořit poděděnou',
+				'type'    => 'create',
+				'dataDep' => true,
+				'params'  => array(
+					'editor'      => 'TemplateEditor',
+					'loadDefault' => 'loadData_inherited'
+				),
+			),
 
-// 			'createCopy' => array(
-// 				'title'   => 'Vytvořit kopii',
-// 				'type'    => 'form',
-// 				'dataDep' => true,
-// 				'params'  => array(
-// 					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
-// 					'mode' => 'inline',
-// 					'data' => 'copy'
-// 				),
-// 				'enabled' => true
-// 			),
-
-// 			'createInherited' => array(
-// 				'title'   => 'Vytvořit poděděnou',
-// 				'type'    => 'form',
-// 				'dataDep' => true,
-// 				'params'  => array(
-// 					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
-// 					'mode' => 'inline',
-// 					'data' => 'inherited'
-// 				),
-// 				'enabled' => true
-// 			),
-
-// 			'edit' => array(
-// 				'title'   => 'Upravit',
-// 				'type'    => 'form',
-// 				'dataDep' => true,
-// 				'params'  => array(
-// 					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
-// 					'mode' => 'inline',
-// 					'data' => 'record'
-// 				),
-// 				'enabled' => true
-// 			),
+			'edit' => array(
+				'title'  => 'Upravit',
+				'type'   => 'edit',
+				'params' => array(
+					'editor'      => 'TemplateEditor',
+					'loadDefault' => 'loadData_record'
+				),
+			),
 
 			'delete' => array(
 				'title'   => 'Smazat',
 				'type'    => 'delete',
-				'enabled' => true,
 // 				'enabled' => function( BlocksSet $record ) {
 // 					return ( $record->getID() % 2 ) == 0;
 // 				}

@@ -40,33 +40,31 @@ class PagesList extends GridList
 			'loadListData' => true,
 
 			'create' => array(
-				'title'   => 'Vytvořit',
-				'type'    => 'form',
-				'dataDep' => false,
-				'params'  => array(
-					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
-					'mode' => 'inline',
-					'data' => 'empty'
+				'title'  => 'Vytvořit',
+				'type'   => 'create',
+				'params' => array(
+					'editor'     => 'PageEditor',
+					'loadAction' => 'loadData_new',
 				),
-				'enabled' => true
-			),
-			'edit' => array(
-				'title'   => 'Upravit',
-				'type'    => 'form',
-				'dataDep' => true,
-				'params'  => array(
-					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
-					'mode' => 'inline',
-					'data' => 'record'
-				),
-				'enabled' => true
 			),
 
-			'delete' => array(
-				'title'   => 'Smazat',
-				'type'    => 'delete',
-				'enabled' => true
-			),
+// 			'edit' => array(
+// 				'title'   => 'Upravit',
+// 				'type'    => 'form',
+// 				'dataDep' => true,
+// 				'params'  => array(
+// 					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
+// 					'mode' => 'inline',
+// 					'data' => 'record'
+// 				),
+// 				'enabled' => true
+// 			),
+
+// 			'delete' => array(
+// 				'title'   => 'Smazat',
+// 				'type'    => 'delete',
+// 				'enabled' => true
+// 			),
 		);
 	}
 

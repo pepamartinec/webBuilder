@@ -1,4 +1,4 @@
-@CHARSET "UTF-8";
+@charset "UTF-8";
 
 .x-templates-list {  }
 .x-templates-list > .x-item { display : inline-block; margin: 10px; padding: 5px; text-align: center; }
@@ -9,12 +9,14 @@
 .i-application-form-edit { background-image: url('../images/icons/application_form_edit.png'); }
 .i-application-go { background-image: url('../images/icons/application_go.png'); }
 .i-application-osx-terminal { background-image: url('../images/icons/application_osx_terminal.png'); }
+.i-arrow-out { background-image: url('../images/icons/arrow_out.png'); }
 .i-arrow-refresh { background-image: url('../images/icons/arrow_refresh.png'); }
 .i-arrow-rotate-anticlockwise { background-image: url('../images/icons/arrow_rotate_anticlockwise.png'); }
 .i-cancel { background-image: url('../images/icons/cancel.png'); }
 .i-chart-bar-error { background-image: url('../images/icons/chart_bar_error.png'); }
 .i-clock-go { background-image: url('../images/icons/clock_go.png'); }
 .i-coins { background-image: url('../images/icons/coins.png'); }
+.i-database-gear { background-image: url('../images/icons/database_gear.png'); }
 .i-delete { background-image: url('../images/icons/delete.png'); }
 .i-delete-email { background-image: url('../images/icons/delete_email.png'); }
 .i-disk { background-image: url('../images/icons/disk.png'); }
@@ -25,14 +27,116 @@
 .i-email-go { background-image: url('../images/icons/email_go.png'); }
 .i-error { background-image: url('../images/icons/error.png'); }
 .i-error-go { background-image: url('../images/icons/error_go.png'); }
+.i-folder { background-image: url('../images/icons/folder.png'); }
+.i-folder-explore { background-image: url('../images/icons/folder_explore.png'); }
+.i-help { background-image: url('../images/icons/help.png'); }
 .i-lorry-add { background-image: url('../images/icons/lorry_add.png'); }
 .i-lorry-go { background-image: url('../images/icons/lorry_go.png'); }
 .i-money { background-image: url('../images/icons/money.png'); }
 .i-money-go { background-image: url('../images/icons/money_go.png'); }
 .i-money-magnify { background-image: url('../images/icons/money_magnify.png'); }
+.i-monitor { background-image: url('../images/icons/monitor.png'); }
 .i-package-go { background-image: url('../images/icons/package_go.png'); }
 .i-page-white-acrobat { background-image: url('../images/icons/page_white_acrobat.png'); }
 .i-page-white-excel { background-image: url('../images/icons/page_white_excel.png'); }
+.i-server-from { background-image: url('../images/icons/server_from.png'); }
+.i-server-to { background-image: url('../images/icons/server_to.png'); }
 .i-table-add { background-image: url('../images/icons/table_add.png'); }
 .i-table-edit { background-image: url('../images/icons/table_edit.png'); }
 .i-time-go { background-image: url('../images/icons/time_go.png'); }
+
+.x-blocks-list {
+	
+}
+
+.x-blocks-list .x-dataview {
+
+}
+
+.x-blocks-list .x-dataview-item {
+	margin  : 5px auto;
+	padding : 3px;
+	width   : 90px;
+	height  : 50px;
+	
+	text-align    : center;
+	border-radius : 3px;
+}
+
+.x-blocks-list .x-dataview-item:hover,
+.x-blocks-list .x-view-selected {
+	background-color : #dfe8f6;
+	border           : 1px solid #abf;
+}
+
+
+
+.x-template-canvas {
+	padding : 0px;
+}
+
+.x-template-canvas .x-block {
+	border : 2px dotted #000;
+	border-radius : 7px;
+	margin : 7px;
+	padding : 7px;
+}
+
+.x-template-canvas .x-block.x-over {
+	border-style: solid;
+}
+	
+.x-template-canvas .x-block > .x-title {
+	float       : left;
+	font-weight : bold;
+}
+		
+.x-template-canvas .x-block > .x-tools {
+	float : right;
+}
+
+.x-template-canvas .x-block .x-tool {
+	width      : 16px;
+	height     : 16px;
+	margin     : 0px 3px;
+	float      : left;
+	cursor     : pointer;
+	background : transparent no-repeat center center;
+}
+
+.x-template-canvas .x-block .x-tool.x-config {
+	background-image: url('../images/icons/cog.png');
+}
+
+.x-template-canvas .x-block .x-tool.x-remove {
+	background-image: url('../images/icons/delete.png');
+}
+
+.x-template-canvas > .x-slot {
+	margin : auto;
+	width  : 95%;
+	height : 95%;
+}
+		
+.x-template-canvas .x-slot {
+	clear  : both;
+	border : 1px dotted #999;
+	border-radius : 7px;
+	margin-top : 7px;
+	padding : 7px;
+}
+
+.x-template-canvas .x-slot > .x-title {
+	font-size: 9px;
+}
+
+.x-template-canvas .x-slot.x-over {
+	border-style: solid;
+}
+
+.x-template-canvas .x-insert-pointer {
+	width  : 95%;
+	height : 0px;
+	margin : 0px auto;
+	border : 1px solid #000;
+}
