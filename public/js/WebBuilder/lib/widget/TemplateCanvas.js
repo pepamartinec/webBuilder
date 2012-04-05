@@ -242,7 +242,7 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 		Ext.EventManager.on( doc, 'click',     me.handleIframeClick,     me );
 
 		me.dragZone = Ext.create( 'WebBuilder.widget.TemplateCanvas.DragZone', me.bodyEl, {
-			ddGroup : me.ddGroup,
+			ddGroup : me.ddGroup +'-inner',
 
 			blockCls      : me.blockCls,
 			blockTitleCls : me.blockTitleCls,
@@ -250,7 +250,7 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 		});
 
 		me.dropZone = Ext.create( 'WebBuilder.widget.TemplateCanvas.DropZone', me.iframeEl, {
-			ddGroup        : me.ddGroup,
+			ddGroup        : me.ddGroup +'-inner',
 			instancesStore : me.instancesStore,
 
 			blockCls     : me.blockCls,
@@ -282,8 +282,9 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 		var me  = this,
 	        doc = me.iframeEl.dom.contentDocument;
 
-		Ext.EventManager.un( doc, 'mousemove', me.handleMouseMove );
-		Ext.EventManager.un( doc, 'mouseup',   me.handleMouseUp   );
+		Ext.EventManager.un( doc, 'mousemove', me.handleIframeMouseMove );
+		Ext.EventManager.un( doc, 'mouseup',   me.handleIframeMouseUp   );
+		Ext.EventManager.un( doc, 'click',     me.handleIframeClick   );
 
 		extAdmin.removeElementGetter( doc.getElementById );
 	},
