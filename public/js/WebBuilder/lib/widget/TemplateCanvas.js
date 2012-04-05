@@ -4,9 +4,8 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 	requires : [
 		'extAdmin.patch.DropZoneTargetInitialization',
 
-		'WebBuilder.widget.TemplateCanvas.DragZone',
-		'WebBuilder.widget.TemplateCanvas.DropZone',
-		'WebBuilder.widget.TemplateCanvas.BlocksListDropZone',
+		'WebBuilder.widget.templateCanvas.DragZone',
+		'WebBuilder.widget.templateCanvas.DropZone'
 	],
 
 	/**
@@ -241,26 +240,15 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 		Ext.EventManager.on( doc, 'mouseup',   me.handleIframeMouseUp,   me );
 		Ext.EventManager.on( doc, 'click',     me.handleIframeClick,     me );
 
-		me.dragZone = Ext.create( 'WebBuilder.widget.TemplateCanvas.DragZone', me.bodyEl, {
-			ddGroup : me.ddGroup +'-inner',
+		me.dragZone = Ext.create( 'WebBuilder.widget.templateCanvas.DragZone', me.bodyEl, {
+			ddGroup : me.ddGroup,
 
 			blockCls      : me.blockCls,
 			blockTitleCls : me.blockTitleCls,
 			dragCls       : me.dragCls
 		});
 
-		me.dropZone = Ext.create( 'WebBuilder.widget.TemplateCanvas.DropZone', me.iframeEl, {
-			ddGroup        : me.ddGroup +'-inner',
-			instancesStore : me.instancesStore,
-
-			blockCls     : me.blockCls,
-			slotCls      : me.slotCls,
-			overCls      : me.overCls,
-			insertPtrDom : me.insertPtrDom,
-			instanceIdRe : me.instanceIdRe
-		});
-
-		me.blocksListdropZone = Ext.create( 'WebBuilder.widget.TemplateCanvas.BlocksListDropZone', me.iframeEl, {
+		me.dropZone = Ext.create( 'WebBuilder.widget.templateCanvas.DropZone', me.iframeEl, {
 			ddGroup        : me.ddGroup,
 			instancesStore : me.instancesStore,
 

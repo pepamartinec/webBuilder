@@ -1,4 +1,4 @@
-Ext.define( 'WebBuilder.widget.TemplateCanvas.AbstractDropZone', {
+Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 	extend : 'Ext.dd.DropZone',
 
 	/**
@@ -163,5 +163,73 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas.AbstractDropZone', {
 	getTargetSlotName : function( slotDom )
 	{
 		return slotDom.children[0].innerHTML;
+	},
+
+	/**
+	 * Block drop handler
+	 *
+	 * @param {HTMLElement} [slotDom]
+	 * @param {Ext.dd.DragSource} [dragSource]
+	 * @param {Event} [e]
+	 * @param {Object} [data]
+	 * @returns {Boolean}
+	 */
+	onNodeDrop : function( slotDom, dragSource, e, data )
+	{
+		// ugly switch is needed here because we have more kind
+		// of dragSources (blockList, canvas self), but Ext allows
+		// only one DropZone instance per target
+
+		if( dragSource instanceof WebBuilder.widget.blocksList.DragZone ) {
+			return this.handleBlockListDrop( slotDom, dragSource, e, data );
+		}
+
+		if( dragSource instanceof WebBuilder.widget.templateCanvas.DragZone ) {
+			return this.handleCanvasDrop( slotDom, dragSource, e, data );
+		}
+
+		return false;
+	},
+
+	handleBlockListDrop : function( slotDom, dragSource, e, data )
+	{
+		var block          = data.records[0],
+		    targetInstance = this.getTargetInstance( slotDom );
+
+		// no block supplied
+		if( block == null || targetInstance == null ) {
+			return false;
+		}
+
+		var position  = this.findInsertPosition( slotDom, e ),
+		    slotName  = this.getTargetSlotName( slotDom ),
+		    instance  = Ext.create( 'WebBuilder.BlockInstance', block );
+
+		// select default template
+		this.instancesStore.setTemplate( instance, block.templates().getAt(0) );
+
+		// insert instance
+		this.instancesStore.insert( instance, targetInstance, slotName, position );
+
+		return true;
+	},
+
+	handleCanvasDrop : function( slotDom, dragSource, e, data )
+	{
+		var draggedInstance = this.getTargetInstance( data.blockDom );
+			targetInstance  = this.getTargetInstance( slotDom );
+
+		// no instance supplied
+		if( draggedInstance == null || targetInstance == null ) {
+			return false;
+		}
+
+		var position  = this.findInsertPosition( slotDom, e ),
+			slotName  = this.getTargetSlotName( slotDom );
+
+		// insert instance
+		this.instancesStore.insert( draggedInstance, targetInstance, slotName, position );
+
+		return true;
 	}
 });
