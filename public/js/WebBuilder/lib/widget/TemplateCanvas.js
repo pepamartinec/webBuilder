@@ -287,6 +287,21 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 		event.xy = [ iframeXY[0] + eventXY[0], iframeXY[1] + eventXY[1] ];
 		Ext.dd.DragDropManager.handleMouseMove( event );
 
+		// styling helpers
+		var blockDom = event.getTarget( '.'+ this.blockCls );
+
+		if( blockDom != this.lastOverBlock ) {
+			if( this.lastOverBlock ) {
+				Ext.fly( this.lastOverBlock ).removeCls( this.overCls );
+				this.lastOverBlock = null;
+			}
+
+			if( blockDom ) {
+				Ext.fly( blockDom ).addCls( this.overCls );
+				this.lastOverBlock = blockDom;
+			}
+		}
+
 		// restore original position
 		event.xy = eventXY;
 	},

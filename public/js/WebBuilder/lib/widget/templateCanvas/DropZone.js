@@ -36,10 +36,23 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 	/**
 	 * Drop position pointer DOM node
 	 *
-	 * @required
-	 * @cfg {HTMLElement}
+	 * @property {HTMLElement} insertPtrDom
 	 */
 	insertPtrDom : null,
+
+	lastOverBlock : null,
+
+	constructor : function( config )
+	{
+		var me = this;
+
+		me.callParent( arguments );
+
+		me.insertPtrDom = Ext.DomHelper.createDom({
+			tag : 'hr',
+	    	cls : Ext.baseCSSPrefix +'insert-pointer'
+		});
+	},
 
 	/**
 	 * Returns valid drop target (if exists)
@@ -49,7 +62,25 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 	 */
 	getTargetFromEvent : function( e )
 	{
-		return e.getTarget( '.'+ this.slotCls );
+//		return Ext.fly( e.target ).hasCls( this.slotCls ) ? e.target : null;
+
+		var blockCls = '.'+ this.blockCls,
+		    slotCls  = '.'+ this.slotCls,
+		    target = e.target,
+		    limit  = 5;
+
+		while( target && --limit >= 0 ) {
+			if( Ext.DomQuery.is( target, slotCls ) ) {
+				return target;
+
+			} else if( Ext.DomQuery.is( target, blockCls ) ) {
+				return false;
+			}
+
+			target = target.parentNode;
+		}
+
+		return false;
 	},
 
 	/**

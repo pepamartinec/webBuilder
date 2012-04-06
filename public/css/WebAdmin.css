@@ -1,5 +1,11 @@
 @charset "UTF-8";
 
+html,
+body {
+	margin  : 0;
+	padding : 0;	
+}
+
 .x-templates-list {  }
 .x-templates-list > .x-item { display : inline-block; margin: 10px; padding: 5px; text-align: center; }
 .x-templates-list > .x-item > .name { padding: 3px; }
@@ -70,73 +76,121 @@
 }
 
 
-
+/************* CANVAS *************/
 .x-template-canvas {
-	padding : 0px;
+	padding     : 0px;
+	font-family : Calibri, Verdana, Arial, sans-serif;
+	font-size   : 15px;
 }
 
+/************* BLOCK *************/
 .x-template-canvas .x-block {
-	background-color : #fff;
-	border           : 2px dotted #000;
-	border-radius    : 7px;
-	margin           : 7px;
-	padding          : 0px;
+	margin  : 7px;
+	padding : 0px;
+	
+	color         : #aaa;
+	border        : 2px solid #aaa;
+	border-radius : 7px;
 }
 
 .x-template-canvas .x-block.x-over {
-	border-style: solid;
+	color            : #000;
+	border           : 2px solid #000;
+	background-color : #fdfdfd;
 }
-	
+
+/************* BLOCK TITLE *************/
 .x-template-canvas .x-block > .x-title {
-	font-size        : 12px;
 	font-weight      : bold;
-	background-color : #F0F2FE;
-	padding          : 7px;
+	background-color : #FDFFFF;
+	padding          : 0px 10px;
 	
 	cursor : pointer;
 }
-		
-.x-template-canvas .x-block .x-tools {
-	float : right;
+
+.x-template-canvas .x-block.x-over > .x-title {
+	background-color : #F0F2FE;
 }
 
-.x-template-canvas .x-block .x-tool {
+/************* BLOCK TITLE TOOLS *************/
+.x-template-canvas .x-block > .x-title > .x-tools {
+	float   : right;
+	display : none;
+}
+
+.x-template-canvas .x-block.x-over > .x-title > .x-tools {
+	display : block;
+}
+
+.x-template-canvas .x-block > .x-title > .x-tools > .x-tool {
 	width      : 16px;
 	height     : 16px;
-	margin     : 0px 3px;
+	margin     : 2px 3px;
 	float      : left;
 	cursor     : pointer;
 	background : transparent no-repeat center center;
 }
 
-.x-template-canvas .x-block .x-tool.x-config {
+.x-template-canvas .x-block > .x-title > .x-tools > .x-tool.x-config {
 	background-image: url('../images/icons/cog.png');
 }
 
-.x-template-canvas .x-block .x-tool.x-remove {
+.x-template-canvas .x-block > .x-title > .x-tools > .x-tool.x-remove {
 	background-image: url('../images/icons/delete.png');
 }
 
+/************* SLOT *************/
 .x-template-canvas > .x-slot {
 	margin : auto;
 	width  : 95%;
 	height : 95%;
 }
-		
+
 .x-template-canvas .x-slot {
-	clear            : both;
-	background-color : #fafafa;
-	border           : 1px dotted #999;
-	border-radius    : 7px;
-	margin           : 7px;
-	padding          : 0px;
+	clear         : both;
+	border        : 1px solid #bbb;
+	border-radius : 7px;
+	margin        : 10px 5px;
+	padding       : 0px;
+	
+	background-color : #fff;
+	
+	position   : relative;
+	min-height : 16px;
 }
 
-.x-template-canvas .x-slot > .x-title {
-	font-size: 9px;
-	margin-bottom : 7px;
+.x-template-canvas .x-block.x-over > .x-slot {
+	border : 1px solid #666;
 }
 
+/************* SLOT TITLE *************/
+.x-template-canvas .x-block > .x-slot > .x-title {
+    position   : absolute;
+    width      : 100%;
+    height     : 100%;
+    border-radius : 7px;
+    text-align : center;
+    
+    z-index    : -1;
+    opacity    : 0;
+    
+   	background-color : #fafafa;
+   	color            : #888;
+   	text-shadow      : #ccc 1px 1px 1px;
+   	font-weight      : bold;
+}
+
+.x-template-canvas .x-block.x-over > .x-slot > .x-title {
+	z-index : 2;
+	opacity : .85;
+	color   : #000;
+}
+
+.x-template-canvas .x-block.x-over > .x-slot:hover > .x-title {
+	z-index : -1;	
+}
+
+	
 .x-template-canvas .x-slot.x-over {
 	border-style: solid;
 }
@@ -144,6 +198,6 @@
 .x-template-canvas .x-insert-pointer {
 	width  : 95%;
 	height : 0px;
-	margin : 0px auto;
+	margin : 7px auto;
 	border : 1px solid #000;
 }
