@@ -178,6 +178,44 @@ Ext.define( 'WebBuilder.EditorStore', {
 	},
 
 	/**
+	 * Removes all instances
+	 *
+	 * @return {WebBuilder.EditorStore} this
+	 */
+	clear : function()
+	{
+		var me    = this,
+		    store = me.store;
+
+		// remove existing data
+		if( me.root ) {
+			me.remove( root );
+		}
+
+		// check for orphaned instances
+		if( store.getCount() > 0 ) {
+			// this should never happen, because all instances
+			// should be somewhere under the root and already
+			// be removed with it
+
+			// <debug>
+				Ext.log({
+					level : 'warn',
+					msg   : '['+ me.$className +'][clear] Store contains orphaned instance.',
+					store : store
+				});
+			// </debug>
+
+			// remove orphaned instances one by one
+			store.each( function( id, instance ) {
+				me.remove( instance );
+			});
+		}
+
+		return this;
+	},
+
+	/**
 	 * Removes the block instance.
 	 *
 	 * @param {WebBuilder.EditorStore.Instance} [instance] The block to remove.

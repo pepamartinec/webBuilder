@@ -2,33 +2,17 @@ Ext.define( 'WebBuilder.widget.blocksList.CategoryView',
 {
 	extend : 'Ext.view.View',
 
-	requires : [
-		'WebBuilder.widget.blocksList.DragZone'
-	],
-
 	/**
 	 * @required
 	 * @cfg {Ext.data.Store} store
 	 */
-	store : null,
+	data : null,
 
-	/**
-	 * @cfg {String} ddGroup
-	 */
-	ddGroup : undefined,
+	itemSelector : Ext.baseCSSPrefix +'template-block',
 
-	itemTpl : '{[ values.title || values.codeName ]}',
-
-	onRender : function()
-	{
-		var me = this;
-
-		// init dragZone
-		me.dragZone = Ext.create( 'WebBuilder.widget.blocksList.DragZone', {
-			view     : me,
-			ddGroup  : me.ddGroup
-		});
-
-		me.callParent( arguments );
-	}
+	tpl : [
+		'<tpl for=".">',
+			'<div class="', Ext.baseCSSPrefix ,'template-block ', Ext.baseCSSPrefix ,'template-block-{ID}">{[ values.title || values.codeName ]}</div>',
+		'</tpl>'
+	]
 });

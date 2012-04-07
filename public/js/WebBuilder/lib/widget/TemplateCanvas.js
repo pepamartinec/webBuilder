@@ -258,6 +258,13 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 			insertPtrDom : me.insertPtrDom,
 			instanceIdRe : me.instanceIdRe
 		});
+
+		var store = me.instancesStore,
+		    root  = store.getRoot();
+
+		if( root ) {
+			me.handleInstanceAdd( store, root );
+		}
 	},
 
 	/**
@@ -267,14 +274,17 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 	 */
 	cleanupIframe : function()
 	{
-		var me  = this,
-	        doc = me.iframeEl.dom.contentDocument;
+		var me = this;
 
-		Ext.EventManager.un( doc, 'mousemove', me.handleIframeMouseMove );
-		Ext.EventManager.un( doc, 'mouseup',   me.handleIframeMouseUp   );
-		Ext.EventManager.un( doc, 'click',     me.handleIframeClick   );
+		if( me.iframeEl ) {
+			var doc = me.iframeEl.dom.contentDocument;
 
-		extAdmin.removeElementGetter( doc.getElementById );
+			Ext.EventManager.un( doc, 'mousemove', me.handleIframeMouseMove );
+			Ext.EventManager.un( doc, 'mouseup',   me.handleIframeMouseUp   );
+			Ext.EventManager.un( doc, 'click',     me.handleIframeClick   );
+
+			extAdmin.removeElementGetter( doc.getElementById );
+		}
 	},
 
 	handleIframeMouseMove : function( event )

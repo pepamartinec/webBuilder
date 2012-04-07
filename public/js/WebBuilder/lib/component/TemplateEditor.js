@@ -7,11 +7,11 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		'Ext.layout.container.Border',
 		'WebBuilder.widget.BlocksList',
 		'WebBuilder.widget.TemplateCanvas',
+
+		'WebBuilder.EditorStore',
 		'extAdmin.Store',
-		'WebBuilder.model.BlocksCategory',
-		'WebBuilder.model.Block',
-		'WebBuilder.model.BlockTemplate',
-		'WebBuilder.model.BlockTemplateSlot'
+		'WebBuilder.BlockInstance',
+		'WebBuilder.model.Block'
 	],
 
 	/**
@@ -23,7 +23,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	/**
 	 * @cfg {extAdmin.Module/String} module
 	 */
-	module : null,
+	module : '\\WebBuilder\\WebBuilder\\ExtAdmin\\TemplatesManager\\TemplateEditor',
 
 	/**
 	 * @cfg {Array/String} blocksLoadAction
@@ -38,12 +38,12 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	{
 		var me = this;
 
-		me.module = me.env.getModule( me.module || '\\WebBuilder\\WebBuilder\\ExtAdmin\\TemplatesManager\\TemplateEditor' );
+		me.module = me.env.getModule( me.module );
 
 		me.initData();
 
-		// init components
-		var ddGroup = 'template-editor-'+ me.getId();
+		// init internal components
+		var ddGroup = me.getId();
 
 		me.list = Ext.create( 'WebBuilder.widget.BlocksList', {
 			region      : 'east',
@@ -51,19 +51,14 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 			collapsible : true,
 			width       : 150,
 
-			ddGroup : ddGroup,
-			store   : me.categoriesStore
+			module      : me.module,
+			ddGroup     : ddGroup,
+			blocksStore : me.blocksStore
 		});
 
 		me.canvas = Ext.create( 'WebBuilder.widget.TemplateCanvas', {
 			region : 'center',
-//			border : false,
 			title  : 'Plátno',
-
-			listeners : {
-				scope : me,
-				render : me.initBlockInstances
-			},
 
 			module         : me.module,
 			ddGroup        : ddGroup,
@@ -95,74 +90,16 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		me.callParent( arguments );
 	},
 
-//	initData : function( cb, cbScope )
-//	{
-//		var me     = this,
-//		    stores = me.stores = {};
-//
-//		stores.categories = Ext.create( 'Ext.data.Store', {
-//			model : 'WebBuilder.model.BlocksCategory',
-//			proxy : {
-//				type   : 'memory',
-//				reader : {
-//					type : 'json',
-//					root : 'categories'
-//				}
-//			}
-//		});
-//
-//		stores.blocks = Ext.create( 'Ext.data.Store', {
-//			model : 'WebBuilder.model.Block',
-//			proxy : {
-//				type   : 'memory',
-//				reader : {
-//					type : 'json',
-//					root : 'blocks'
-//				}
-//			}
-//		});
-//
-//		stores.templates = Ext.create( 'Ext.data.Store', {
-//			model : 'WebBuilder.model.BlockTemplate',
-//			proxy : {
-//				type   : 'memory',
-//				reader : {
-//					type : 'json',
-//					root : 'templates'
-//				}
-//			}
-//		});
-//
-//		stores.slots = Ext.create( 'Ext.data.Store', {
-//			model : 'WebBuilder.model.BlockTemplateSlot',
-//			proxy : {
-//				type   : 'memory',
-//				reader : {
-//					type : 'json',
-//					root : 'slots'
-//				}
-//			}
-//		});
-//
-//		this.module.runAction( 'loadBlocks', {
-//			success : function( response ) {
-//				Ext.Object.each( response.data, function( k, data ) {
-//					stores[k].loadData( data );
-//				});
-//			}
-//		});
-//	}
-
 	initData : function( cb, cbScope )
 	{
 		var me = this;
 
 		me.instancesStore = Ext.create( 'WebBuilder.EditorStore' );
 
-		me.categoriesStore = extAdmin.Store.create({
+		me.blocksStore = extAdmin.Store.create({
 			env        : me.env,
 			loadAction : [ me.module.name, 'loadBlocks' ],
-			model      : 'WebBuilder.model.BlocksCategory',
+			model      : 'WebBuilder.model.Block',
 
 			remoteSort   : false,
 			remoteFilter : false,
@@ -170,41 +107,29 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 
 			listeners : {
 				scope : me,
-	//			load  : me.initBlockInstances
+				load  : me.onBlocksLoad
 			}
 		});
 	},
 
-	initBlockInstances : function()
+	onBlocksLoad : function( blocksStore, blocks )
 	{
-		var me         = this,
-	    blockByIds = {};
-
-		Ext.Function.defer( function() {
-
-
-
-		me.categoriesStore.each( function( blocksCategory ) {
-			blocksCategory.blocks().each( function( block ) {
-				blockByIds[ block.getId() ] = block;
-			});
-		});
-
-		var defaultBlockId    = '4',
-		    defaultTemplateId = '10',
-		    root              = null;
+		var me = this,
+			defaultBlockId    = 4,
+			defaultTemplateId = 10;
 
 		// convert value to block instance
 		if( me.value ) {
 
 		// no value, create empty root instance
 		} else {
-			root = Ext.create( 'WebBuilder.BlockInstance', blockByIds[ defaultBlockId ] );
+			var block = blocksStore.getById( defaultBlockId ),
+			    template = block.templates().getById( defaultTemplateId );
+
+			var root = Ext.create( 'WebBuilder.BlockInstance', block );
+			me.instancesStore.setTemplate( root, template );
 
 			me.instancesStore.setRoot( root );
-			me.instancesStore.setTemplate( root, blockByIds[ defaultBlockId ].templates().getById( defaultTemplateId ) );
 		}
-
-		},2000);
 	}
 });

@@ -6,14 +6,22 @@ Ext.define( 'WebBuilder.widget.BlocksList',
 		'Ext.layout.container.Accordion',
 		'Ext.panel.Panel',
 		'Ext.layout.container.Fit',
-		'WebBuilder.widget.blocksList.CategoryView'
+		'WebBuilder.widget.blocksList.CategoryView',
+		'WebBuilder.model.BlocksCategory',
+		'WebBuilder.widget.blocksList.DragZone'
 	],
 
 	/**
 	 * @required
-	 * @cfg {Ext.data.Store} store
+	 * @cfg {extAdmin.Module} module
 	 */
-	store : null,
+	module : null,
+
+	/**
+	 * @required
+	 * @cfg {Ext.data.Store} blocksStore
+	 */
+	blocksStore : null,
 
 	/**
 	 * @cfg {String} ddGroup
@@ -41,31 +49,100 @@ Ext.define( 'WebBuilder.widget.BlocksList',
 
 		me.callParent( arguments );
 
-		me.store.on( 'datachanged', me.onCategoriesChange, me );
+		/**
+		 * @property {Ext.data.Store} categoriesStore
+		 */
+		me.categoriesStore = me.module.createStore({
+			loadAction : 'loadBlocksCategories',
+			model      : 'WebBuilder.model.BlocksCategory',
+
+			remoteSort   : false,
+			remoteFilter : false,
+			autoLoad     : true,
+
+			listeners : {
+				scope  : me,
+				single : true,
+				load   : me.onCategoriesLoad
+			}
+		});
 	},
 
-	onCategoriesChange : function( store, categories )
+	onRender : function()
 	{
 		var me = this;
 
-		Ext.Array.forEach( categories, me.addCategory, me );
+		// init dragZone
+		me.dragZone = Ext.create( 'WebBuilder.widget.blocksList.DragZone', me.getEl(), {
+			ddGroup     : me.ddGroup,
+			blocksStore : me.blocksStore
+		});
+
+		me.callParent( arguments );
 	},
 
-	addCategory : function( category )
+	/**
+	 * Categories store 'load' event handler
+	 *
+	 * Bind refresh event & render view
+	 *
+	 * @private
+	 * @param {Ext.data.Store} categoriesStore
+	 * @param {WebBuilder.model.BlocksCategory[]} categories
+	 */
+	onCategoriesLoad : function( categoriesStore, categories )
 	{
 		var me = this;
 
-		var view = Ext.create( 'WebBuilder.widget.blocksList.CategoryView', {
-			ddGroup : me.ddGroup,
-			store   : category.blocks()
+		me.refreshPanels();
+
+		me.mon( me.categoriesStore, 'refresh', me.refreshPanels, me );
+		me.mon( me.blocksStore,     'refresh', me.refreshPanels, me );
+	},
+
+	/**
+	 * Renders panels according to current categories & blocks
+	 *
+	 */
+	refreshPanels : function()
+	{
+		var me = this;
+
+		// remove current panels
+		me.removeAll();
+
+		// cancel refresh when one of stores is refreshing data
+		if( me.categoriesStore.isLoading() || me.blocksStore.getCount() == 0 ) {
+			return;
+		}
+
+		// group blocks by categories
+		var blocksData = {};
+
+		me.blocksStore.each( function( block ) {
+			var categoryId = block.get('categoryID');
+
+			if( blocksData[ categoryId ] == null ) {
+				blocksData[ categoryId ] = [];
+			}
+
+			blocksData[ categoryId ].push( block.getData() );
 		});
 
-		var panel = Ext.create( 'Ext.panel.Panel', {
-			layout : 'fit',
-			title  : category.get('title'),
-			items  : [ view ]
-		});
+		// create panels with new data
+		me.categoriesStore.each( function( category ) {
+			var view = Ext.create( 'WebBuilder.widget.blocksList.CategoryView', {
+				ddGroup : me.ddGroup,
+				data    : blocksData[ category.getId() ] || []
+			});
 
-		this.add( panel );
+			var panel = Ext.create( 'Ext.panel.Panel', {
+				layout : 'fit',
+				title  : category.get('title'),
+				items  : [ view ]
+			});
+
+			me.add( panel );
+		});
 	}
 });

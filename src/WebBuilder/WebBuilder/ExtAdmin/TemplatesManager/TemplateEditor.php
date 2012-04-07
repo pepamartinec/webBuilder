@@ -63,6 +63,7 @@ class TemplateEditor extends DataEditor
 				'type' => 'cancel'
 			),
 
+			'loadBlocksCategories' => true,
 			'loadBlocks' => true,
 			'loadSimplifiedStylesheet' => true,
 			'loadMasterBlockTemplate' => true,
@@ -217,6 +218,27 @@ class TemplateEditor extends DataEditor
 	}
 
 	/**
+	 * Loads list of available blocks categories
+	 *
+	 * @param RequestInterface $request
+	 * @return DataStoreResponse
+	 */
+	public function loadBlocksCategories( RequestInterface $request )
+	{
+		$categoriesFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\BlocksCategory', $this->database );
+		$categories       = $categoriesFeeder->get();
+
+		$response = new DataStoreResponse( true, $categories, null, function( BlocksCategory $category ) {
+			return array(
+				'ID'    => $category->getID(),
+				'title' => $category->getTitle(),
+			);
+		});
+
+		return $response;
+	}
+
+	/**
 	 * Loads list of available template building blocks
 	 *
 	 * @param RequestInterface $request
@@ -224,11 +246,8 @@ class TemplateEditor extends DataEditor
 	 */
 	public function loadBlocks( RequestInterface $request )
 	{
-		$categoriesFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\BlocksCategory', $this->database );
-		$categories       = $categoriesFeeder->get();
-
 		$blocksFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\Block', $this->database );
-		$blocks       = $blocksFeeder->groupBy( 'category_ID' )->get();
+		$blocks       = $blocksFeeder->get();
 
 		$templatesFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\BlockTemplate', $this->database );
 		$templates       = $templatesFeeder->groupBy( 'block_ID' )->get();
@@ -238,83 +257,51 @@ class TemplateEditor extends DataEditor
 
 		$data = array();
 
-		foreach( $categories as $category ) {
-			/* @var $category BlocksCategory */
-			$categoryID = $category->getID();
+		foreach( $blocks as $block ) {
+			/* @var $block Block */
+			$blockID = $block->getID();
 
-			$categoryData = array(
-				'ID'     => $categoryID,
-				'title'  => $category->getTitle(),
-				'blocks' => array(),
+			$blockData = array(
+				'ID'         => $blockID,
+				'categoryID' => $block->getCategoryID(),
+				'title'      => $block->getTitle(),
+				'codeName'   => $block->getCodeName(),
+				'templates'  => array(),
 			);
 
-			if( isset( $blocks[ $categoryID ] ) ) {
-				foreach( $blocks[ $categoryID ] as $block ) {
-					/* @var $block Block */
-					$blockID = $block->getID();
+			if( isset( $templates[ $blockID ] ) ) {
+				foreach( $templates[ $blockID ] as $template ) {
+					/* @var $template BlockTemplate */
+					$templateID = $template->getID();
 
-					$blockData = array(
-						'ID'         => $blockID,
-						'categoryID' => $categoryID,
-						'title'      => $block->getTitle(),
-						'codeName'   => $block->getCodeName(),
-						'templates'  => array(),
+					$templateData = array(
+						'ID'        => $templateID,
+						'blockID'   => $blockID,
+						'filename'  => $template->getFilename(),
+						'slots' => array(),
 					);
 
-					if( isset( $templates[ $blockID ] ) ) {
-						foreach( $templates[ $blockID ] as $template ) {
+					if( isset( $slots[ $templateID ] ) ) {
+						foreach( $slots[ $templateID ] as $slot ) {
 							/* @var $template BlockTemplate */
-							$templateID = $template->getID();
+							$slotID = $slot->getID();
 
-							$templateData = array(
-								'ID'        => $templateID,
-								'blockID'   => $blockID,
-								'filename'  => $template->getFilename(),
-								'slots' => array(),
+							$slotData = array(
+								'ID'         => $slotID,
+								'templateID' => $templateID,
+								'codeName'   => $slot->getCodeName(),
 							);
 
-							if( isset( $slots[ $templateID ] ) ) {
-								foreach( $slots[ $templateID ] as $slot ) {
-									/* @var $template BlockTemplate */
-									$slotID = $slot->getID();
-
-									$slotData = array(
-										'ID'         => $slotID,
-										'templateID' => $templateID,
-										'codeName'   => $slot->getCodeName(),
-									);
-
-									$templateData['slots'][] = $slotData;
-								}
-							}
-
-							$blockData['templates'][] = $templateData;
+							$templateData['slots'][] = $slotData;
 						}
 					}
 
-					$categoryData['blocks'][] = $blockData;
+					$blockData['templates'][] = $templateData;
 				}
 			}
 
-			$data[] = $categoryData;
+			$data[] = $blockData;
 		}
-
-// 		$extractor = function( array $dataObjects ) {
-// 			$data = array();
-
-// 			foreach( $dataObjects as $dataObject ) {
-// 				$data[] = $dataObject->getInnerValues();
-// 			}
-
-// 			return $data;
-// 		};
-
-// 		$data = array(
-// 				'categories' => $extractor( $categories ),
-// 				'blocks'     => $extractor( $blocks ),
-// 				'templates'  => $extractor( $templates ),
-// 				'slots'      => $extractor( $slots ),
-// 		);
 
 		$response = new ActionResponse( true );
 		$response->setData( $data );

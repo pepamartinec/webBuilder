@@ -1,15 +1,15 @@
 Ext.define( 'WebBuilder.model.BlockTemplate',
 {
 	extend : 'extAdmin.Model',
-	
+
 	uses : [
 		'WebBuilder.model.Block',
 		'WebBuilder.model.BlockTemplateSlot'
 	],
-	
+
 	fields : [{
-		name : 'title',
-		type : 'string'
+		name : 'blockID',
+		type : 'int'
 	},{
 		name : 'thumb',
 		type : 'string'
@@ -20,14 +20,19 @@ Ext.define( 'WebBuilder.model.BlockTemplate',
 		name : 'structure',
 		type : 'string'
 	}],
-	
+
 	belongsTo : [{
-		model : 'WebBuilder.model.Block',
-		name  : 'block'
+		model      : 'WebBuilder.model.Block',
+		getterName : 'getBlock',
+		setterName : 'setBlock',
+		primaryKey : 'ID',
+		foreignKey : 'blockID'
 	}],
-	
+
 	hasMany : [{
-		model : 'WebBuilder.model.BlockTemplateSlot',
-		name  : 'slots'
+		model      : 'WebBuilder.model.BlockTemplateSlot',
+		name       : 'slots',
+		primaryKey : 'ID',
+		foreignKey : 'templateID'
 	}]
 });

@@ -1,13 +1,16 @@
 Ext.define( 'WebBuilder.model.Block',
 {
 	extend : 'extAdmin.Model',
-	
+
 	uses : [
 		'WebBuilder.model.BlocksCategory',
 		'WebBuilder.model.BlockTemplate'
 	],
-	
+
 	fields : [{
+		name : 'categoryID',
+		type : 'int'
+	},{
 		name : 'title',
 		type : 'string'
 	},{
@@ -17,14 +20,19 @@ Ext.define( 'WebBuilder.model.Block',
 		name : 'codeName',
 		type : 'string'
 	}],
-	
+
 	belongsTo : [{
-		model : 'WebBuilder.model.BlocksCategory',
-		name  : 'category'
+		model      : 'WebBuilder.model.BlocksCategory',
+		getterName : 'getCategory',
+		setterName : 'setCategory',
+		primaryKey : 'ID',
+		foreignKey : 'categoryID'
 	}],
-	
+
 	hasMany : [{
-		model : 'WebBuilder.model.BlockTemplate',
-		name  : 'templates'
+		model      : 'WebBuilder.model.BlockTemplate',
+		name       : 'templates',
+		primaryKey : 'ID',
+		foreignKey : 'templateID'
 	}]
 });

@@ -16,6 +16,11 @@ class Block extends aDataObject
 			'type' => 'integer',
 		),
 
+		'categoryID' => array(
+			'dbColumn' => 'category_ID',
+			'type' => 'integer',
+		),
+
 		'codeName' => array(
 			'dbColumn' => 'code_name',
 			'type' => 'string',

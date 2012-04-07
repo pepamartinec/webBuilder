@@ -219,12 +219,17 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 			return this.handleCanvasDrop( slotDom, dragSource, e, data );
 		}
 
+		Ext.log({
+			msg  : '['+ this.$className +'][onNodeDrop] Invalid drag source',
+			dump : dragSource
+		});
+
 		return false;
 	},
 
 	handleBlockListDrop : function( slotDom, dragSource, e, data )
 	{
-		var block          = data.records[0],
+		var block          = data.block,
 		    targetInstance = this.getTargetInstance( slotDom );
 
 		// no block supplied
