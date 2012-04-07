@@ -347,7 +347,7 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 
 				// REMOVE
 				} else if( target.hasCls( me.removeToolCls ) ) {
-					me.instancesStore.remove( instance );
+					instance.remove();
 				}
 			}
 		}
@@ -425,16 +425,6 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 		// replace old DOM node with refreshed one
 		var newBlockDom = Ext.DomHelper.createDom( me.createBlockDefinition( instance ) );
 		Ext.fly( newBlockDom ).replace( blockDom );
-	},
-
-	/**
-	 * Handles user block configuration request
-	 *
-	 * @param {Event} [event]
-	 */
-	handleConfigToolClick : function( event )
-	{
-		console.log('configure me');
 	},
 
 	/**

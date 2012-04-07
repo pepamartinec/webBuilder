@@ -38,143 +38,12 @@ Ext.define( 'WebBuilder.EditorStore', {
 			'beforeremove',
 			'remove',
 			'beforetemplatechange',
-			'templatechange'
+			'templatechange',
+			'beforeconfigchange',
+			'configchange'
 		);
 
 		me.store = Ext.create( 'Ext.util.HashMap' );
-	},
-
-	/**
-	 * Adds instance to instances tree and storage
-	 *
-	 * @protected
-	 * @param {WebBuilder.EditorStore.Instance}
-	 */
-	addInstance : function( instance )
-	{
-		var me    = this,
-		    store = me.store,
-		    id    = instance.id;
-
-		// add instance to store
-		if( store.containsKey( id ) == false ) {
-			store.add( id, instance );
-		}
-
-		instance.store = me;
-
-		// add all instance children
-		if( instance.slots != null ) {
-			Ext.Object.each( instance.slots, me.addInstance_walkSlots, me );
-		}
-	},
-
-	/**
-	 * @ignore
-	 */
-	addInstance_walkSlots : function( slotName, slotItems ) {
-		Ext.Array.forEach( slotItems, this.addInstance, this );
-	},
-
-	/**
-	 * Returns the instance with given id.
-	 *
-	 * @param {String} [id]
-	 * @returns {WebBuilder.EditorStore.Instance}
-	 */
-	get : function( id )
-	{
-		return this.store.get( id );
-	},
-
-	/**
-	 * Returns the root instance.
-	 *
-	 * @returns {WebBuilder.EditorStore.Instance}
-	 */
-	getRoot : function()
-	{
-		return this.root;
-	},
-
-	/**
-	 * Inserts the block instance at given position
-	 *
-	 * @param {WebBuilder.EditorStore.Instance} [instance]
-	 * @param {WebBuilder.EditorStore.Instance} [parentBlock]
-	 * @param {String} [parentSlotName]
-	 * @param {WebBuilder.EditorStore.Instance} [insertBefore=null]
-	 * @returns
-	 */
-	insert : function( instance, parent, parentSlotName, position )
-	{
-		var me = this;
-
-		if( me.fireEvent( 'beforeadd', me, instance, parent, parentSlotName, position ) === false ) {
-			return;
-		}
-
-		// remove instance from its original position first
-		var originalStore = instance.store;
-
-		if( originalStore ) {
-			originalStore.remove( instance );
-		}
-
-		// insert instance under its new parent
-		var parentSlot = parent.slots[ parentSlotName ];
-
-		if( parentSlot ) {
-			if( position === undefined || position === null ) {
-				parentSlot.push( instance );
-
-			} else {
-				Ext.Array.insert( parentSlot, position, instance );
-			}
-		}
-
-		// save instance to the store
-		me.addInstance( instance );
-
-		me.fireEvent( 'add', me, instance, parent, parentSlotName, position );
-	},
-
-	/**
-	 * Sets the instance as root
-	 *
-	 * @param {WebBuilder.EditorStore.Instance} [instance]
-	 * @return {WebBuilder.EditorStore.Instance}
-	 */
-	setRoot : function( instance )
-	{
-		var me = this;
-
-		if( me.fireEvent( 'beforeadd', me, instance, null, null, null ) === false ) {
-			return;
-		}
-
-		// remove instance from its original position first
-		var originalStore = instance.store;
-
-		if( originalStore ) {
-			originalStore.remove( instance );
-		}
-
-		// replace current instances with new ones
-		var oldRoot = me.root;
-		me.root = instance;
-
-		if( oldRoot ) {
-			me.remove( oldRoot );
-		}
-
-		me.addInstance( instance );
-
-
-
-		me.fireEvent( 'add', me, instance, null, null, null );
-
-		return oldRoot;
 	},
 
 	/**
@@ -216,146 +85,176 @@ Ext.define( 'WebBuilder.EditorStore', {
 	},
 
 	/**
-	 * Removes the block instance.
+	 * Returns the instance with given id.
 	 *
-	 * @param {WebBuilder.EditorStore.Instance} [instance] The block to remove.
+	 * @param {String} [id]
+	 * @returns {WebBuilder.EditorStore.Instance}
 	 */
-	remove : function( instance )
+	get : function( id )
+	{
+		return this.store.get( id );
+	},
+
+	/**
+	 * Returns the root instance.
+	 *
+	 * @returns {WebBuilder.EditorStore.Instance}
+	 */
+	getRoot : function()
+	{
+		return this.root;
+	},
+
+	/**
+	 * Sets the instance as root
+	 *
+	 * @param {WebBuilder.EditorStore.Instance} [instance]
+	 * @return {WebBuilder.EditorStore.Instance}
+	 */
+	setRoot : function( instance )
 	{
 		var me = this;
 
-		// <debug>
-			me.checkInstance( instance, true, true );
-		// </debug>
-
-		if( me.fireEvent( 'beforeremove', me, instance ) === false ) {
+		if( me.fireEvent( 'beforeadd', me, instance, null, null, null ) === false ) {
 			return;
 		}
 
-		// remove from store (including all children)
-		me.remove_removeInstace( instance );
+		// remove instance from its original place
+		instance.remove();
 
-		// remove from parent
-		var parent      = instance.parent,
-		    slotName    = null,
-		    instanceIdx = null;
+		// replace current instances with new ones
+		var oldRoot = me.root;
 
-		if( parent ) {
-			var Array       = Ext.Array,
-			    parentSlots = parent.slots,
-			    slotInstances;
-
-			for( slotName in parentSlots ) {
-				if( parentSlots.hasOwnProperty( name ) === false ) {
-					continue;
-				}
-
-				slotInstances = parent.slots[ name ];
-				instanceIdx   = Array.indexOf( slotInstances, instance );
-
-				if( instanceIdx !== -1 ) {
-					Array.erase( slotInstances, instanceIdx, 1 );
-					break;
-				}
-			}
-
-			if( instanceIdx === -1 ) {
-				instanceIdx = null;
-			}
+		if( oldRoot ) {
+			me.remove( oldRoot );
 		}
 
-		// notify about removal
-		me.fireEvent( 'remove', me, instance, parent, slotName, instanceIdx );
+		me.root = instance;
+		me.addInstance( instance );
+
+		me.fireEvent( 'add', me, instance, null, null, null );
+
+		return oldRoot;
+	},
+
+	/**
+	 * Adds the instance and all its children.
+	 *
+	 * @protected
+	 * @param {WebBuilder.EditorStore.Instance}
+	 */
+	addInstance : function( instance )
+	{
+		var me    = this,
+		    store = me.store,
+		    id    = instance.id;
+
+		// add instance to store
+		if( store.containsKey( id ) == false ) {
+			store.add( id, instance );
+
+		} else {
+			Ext.log({
+				level : 'warn',
+				msg   : '['+ me.$className +'][addInstance] Instance is already present in this store',
+				dump  : {
+					store    : me,
+					instance : instance
+				}
+			});
+		}
+
+		instance.store = me;
+
+		// add all instance children
+		if( instance.slots != null ) {
+			Ext.Object.each( instance.slots, me.addInstance_walkSlots, me );
+		}
 	},
 
 	/**
 	 * @ignore
 	 */
-	remove_removeInstace : function( instance )
+	addInstance_walkSlots : function( slotName, slotItems ) {
+		Ext.Array.forEach( slotItems, this.addInstance, this );
+	},
+
+	/**
+	 * Removes the instance and all its children.
+	 *
+	 * @protected
+	 * @param {WebBuilder.EditorStore.Instance}
+	 */
+	removeInstance : function( instance )
 	{
-		// remove children
+		// remove children from store
 		if( instance.slots ) {
-			Ext.Object.each( instance.slots, this.remove_removeSlotChildren, this );
+			Ext.Object.each( instance.slots, this.removeInstance_walkSlot, this );
 		}
 
-		// remove self
+		instance.store = null;
+
+		// remove instance from store
 		this.store.removeAtKey( instance.id );
 	},
 
 	/**
 	 * @ignore
 	 */
-	remove_removeSlotChildren : function( name, children )
+	removeInstance_walkSlot : function( name, children )
 	{
-		Ext.Array.forEach( children, this.remove_removeInstace, this );
+		Ext.Array.forEach( children, this.removeInstance, this );
 	},
 
-	/**
-	 * Sets the instance active template.
-	 *
-	 * @param {WebBuilder.EditorStore.Instance} [instance]
-	 * @param {WebBuilder.model.BlockTemplate} [template]
-	 */
-	setTemplate : function( instance, template )
+
+
+	onBeforeAddChild : function( instance, child, slotName, position )
+	{
+		return this.fireEvent( 'beforeadd', this, child, instance, slotName, position );
+	},
+
+	onAddChild : function( instance, child, slotName, position )
+	{
+		// add to the store (including all children)
+		this.addInstance( child );
+
+		// notify about addition
+		this.fireEvent( 'add', this, child, instance, slotName, position );
+	},
+
+	onBeforeRemoveChild : function( instance, child, slotName, position )
+	{
+		return this.fireEvent( 'beforeremove', this, child, instance, slotName, position );
+	},
+
+	onRemoveChild : function( instance, child, slotName, position )
 	{
 		var me = this;
 
-		// <debug>
-			me.checkInstance( instance, false, true );
-		// </debug>
+		// remove from store (including all children)
+		me.removeInstance( child );
 
-		if( me.fireEvent( 'beforetemplatechange', me, instance, template ) === false ) {
-			return;
-		}
-
-		var oldSlots = instance.slots || {};
-
-		instance.template = template;
-		instance.slots    = {};
-
-		template.slots().each( function( slot ) {
-			var name = slot.get('codeName');
-
-			if( oldSlots[ name ] ) {
-				instance.slots[ name ] = oldSlots[ name ];
-				delete oldSlots[ name ];
-
-			} else {
-				instance.slots[ name ] = [];
-			}
-		});
-
-		me.fireEvent( 'templatechange', me, instance, oldSlots );
-
-		return oldSlots;
+		// notify about removal
+		this.fireEvent( 'remove', this, child, instance, slotName, position );
 	},
 
-	/**
-	 * Check the block instance for valid store assignment
-	 *
-	 * @private
-	 * @param {WebBuilder.EditorStore.Instance} [instance]
-	 * @param {Boolean} [belongsToMe]
-	 */
-	checkInstance : function( instance, needsStore, belongsToMe )
+	onBeforeTemplateChange : function( instance, template )
 	{
-		var me = this;
+		return this.fireEvent( 'beforetemplatechange', this, instance, template );
+	},
 
-		if( needsStore && instance.store == null ) {
-			Ext.log({
-				level : 'warn',
-				msg   : '['+ me.$className +'] The block instance has no store associated',
-				dump  : instance
-			});
+	onTemplateChange : function( instance, oldTemplate )
+	{
+		return this.fireEvent( 'templatechange', this, instance, oldTemplate );
+	},
 
-		}
+	onBeforeConfigChange : function( instance, config )
+	{
+		return this.fireEvent( 'beforeconfigchange', this, instance, config );
+	},
 
-		if( belongsToMe && me.store.containsKey( instance.id ) === false ) {
-			Ext.log({
-				level : 'warn',
-				msg   : '['+ me.$className +'] The block instance is not associated with current store',
-				dump  : instance
-			});
-		}
+	onConfigChange : function( instance, config )
+	{
+		return this.fireEvent( 'configchange', this, instance, Ext.Object.getKeys( config ) );
 	}
 });

@@ -123,11 +123,9 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 
 		// no value, create empty root instance
 		} else {
-			var block = blocksStore.getById( defaultBlockId ),
-			    template = block.templates().getById( defaultTemplateId );
-
-			var root = Ext.create( 'WebBuilder.BlockInstance', block );
-			me.instancesStore.setTemplate( root, template );
+			var block    = blocksStore.getById( defaultBlockId ),
+			    template = block.templates().getById( defaultTemplateId ),
+			    root     = Ext.create( 'WebBuilder.BlockInstance', block, template );
 
 			me.instancesStore.setRoot( root );
 		}

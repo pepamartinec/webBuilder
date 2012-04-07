@@ -242,10 +242,10 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 		    instance  = Ext.create( 'WebBuilder.BlockInstance', block );
 
 		// select default template
-		this.instancesStore.setTemplate( instance, block.templates().getAt(0) );
+		instance.setTemplate( block.templates().getAt(0) );
 
 		// insert instance
-		this.instancesStore.insert( instance, targetInstance, slotName, position );
+		targetInstance.addChild( instance, slotName, position );
 
 		return true;
 	},
@@ -264,7 +264,7 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 			slotName  = this.getTargetSlotName( slotDom );
 
 		// insert instance
-		this.instancesStore.insert( draggedInstance, targetInstance, slotName, position );
+		targetInstance.addChild( draggedInstance, slotName, position );
 
 		return true;
 	}
