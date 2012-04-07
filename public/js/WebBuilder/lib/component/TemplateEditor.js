@@ -3,6 +3,10 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	extend : 'Ext.container.Container',
 	alias  : 'widget.templateeditor',
 
+	mixins : {
+		field : 'Ext.form.field.Field'
+	},
+
 	requires : [
 		'Ext.layout.container.Border',
 		'WebBuilder.widget.BlocksList',
@@ -114,20 +118,123 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 
 	onBlocksLoad : function( blocksStore, blocks )
 	{
-		var me = this,
-			defaultBlockId    = 4,
-			defaultTemplateId = 10;
+		var me = this;
 
-		// convert value to block instance
-		if( me.value ) {
-
-		// no value, create empty root instance
-		} else {
-			var block    = blocksStore.getById( defaultBlockId ),
-			    template = block.templates().getById( defaultTemplateId ),
-			    root     = Ext.create( 'WebBuilder.BlockInstance', block, template );
-
-			me.instancesStore.setRoot( root );
+		// fill some default content
+		if( me.value == null ) {
+			me.value = {
+				blockID    : 4,
+				templateID : 10
+			};
 		}
-	}
+//
+//		// convert value to block instance
+//		if( me.value ) {
+//
+//		// no value, create empty root instance
+//		} else {
+//			var block    = blocksStore.getById( defaultBlockId ),
+//			    template = block.templates().getById( defaultTemplateId ),
+//			    root     = Ext.create( 'WebBuilder.BlockInstance', block, template );
+//
+//			me.instancesStore.setRoot( root );
+//		}
+
+		// init field mixin
+		// this must be done after block load
+		// so we have all data for instances creation
+		me.initField();
+	},
+
+	/**
+	 * Returns the current data value of the field.
+	 *
+	 * @return {Object} value The field value
+	 */
+	getValue : function()
+	{
+		return this.instancesStore.exportValues();
+	},
+
+	/**
+	 * Sets a data value into the field and runs the change detection and validation.
+	 *
+	 * @param {Object} value The value to set
+	 * @return {WebBuilder.widget.TemplateCanvas} this
+	 */
+	setValue : function( value )
+	{
+		var me    = this,
+		    store = me.instancesStore;
+
+		// clear data storage
+		store.clear();
+
+		var root = me.setValue_createInstance( value );
+		store.setRoot( root );
+
+		me.checkChange();
+
+		return me;
+	},
+
+	setValue_createInstance : function( value )
+	{
+		var me       = this,
+		    block    = me.blocksStore.getById( value.blockID ),
+		    template = value.templateID && block.templates().getById( value.templateID ),
+		    config   = value.config;
+
+		// create instance
+		var instance = Ext.create( 'WebBuilder.BlockInstance', block, template );
+
+		// create children
+		if( value.slots ) {
+			Ext.Object.each( value.slots, function( name, children ) {
+				Ext.Array.forEach( children, function( child ) {
+					var childInstance = me.setValue_createInstance( child );
+
+					instance.addChild( childInstance );
+				});
+			});
+		}
+
+		return instance;
+	},
+
+	exportData : function( data )
+	{
+
+	},
+
+	/**
+	 * Returns whether two field {@link #getValue values} are logically equal.
+	 *
+	 * @param {Object} value1 The first value to compare
+	 * @param {Object} value2 The second value to compare
+	 * @return {Boolean} True if the values are equal, false if inequal.
+	 */
+	isEqual: function( value1, value2 )
+	{
+		return this.instancesStore.self.isEqual( value1, value2 );
+	},
+
+	/**
+	 * Returns the parameter(s) that would be included in a standard form submit for this field.
+	 *
+	 * @return {Object} A mapping of submit parameter names to values. It can also return null
+	 * if there are no parameters to be submitted.
+	 */
+	getSubmitData: function()
+	{
+		// <debug>
+			Ext.Error.raise({
+				msg : '[WebBuilder.component.TemplateEditor][getSubmitData] has no default implementation, '+
+				      'because it returns structured data. Please create your own implementation or use getModelData instead',
+				templateEditor : this
+			});
+		// </debug>
+
+		return null;
+	},
 });
