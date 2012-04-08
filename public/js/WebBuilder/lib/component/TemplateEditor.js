@@ -18,6 +18,10 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		'WebBuilder.model.Block'
 	],
 
+	uses : [
+		'Ext.JSON'
+	],
+
 	/**
 	 * @required
 	 * @cfg {extAdmin.Environment} env
@@ -153,7 +157,32 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	 */
 	getValue : function()
 	{
-		return this.instancesStore.exportValues();
+		var me   = this,
+		    root = me.instancesStore.getRoot();
+
+		return me.getValue_instance( root );
+	},
+
+	/**
+	 * @ignore
+	 */
+	getValue_instance : function( instance )
+	{
+		return {
+			blockID : instance.block.getId(),
+			config  : Ext.clone( instance.config ),
+
+			templateID : instance.template && instance.template.getId(),
+			slots      : instance.slots    && Ext.Object.map( instance.slots, me.walkInstanceSlot, me )
+		};
+	},
+
+	/**
+	 * @ignore
+	 */
+	getValue_walkInstanceSlot : function( name, children )
+	{
+		return Ext.Array.map( children, me.getValue_instance, me );
 	},
 
 	/**
@@ -178,6 +207,9 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		return me;
 	},
 
+	/**
+	 * @ignore
+	 */
 	setValue_createInstance : function( value )
 	{
 		var me       = this,
@@ -202,11 +234,6 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		return instance;
 	},
 
-	exportData : function( data )
-	{
-
-	},
-
 	/**
 	 * Returns whether two field {@link #getValue values} are logically equal.
 	 *
@@ -216,7 +243,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	 */
 	isEqual: function( value1, value2 )
 	{
-		return this.instancesStore.self.isEqual( value1, value2 );
+		return Ext.JSON.encode( value1 ) === Ext.JSON.encode( value2 );
 	},
 
 	/**
