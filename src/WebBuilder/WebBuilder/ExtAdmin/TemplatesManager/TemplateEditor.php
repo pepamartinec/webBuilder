@@ -1,6 +1,16 @@
 <?php
 namespace WebBuilder\WebBuilder\ExtAdmin\TemplatesManager;
 
+use WebBuilder\WebBuilder\DataObjects\BlocksSet;
+
+use WebBuilder\WebBuilder\BlockInstance;
+
+use ExtAdmin\Request\Request;
+
+use Inspirio\Database\aDataObject;
+
+use WebBuilder\WebBuilder\DataObjects\Block;
+
 use WebBuilder\WebBuilder\WebBuilderInterface;
 use WebBuilder\WebBuilder\DataObjects\WebStructureItem;
 use ExtAdmin\Response\HtmlResponse;
@@ -418,10 +428,79 @@ class TemplateEditor extends DataEditor
 	 */
 	public function saveData( RequestInterface $request )
 	{
+		$ID       = $request->getData( 'ID', 'int' );
+		$name     = $request->getData( 'name', 'string' );
+		$instance = $this->saveData_safeInputBlock( $request->getRawData( 'template' ) );
+
+		try {
+			$this->database->transactionStart();
+
+			$blocksSet = new BlocksSet( array(
+				'ID'   => $ID,
+				'name' => $name
+			) );
+
+			$blockSetsFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\BlocksSet', $this->database );
+			$blockSetsFeeder->save( $blocksSet );
+
+			$this->saveData_saveInstance( $blocksSet->getID(), $instance );
+
+			$this->database->transactionCommit();
+
+		} catch( Exception $e ) {
+			$this->database->transactionRollback();
+			throw $e;
+		}
+
+		// reassemble updated data & do response
 		$response = new ActionResponse( true );
-		$response->setMessage( 'Eeee, tohe teda ne' );
-sleep(5);
+		$response->setData( array(
+			'ID'       => $blocksSet->getID(),
+			'name'     => $blocksSet->getName(),
+			'template' => $instance
+		));
+
 		return $response;
+	}
+
+	private function saveData_safeInputBlock( array $rawBlock )
+	{
+		$instance = array(
+			'templateID' => Request::secureData( $rawBlock, 'templateID', 'int' ),
+			'slots'      => array()
+		);
+
+		$instances[] = &$instance;
+
+		foreach( $rawBlock['slots'] as $rawSlotID => $children ) {
+			$slotID = Request::secureValue( $rawSlotID, 'int' );
+
+			$slot = array();
+			$instance['slots'][ $slotID ] = &$slot;
+
+			foreach( $children as $rawChild ) {
+				$slot[] = $this->saveData_safeInputBlock( $rawChild );
+			}
+		}
+
+		return $instance;
+	}
+
+	private function saveData_saveInstance( $blocksSetID, array &$instance )
+	{
+		$sql = "INSERT INTO blocks_instances ( blocks_set_ID, template_ID ) VALUES ( {$blocksSetID}, {$instance['templateID']} )";
+		$this->database->query( $sql );
+
+		$instance['ID'] = $this->database->getLastInsertedId();
+
+		foreach( $instance['slots'] as $slotID => $children ) {
+			foreach( $children as $position => &$child ) {
+				$this->saveData_saveInstance( $blocksSetID, $child );
+
+				$sql = "INSERT INTO blocks_instances_subblocks ( parent_instance_ID, parent_slot_ID, position, inserted_instance_ID ) VALUES ( {$instance['ID']}, {$slotID}, {$position}, {$child['ID']} )";
+				$this->database->query( $sql );
+			}
+		}
 	}
 }
 
