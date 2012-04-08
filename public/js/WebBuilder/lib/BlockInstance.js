@@ -48,15 +48,15 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		return this.store[ 'on'+ Ext.String.capitalize( event ) ].apply( this.store, args );
 	},
 
-	addChild : function( instance, slotName, position )
+	addChild : function( instance, slotId, position )
 	{
 		var me   = this,
-		    slot = me.slots[ slotName ];
+		    slot = me.slots[ slotId ];
 
 		if( slot == null ) {
 			Ext.log({
 				level : 'warn',
-				msg   : '['+ me.$className +'][addChild] Invalid slot "'+ slotName +'".',
+				msg   : '['+ me.$className +'][addChild] Invalid slot ID "'+ slotId +'".',
 				dump  : me
 			});
 
@@ -97,7 +97,7 @@ Ext.define( 'WebBuilder.BlockInstance', {
 			return;
 		}
 
-		var slotName    = null,
+		var slotId      = null,
 		    instanceIdx = -1;
 
 		var Array = Ext.Array,
@@ -105,12 +105,12 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		    slotInstances;
 
 		// search for child in every slot
-		for( slotName in slots ) {
-			if( slots.hasOwnProperty( slotName ) === false ) {
+		for( slotId in slots ) {
+			if( slots.hasOwnProperty( slotId ) === false ) {
 				continue;
 			}
 
-			slotInstances = slots[ slotName ];
+			slotInstances = slots[ slotId ];
 			instanceIdx   = Array.indexOf( slotInstances, instance );
 
 			// child found
@@ -167,16 +167,16 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		me.slots    = {};
 
 		template.slots().each( function( slot ) {
-			var name = slot.get('codeName');
-
-			me.slots[ name ] = [];
+			me.slots[ slot.getId() ] = [];
 		});
 
-		Ext.Object.each( oldSlots, function( name, children ) {
+		Ext.Object.each( oldSlots, function( id, children ) {
+			var oldSlot = oldTemplate.slots().getById( id ),
+			    newSlot = template.slots().findRecord( 'codeName', oldSlot.get('codeName') );
 
 			// transfer children between equally named slots
-			if( me.slots[ name ] ) {
-				me.slots[ name ] = children;
+			if( newSlot ) {
+				me.slots[ newSlot.getId() ] = children;
 
 			// remove children of slots that name does not match
 			// TODO is this the right way?

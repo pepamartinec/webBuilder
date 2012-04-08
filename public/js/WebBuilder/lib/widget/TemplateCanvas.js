@@ -117,6 +117,12 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 	instanceIdRe : new RegExp( 'template-block-instance-(\\d+)' ),
 
 	/**
+	 * @private
+	 * @property {RegExp} slotIdRe
+	 */
+	slotIdRe : new RegExp( 'template-block-instance-\\d+-slot-(\\d+)' ),
+
+	/**
 	 * Drop position pointer DOM node
 	 *
 	 * @property {HTMLElement}
@@ -256,7 +262,8 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 			slotCls      : me.slotCls,
 			overCls      : me.overCls,
 			insertPtrDom : me.insertPtrDom,
-			instanceIdRe : me.instanceIdRe
+			instanceIdRe : me.instanceIdRe,
+			slotIdRe     : me.slotIdRe
 		});
 
 		var store = me.instancesStore,
@@ -359,10 +366,10 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 	 * @param {WebBuilder.EditorStore} [store]
 	 * @param {WebBuilder.BlockInstance} [instance]
 	 * @param {WebBuilder.BlockInstance} [parentBlock]
-	 * @param {String} [parentSlotName]
+	 * @param {Number} [parentSlotId]
 	 * @param {Number,Null} [position]
 	 */
-	handleInstanceAdd : function( store, instance, parentBlock, parentSlotName, position )
+	handleInstanceAdd : function( store, instance, parentBlock, parentSlotId, position )
 	{
 		var me = this;
 
@@ -370,7 +377,7 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 		var blockDom = Ext.DomHelper.createDom( me.createBlockDefinition( instance ) );
 
 		if( parentBlock ) {
-			var slotDom      = me.findSlotDom( parentBlock, parentSlotName ),
+			var slotDom      = me.findSlotDom( parentBlock, parentSlotId ),
 			    insertBefore = slotDom.childNodes[ position ];
 
 			if( insertBefore ) {
@@ -459,12 +466,12 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 	 * Returns the slot DOM node
 	 *
 	 * @param {WebBuilder.BlockInstance} [instance]
-	 * @param {String} [slotName]
+	 * @param {Number} [slotId]
 	 * @return {HTMLElement}
 	 */
-	findSlotDom : function( instance, slotName )
+	findSlotDom : function( instance, slotId )
 	{
-		return this.iframeEl.dom.contentDocument.getElementById( 'template-block-instance-'+ instance.id +'-slot-'+ slotName );
+		return this.iframeEl.dom.contentDocument.getElementById( 'template-block-instance-'+ instance.id +'-slot-'+ slotId );
 	},
 
 	/**
@@ -521,18 +528,20 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 
 		// create slots DOM nodes definition
 		if( instance.slots ) {
-			Ext.Object.each( instance.slots, function( name, children ) {
-				var childrenDef = Ext.Array.map( children, me.createBlockDefinition, me );
+			Ext.Object.each( instance.slots, function( id, children ) {
+				var id          = parseInt( id ),
+				    slot        = instance.template.slots().getById( id ),
+				    childrenDef = Ext.Array.map( children, me.createBlockDefinition, me );
 
 				childrenDef.unshift({
 					tag  : 'div',
 					cls  : [ me.titleCls, me.slotTitleCls ].join(' '),
-					html : name
+					html : slot.get('codeName')
 				});
 
 				blockDef.children.push({
 					tag : 'div',
-					id  : 'template-block-instance-'+ instance.id +'-slot-'+ name,
+					id  : 'template-block-instance-'+ instance.id +'-slot-'+ id,
 					cls : me.slotCls,
 
 					children : childrenDef

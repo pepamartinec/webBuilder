@@ -175,7 +175,7 @@ Ext.define( 'WebBuilder.EditorStore', {
 	/**
 	 * @ignore
 	 */
-	addInstance_walkSlots : function( slotName, slotItems ) {
+	addInstance_walkSlots : function( slotId, slotItems ) {
 		Ext.Array.forEach( slotItems, this.addInstance, this );
 	},
 
@@ -208,26 +208,26 @@ Ext.define( 'WebBuilder.EditorStore', {
 
 
 
-	onBeforeAddChild : function( instance, child, slotName, position )
+	onBeforeAddChild : function( instance, child, slotId, position )
 	{
-		return this.fireEvent( 'beforeadd', this, child, instance, slotName, position );
+		return this.fireEvent( 'beforeadd', this, child, instance, slotId, position );
 	},
 
-	onAddChild : function( instance, child, slotName, position )
+	onAddChild : function( instance, child, slotId, position )
 	{
 		// add to the store (including all children)
 		this.addInstance( child );
 
 		// notify about addition
-		this.fireEvent( 'add', this, child, instance, slotName, position );
+		this.fireEvent( 'add', this, child, instance, slotId, position );
 	},
 
-	onBeforeRemoveChild : function( instance, child, slotName, position )
+	onBeforeRemoveChild : function( instance, child, slotId, position )
 	{
-		return this.fireEvent( 'beforeremove', this, child, instance, slotName, position );
+		return this.fireEvent( 'beforeremove', this, child, instance, slotId, position );
 	},
 
-	onRemoveChild : function( instance, child, slotName, position )
+	onRemoveChild : function( instance, child, slotId, position )
 	{
 		var me = this;
 
@@ -235,7 +235,7 @@ Ext.define( 'WebBuilder.EditorStore', {
 		me.removeInstance( child );
 
 		// notify about removal
-		this.fireEvent( 'remove', this, child, instance, slotName, position );
+		this.fireEvent( 'remove', this, child, instance, slotId, position );
 	},
 
 	onBeforeTemplateChange : function( instance, template )

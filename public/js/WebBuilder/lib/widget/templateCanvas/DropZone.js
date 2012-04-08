@@ -34,14 +34,25 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 	instanceIdRe : null,
 
 	/**
+	 * Slot id regexp
+	 *
+	 * @required
+	 * @cfg {RegExp} slotIdRe
+	 */
+	slotIdRe : null,
+
+	/**
 	 * Drop position pointer DOM node
 	 *
 	 * @property {HTMLElement} insertPtrDom
 	 */
 	insertPtrDom : null,
 
-	lastOverBlock : null,
-
+	/**
+	 * Constructor
+	 *
+	 * @param {Object} [config]
+	 */
 	constructor : function( config )
 	{
 		var me = this;
@@ -191,9 +202,18 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 		return this.instancesStore.get( instanceId );
 	},
 
-	getTargetSlotName : function( slotDom )
+	/**
+	 * Returns ID of the slot represented by the DOM node
+	 *
+	 * @param {HTMLElement} [slotDom]
+	 * @returns {Number}
+	 */
+	parseSlotId : function( slotDom )
 	{
-		return slotDom.children[0].innerHTML;
+		var match = slotDom.id.match( this.slotIdRe ),
+	        id    = parseInt( match[1] );
+
+		return isNaN( id ) ? null : id;
 	},
 
 	/**
@@ -238,14 +258,14 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 		}
 
 		var position  = this.findInsertPosition( slotDom, e ),
-		    slotName  = this.getTargetSlotName( slotDom ),
+		    slotId    = this.parseSlotId( slotDom ),
 		    instance  = Ext.create( 'WebBuilder.BlockInstance', block );
 
 		// select default template
 		instance.setTemplate( block.templates().getAt(0) );
 
 		// insert instance
-		targetInstance.addChild( instance, slotName, position );
+		targetInstance.addChild( instance, slotId, position );
 
 		return true;
 	},
@@ -260,11 +280,11 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 			return false;
 		}
 
-		var position  = this.findInsertPosition( slotDom, e ),
-			slotName  = this.getTargetSlotName( slotDom );
+		var position = this.findInsertPosition( slotDom, e ),
+		    slotId   = this.parseSlotId( slotDom );
 
 		// insert instance
-		targetInstance.addChild( draggedInstance, slotName, position );
+		targetInstance.addChild( draggedInstance, slotId, position );
 
 		return true;
 	}
