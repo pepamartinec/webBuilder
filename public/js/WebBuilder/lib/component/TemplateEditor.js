@@ -19,7 +19,8 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	],
 
 	uses : [
-		'Ext.JSON'
+		'Ext.JSON',
+		'extAdmin.patch.ExtObjectMap'
 	],
 
 	/**
@@ -157,10 +158,9 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	 */
 	getValue : function()
 	{
-		var me   = this,
-		    root = me.instancesStore.getRoot();
+		var root = this.instancesStore.getRoot();
 
-		return me.getValue_instance( root );
+		return this.getValue_instance( root );
 	},
 
 	/**
@@ -173,7 +173,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 			config  : Ext.clone( instance.config ),
 
 			templateID : instance.template && instance.template.getId(),
-			slots      : instance.slots    && Ext.Object.map( instance.slots, me.walkInstanceSlot, me )
+			slots      : instance.slots    && Ext.Object.map( instance.slots, this.getValue_walkInstanceSlot, this )
 		};
 	},
 
@@ -182,7 +182,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	 */
 	getValue_walkInstanceSlot : function( name, children )
 	{
-		return Ext.Array.map( children, me.getValue_instance, me );
+		return Ext.Array.map( children, this.getValue_instance, this );
 	},
 
 	/**
