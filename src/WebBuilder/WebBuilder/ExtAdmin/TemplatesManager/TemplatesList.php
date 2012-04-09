@@ -132,6 +132,10 @@ class TemplatesList extends GridList
 		$data       = $dataFeeder->get();
 		$count      = $dataFeeder->getCount();
 
+		if( $data === null ) {
+			$data = array();
+		}
+
 		return new DataBrowserResponse( true, $data, $count, function( BlocksSet $record ) {
 			return array(
 				'ID'    => $record->getID(),
