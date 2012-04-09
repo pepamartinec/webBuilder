@@ -4,7 +4,7 @@ namespace WebBuilder\WebBuilder\ExtAdmin\WebEditor;
 use WebBuilder\WebBuilder\DataObjects\BlocksSet;
 use ExtAdmin\Response\DataBrowserResponse;
 use Inspirio\Database\cDBFeederBase;
-use ExtAdmin\Request\DataRequest;
+use ExtAdmin\Request\DataRequestDecorator;
 use ExtAdmin\RequestInterface;
 use Inspirio\Database\cDatabase;
 use ExtAdmin\Module\DataBrowser\GridList;
@@ -99,7 +99,7 @@ class PagesList extends GridList
 	 */
 	public function loadListData( RequestInterface $request )
 	{
-		$request = new DataRequest( $request );
+		$request = new DataRequestDecorator( $request );
 
 		return new DataBrowserResponse( true, array(), 0 );
 	}

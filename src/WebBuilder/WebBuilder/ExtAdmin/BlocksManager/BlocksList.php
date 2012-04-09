@@ -8,7 +8,7 @@ use WebBuilder\WebBuilder\DataObjects\BlocksCategory;
 
 use Inspirio\Database\cDBFeederBase;
 
-use ExtAdmin\Request\DataRequest;
+use ExtAdmin\Request\DataRequestDecorator;
 
 use ExtAdmin\RequestInterface;
 
@@ -118,7 +118,7 @@ class BlocksList extends TreeList
 	 */
 	public function loadListData( RequestInterface $request )
 	{
-		$request = new DataRequest( $request );
+		$request = new DataRequestDecorator( $request );
 
 		$categoriesFeeder = new cDBFeederBase( 'WebBuilder\\WebBuilder\\DataObjects\\BlocksCategory', $this->database );
 		$categories       = $categoriesFeeder->get();

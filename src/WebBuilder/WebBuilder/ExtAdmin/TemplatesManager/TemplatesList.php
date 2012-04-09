@@ -3,7 +3,7 @@ namespace WebBuilder\WebBuilder\ExtAdmin\TemplatesManager;
 
 use ExtAdmin\Module\DataBrowser\GridList;
 use WebBuilder\WebBuilder\DataObjects\BlocksSet;
-use ExtAdmin\Request\DataRequest;
+use ExtAdmin\Request\DataRequestDecorator;
 use ExtAdmin\Response\DataBrowserResponse;
 use ExtAdmin\RequestInterface;
 use Inspirio\Database\cDBFeederBase;
@@ -126,7 +126,7 @@ class TemplatesList extends GridList
 	 */
 	public function loadListData( RequestInterface $request )
 	{
-		$request = new DataRequest( $request );
+		$request = new DataRequestDecorator( $request );
 
 		$dataFeeder = new cDBFeederBase( 'WebBuilder\\WebBuilder\\DataObjects\\BlocksSet', $this->database );
 		$data       = $dataFeeder->get();

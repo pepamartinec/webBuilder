@@ -1,16 +1,13 @@
 <?php
 namespace WebBuilder\WebBuilder\ExtAdmin\TemplatesManager;
 
+use WebBuilder\WebBuilder\BlocksLoaders\DatabaseLoader;
+
 use WebBuilder\WebBuilder\DataObjects\BlocksSet;
-
 use WebBuilder\WebBuilder\BlockInstance;
-
 use ExtAdmin\Request\Request;
-
 use Inspirio\Database\aDataObject;
-
 use WebBuilder\WebBuilder\DataObjects\Block;
-
 use WebBuilder\WebBuilder\WebBuilderInterface;
 use WebBuilder\WebBuilder\DataObjects\WebStructureItem;
 use ExtAdmin\Response\HtmlResponse;
@@ -117,29 +114,37 @@ class TemplateEditor extends DataEditor
 	/**
 	 * Loads template by ID
 	 *
-	 * @param  int                $templateID
+	 * @param  int                $blocksSetID
 	 * @param  RessponseInterface $response
 	 * @return BlocksSet
 	 */
-	private function loadTemplate( $templateID, ResponseInterface $response )
+	private function loadTemplateData( $blocksSetID, ResponseInterface $response )
 	{
 		/* @var $template BlocksSet */
-		$template = null;
+		$blocksSet = null;
 
-		// load template
-		if( $templateID != null ) {
-			$templatesFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\BlocksSet', $this->database );
-			$template        = $templatesFeeder->whereID( $templateID )->getOne();
-		}
+		// load blocks set
+		$blocksSetsFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\BlocksSet', $this->database );
+		$blocksSet        = $blocksSetsFeeder->whereID( $blocksSetID )->getOne();
 
-		if( $template === null ) {
+		if( $blocksSet === null ) {
 			$response->setSuccess( false )
 			         ->setMessage( 'Template not found' );
 
 			return null;
 		}
 
-		return $template;
+		// load template blocks
+		$blocksLoader = new \WebBuilder\WebBuilder\BlocksLoaders\DatabaseLoader( $blocksSetsFeeder );
+		$blocks       = $blocksLoader->fetchBlocksInstances( $blocksSet );
+		$rootBlock    = reset( $blocks );
+
+		return array(
+			'ID'       => $blocksSet->getID(),
+			'name'     => $blocksSet->getName(),
+			'parentID' => $blocksSet->getParentID(),
+			'template' => $rootBlock->export()
+		);
 	}
 
 	/**
@@ -166,15 +171,20 @@ class TemplateEditor extends DataEditor
 		$templateID = $request->getData( 'ID', 'int' );
 		$response   = new ActionResponse( true );
 
-		$template = $this->loadTemplate( $templateID, $response );
+		$templateData = $this->loadTemplateData( $templateID, $response );
 
 		if( $response->getSuccess() === false ) {
 			return $response;
 		}
 
-		$response->setData( $template->getInnerValues() );
+		$response->setData( $templateData );
 
 		return $response;
+	}
+
+	private function loadData_record_buildInstanceData()
+	{
+
 	}
 
 	/**
@@ -188,16 +198,16 @@ class TemplateEditor extends DataEditor
 		$templateID = $request->getData( 'ID', 'int' );
 		$response   = new ActionResponse( true );
 
-		$template = $this->loadTemplate( $templateID, $response );
+		$templateData = $this->loadTemplateData( $templateID, $response );
 
 		if( $response->getSuccess() === false ) {
 			return $response;
 		}
 
-		$template->setID( null );
-		$template->setName( "{$template->getName()} (kopie)" );
+		$templateData['ID'] = null;
+		$templateData['name'] += ' (kopie)';
 
-		$response->setData( $template->getInnerValues() );
+		$response->setData( $templateData );
 
 		return $response;
 	}
@@ -213,16 +223,17 @@ class TemplateEditor extends DataEditor
 		$templateID = $request->getData( 'ID', 'int' );
 		$response   = new ActionResponse( true );
 
-		$template = $this->loadTemplate( $templateID, $response );
+		$templateData = $this->loadTemplateData( $templateID, $response );
 
 		if( $response->getSuccess() === false ) {
 			return $response;
 		}
 
-		$template->setParentID( $template->getID() );
-		$template->setID( null );
+		$templateData['parentID'] = $templateData['ID'];
+		$templateData['ID'] = null;
+		$templateData['name'] += ' (kopie)';
 
-		$response->setData( $template->getInnerValues() );
+		$response->setData( $templateData );
 
 		return $response;
 	}

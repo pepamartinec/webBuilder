@@ -40,11 +40,18 @@ class BlockInstance
 	public $blockName;
 
 	/**
+	 * WebBlock template ID
+	 *
+	 * @var int
+	 */
+	public $templateID;
+
+	/**
 	 * WebBlock template filename
 	 *
 	 * @var string
 	 */
-	public $template;
+	public $templateFile;
 
 	/**
 	 * Slots occupancy
@@ -68,7 +75,7 @@ class BlockInstance
 	 * @var array|null
 	 */
 	public $data = null;
-	
+
 	/**
 	 * Constructor
 	 *
@@ -77,11 +84,11 @@ class BlockInstance
 	public function __construct( $instanceID )
 	{
 		$this->ID = $instanceID;
-		
+
 		$this->slots            = array();
 		$this->dataDependencies = array();
 	}
-	
+
 	/**
 	 * Adds new child instance to given slot
 	 *
@@ -95,11 +102,11 @@ class BlockInstance
 		if( isset( $this->slots[ $slot ] ) === false ) {
 			$this->slots[ $slot ] = array();
 		}
-		
+
 		$childInstance->parent = $this;
 		$this->slots[ $slot ][ $position ] = $childInstance;
 	}
-	
+
 	/**
 	 * Returns printable representation of the object
 	 *
@@ -117,6 +124,33 @@ class BlockInstance
 	 */
 	public function __sleep()
 	{
-		return array( 'parent', 'ID', 'blockID', 'blockName', 'template', 'slots', 'dataDependencies' );
+		return array( 'parent', 'ID', 'blockID', 'blockName', 'templateID', 'templateFile', 'slots', 'dataDependencies' );
+	}
+
+	/**
+	 * Exports instance data so it can be reconstructed lately somewhere else
+	 *
+	 * This method does not export all internal data, only IDs of references
+	 *
+	 * @return array
+	 */
+	public function export()
+	{
+		return self::export_block( $this );
+	}
+
+	private static function export_block( BlockInstance $block )
+	{
+		return array(
+			'ID'         => $block->ID,
+			'blockID'    => $block->blockID,
+			'templateID' => $block->templateID,
+			'slots'      => array_map( array( 'self', 'export_blockSlot' ), $block->slots )
+		);
+	}
+
+	private static function export_blockSlot( $children )
+	{
+		return array_map( array( 'self', 'export_block' ), $children );
 	}
 }

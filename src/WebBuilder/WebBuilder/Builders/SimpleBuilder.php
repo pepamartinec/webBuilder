@@ -54,7 +54,7 @@ class SimpleBuilder implements BlocksBuilderInterface
 		}
 
 		/* @var $template \WebBuilder\WebBuilder\Twig\WebBuilderTemplate */
-		$template = $this->twig->loadTemplate( $block->template );
+		$template = $this->twig->loadTemplate( $block->templateFile );
 
 		// TODO ugly hack
 		$template->setBuilder( $this );

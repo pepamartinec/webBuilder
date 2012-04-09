@@ -1,7 +1,7 @@
 <?php
 namespace WebBuilder;
 
-use ExtAdmin\Request\PayloadRequest;
+use ExtAdmin\Request\FakeRequest;
 
 include_once 'common.php';
 
@@ -20,6 +20,13 @@ $factory  = new \WebBuilder\WebBuilder\ExtAdmin\ModulesFactory( $database, $labe
 $extAdmin->registerModuleFactory( '\\WebBuilder', $factory );
 
 // handle client request
-$request = new \ExtAdmin\Request\PayloadRequest();
+$module     = '\\WebBuilder\\WebBuilder\\ExtAdmin\\TemplatesManager\\TemplateEditor';
+$action     = 'loadData_record';
+$parameters = null;
+$data       = array(
+	'ID' => 8
+);
+
+$request = new \ExtAdmin\Request\FakeRequest( $module, $action, $parameters, $data );
 
 $extAdmin->handleClientRequest( $request );
