@@ -1,6 +1,8 @@
 <?php
 namespace WebBuilder\WebBuilder\ExtAdmin\TemplatesManager;
 
+use ExtAdmin\Request\AbstractRequest;
+
 use WebBuilder\WebBuilder\BlocksLoaders\DatabaseLoader;
 
 use WebBuilder\WebBuilder\DataObjects\BlocksSet;
@@ -441,11 +443,16 @@ class TemplateEditor extends DataEditor
 	{
 		$ID       = $request->getData( 'ID', 'int' );
 		$name     = $request->getData( 'name', 'string' );
-		$instance = $this->saveData_safeInputBlock( $request->getRawData( 'template' ) );
+		$slotIDs  = array();
+		$instance = $this->saveData_safeInputBlock( $request->getRawData( 'template' ), $slotIDs );
 
 		try {
 			$this->database->transactionStart();
 
+			// convert slot identificators
+			$this->convertSlotIdentificators( $instance );
+
+			// create blocksSet (template)
 			$blocksSet = new BlocksSet( array(
 				'ID'   => $ID,
 				'name' => $name
@@ -453,6 +460,11 @@ class TemplateEditor extends DataEditor
 
 			$blockSetsFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\BlocksSet', $this->database );
 			$blockSetsFeeder->save( $blocksSet );
+
+			// save blocks instances (template items)
+
+			$sql = "DELETE FROM blocks_instances WHERE blocks_set_ID = {$blocksSet->getID()}";
+			$this->database->query( $sql );
 
 			$this->saveData_saveInstance( $blocksSet->getID(), $instance );
 
@@ -463,38 +475,111 @@ class TemplateEditor extends DataEditor
 			throw $e;
 		}
 
-		// reassemble updated data & do response
+		// reload updated data
 		$response = new ActionResponse( true );
-		$response->setData( array(
-			'ID'       => $blocksSet->getID(),
-			'name'     => $blocksSet->getName(),
-			'template' => $instance
-		));
+		$response->setData( $this->loadTemplateData( $blocksSet->getID(), $response ) );
 
 		return $response;
 	}
 
-	private function saveData_safeInputBlock( array $rawBlock )
+	private function saveData_safeInputBlock( array $rawBlock, array &$slotIDs )
 	{
 		$instance = array(
-			'templateID' => Request::secureData( $rawBlock, 'templateID', 'int' ),
+			'templateID' => AbstractRequest::secureData( $rawBlock, 'templateID', 'int' ),
 			'slots'      => array()
 		);
 
 		$instances[] = &$instance;
 
 		foreach( $rawBlock['slots'] as $rawSlotID => $children ) {
-			$slotID = Request::secureValue( $rawSlotID, 'int' );
+			$slotID = AbstractRequest::secureValue( $rawSlotID, 'string' );
 
-			$slot = array();
-			$instance['slots'][ $slotID ] = &$slot;
+			$slotIDs[] = $slotID;
+
+			$instance['slots'][ $slotID ] = array();
+			$slot = &$instance['slots'][ $slotID ];
 
 			foreach( $children as $rawChild ) {
-				$slot[] = $this->saveData_safeInputBlock( $rawChild );
+				$slot[] = $this->saveData_safeInputBlock( $rawChild, $slotIDs );
 			}
 		}
 
 		return $instance;
+	}
+
+	private function convertSlotIdentificators( array &$rootInstance )
+	{
+		// collect used codeNames
+		$slotCodeNames = array();
+		$this->convertSlotIdentificators_collectSlots( $rootInstance, $slotCodeNames );
+
+		// load slots
+		$filter = array();
+		foreach( $slotCodeNames as $templateID => $codeNames ) {
+			$codeNames = implode( "','", $codeNames );
+
+			$filter[] = "( template_ID = {$templateID} AND code_name IN ('{$codeNames}') )";
+		}
+
+		$slotsFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\BlockTemplateSlot', $this->database );
+		$slots       = $slotsFeeder->where( implode( ' OR ', $filter ) )->groupBy( 'template_ID' )->indexBy( 'code_name' )->get();
+
+		// convert identificators
+		$this->convertSlotIdentificators_convert( $rootInstance, $slots );
+	}
+
+	private function convertSlotIdentificators_collectSlots( array $instance, array &$slots )
+	{
+		// skip blocks with no slots
+		if( $instance['slots'] == null ) {
+			return;
+		}
+
+		$templateID = $instance['templateID'];
+
+		foreach( $instance['slots'] as $codeName => $children ) {
+			$slots[ $templateID ][] = $codeName;
+
+			foreach( $children as $child ) {
+				$this->convertSlotIdentificators_collectSlots( $child, $slots );
+			}
+		}
+	}
+
+	private function convertSlotIdentificators_convert( array &$instance, array $slots )
+	{
+		// skip blocks with no slots
+		if( $instance['slots'] == null ) {
+			return;
+		}
+
+		$templateID = $instance['templateID'];
+
+		if( isset( $slots[ $templateID ] ) === false ) {
+			// ERROR
+		}
+
+		$templateSlots = $slots[ $templateID ];
+		$slotsByIDs    = array();
+
+		foreach( $instance['slots'] as $codeName => $children ) {
+			if( isset( $templateSlots[ $codeName ] ) === false ) {
+				// ERROR
+			}
+
+			$slot = $templateSlots[ $codeName ];
+
+			$slotsByIDs[ $slot->getID() ] = array();
+			$newChildren = &$slotsByIDs[ $slot->getID() ];
+
+			foreach( $children as &$child ) {
+				$this->convertSlotIdentificators_convert( $child, $slots );
+
+				$newChildren[] = $child;
+			}
+		}
+
+		$instance['slots'] = $slotsByIDs;
 	}
 
 	private function saveData_saveInstance( $blocksSetID, array &$instance )
