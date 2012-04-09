@@ -120,7 +120,7 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 	 * @private
 	 * @property {RegExp} slotIdRe
 	 */
-	slotIdRe : new RegExp( 'template-block-instance-\\d+-slot-(\\d+)' ),
+	slotIdRe : new RegExp( 'template-block-instance-\\d+-slot-(\\w+)' ),
 
 	/**
 	 * Drop position pointer DOM node
@@ -529,8 +529,7 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 		// create slots DOM nodes definition
 		if( instance.slots ) {
 			Ext.Object.each( instance.slots, function( id, children ) {
-				var id          = parseInt( id ),
-				    slot        = instance.template.slots().getById( id ),
+				var slot        = instance.template.slots().findRecord( 'codeName', id ),
 				    childrenDef = Ext.Array.map( children, me.createBlockDefinition, me );
 
 				childrenDef.unshift({

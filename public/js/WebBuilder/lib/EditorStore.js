@@ -22,6 +22,13 @@ Ext.define( 'WebBuilder.EditorStore', {
 	root : null,
 
 	/**
+	 * @private
+	 */
+	suspendChangeEvt : 0,
+
+// ====================== PUBLIC INTERFACE ====================== //
+
+	/**
 	 * Constructor
 	 *
 	 * @param {WebBuilder.EditorStore.Instance} rootInstance The root block instance
@@ -33,14 +40,11 @@ Ext.define( 'WebBuilder.EditorStore', {
 		me.mixins.observable.constructor.call( me, config );
 
 		me.addEvents(
-			'beforeadd',
 			'add',
-			'beforeremove',
 			'remove',
-			'beforetemplatechange',
 			'templatechange',
-			'beforeconfigchange',
-			'configchange'
+			'configchange',
+			'change'
 		);
 
 		me.store = Ext.create( 'Ext.util.HashMap' );
@@ -53,35 +57,7 @@ Ext.define( 'WebBuilder.EditorStore', {
 	 */
 	clear : function()
 	{
-		var me    = this,
-		    store = me.store;
-
-		// remove existing data
-		if( me.root ) {
-			me.remove( root );
-		}
-
-		// check for orphaned instances
-		if( store.getCount() > 0 ) {
-			// this should never happen, because all instances
-			// should be somewhere under the root and already
-			// be removed with it
-
-			// <debug>
-				Ext.log({
-					level : 'warn',
-					msg   : '['+ me.$className +'][clear] Store contains orphaned instance.',
-					store : store
-				});
-			// </debug>
-
-			// remove orphaned instances one by one
-			store.each( function( id, instance ) {
-				me.remove( instance );
-			});
-		}
-
-		return this;
+		return this.setRoot( null );
 	},
 
 	/**
@@ -115,27 +91,34 @@ Ext.define( 'WebBuilder.EditorStore', {
 	{
 		var me = this;
 
-		if( me.fireEvent( 'beforeadd', me, instance, null, null, null ) === false ) {
-			return;
-		}
+		// suspend change event
+		// so clients do just bulk get 'change' notification
+		++me.suspendChangeEvt;
 
-		// remove instance from its original place
-		instance.remove();
-
-		// replace current instances with new ones
+		// remove current root
 		var oldRoot = me.root;
 
-		if( oldRoot ) {
-			me.remove( oldRoot );
+		me.clearInstances();
+
+		if( instance ) {
+			// remove new root from its original place
+			instance.remove();
+
+			// set new root
+			me.root = instance;
+
+			me.addInstance( instance );
+			me.fireEvent( 'add', me, instance, null, null, null );
 		}
 
-		me.root = instance;
-		me.addInstance( instance );
+		--me.suspendChangeEvt;
 
-		me.fireEvent( 'add', me, instance, null, null, null );
+		me.onChange();
 
 		return oldRoot;
 	},
+
+// ====================== INNER MANIPULATION METHODS ====================== //
 
 	/**
 	 * Adds the instance and all its children.
@@ -206,25 +189,63 @@ Ext.define( 'WebBuilder.EditorStore', {
 		Ext.Array.forEach( children, this.removeInstance, this );
 	},
 
-
-
-	onBeforeAddChild : function( instance, child, slotId, position )
+	/**
+	 * Removes all instances
+	 *
+	 * @protected
+	 */
+	clearInstances : function()
 	{
-		return this.fireEvent( 'beforeadd', this, child, instance, slotId, position );
+		var me    = this,
+		    store = me.store;
+
+		// remove existing data
+		if( me.root ) {
+			me.removeInstance( root );
+
+			me.root = null;
+		}
+
+		// check for orphaned instances
+		if( store.getCount() > 0 ) {
+			// this should never happen, because all instances
+			// should be somewhere under the root and already
+			// be removed with it
+
+			// <debug>
+				Ext.log({
+					level : 'warn',
+					msg   : '['+ me.$className +'][clear] Store contains orphaned instance.',
+					store : store
+				});
+			// </debug>
+
+			// remove orphaned instances one by one
+			store.each( function( id, instance ) {
+				me.removeInstance( instance );
+			});
+		}
 	},
+
+	onChange : function()
+	{
+		if( this.suspendChangeEvt === 0 ) {
+			this.fireEvent( 'change', this );
+		}
+	},
+
+// ====================== INSTANCES NOTIFICATION INTERFACE ====================== //
 
 	onAddChild : function( instance, child, slotId, position )
 	{
+		var me = this;
+
 		// add to the store (including all children)
-		this.addInstance( child );
+		me.addInstance( child );
 
 		// notify about addition
-		this.fireEvent( 'add', this, child, instance, slotId, position );
-	},
-
-	onBeforeRemoveChild : function( instance, child, slotId, position )
-	{
-		return this.fireEvent( 'beforeremove', this, child, instance, slotId, position );
+		me.fireEvent( 'add', me, child, instance, slotId, position );
+		me.onChange();
 	},
 
 	onRemoveChild : function( instance, child, slotId, position )
@@ -235,26 +256,19 @@ Ext.define( 'WebBuilder.EditorStore', {
 		me.removeInstance( child );
 
 		// notify about removal
-		this.fireEvent( 'remove', this, child, instance, slotId, position );
-	},
-
-	onBeforeTemplateChange : function( instance, template )
-	{
-		return this.fireEvent( 'beforetemplatechange', this, instance, template );
+		me.fireEvent( 'remove', me, child, instance, slotId, position );
+		me.onChange();
 	},
 
 	onTemplateChange : function( instance, oldTemplate )
 	{
-		return this.fireEvent( 'templatechange', this, instance, oldTemplate );
-	},
-
-	onBeforeConfigChange : function( instance, config )
-	{
-		return this.fireEvent( 'beforeconfigchange', this, instance, config );
+		this.fireEvent( 'templatechange', this, instance, oldTemplate );
+		me.onChange();
 	},
 
 	onConfigChange : function( instance, config )
 	{
-		return this.fireEvent( 'configchange', this, instance, Ext.Object.getKeys( config ) );
+		this.fireEvent( 'configchange', this, instance, Ext.Object.getKeys( config ) );
+		me.onChange();
 	}
 });

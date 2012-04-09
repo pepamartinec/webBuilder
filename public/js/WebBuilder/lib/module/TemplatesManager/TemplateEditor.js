@@ -22,6 +22,14 @@ Ext.define( 'WebBuilder.module.TemplatesManager.TemplateEditor',
 	{
 		var me = this;
 
+		me.idField = Ext.create( 'Ext.form.field.Hidden', {
+			name : 'ID'
+		});
+
+		me.parentIdField = Ext.create( 'Ext.form.field.Hidden', {
+			name : 'parentID'
+		});
+
 		me.nameField = Ext.create( 'Ext.form.field.Text', {
 			fieldLabel : 'Název',
 			name       : 'name'
@@ -37,7 +45,7 @@ Ext.define( 'WebBuilder.module.TemplatesManager.TemplateEditor',
 			title   : 'Obecné',
 			padding : 5,
 
-			items : [ me.nameField ]
+			items : [ me.idField, me.parentIdField, me.nameField ]
 		});
 
 		var editorTab = Ext.apply( me.templateEditor, {
@@ -60,7 +68,12 @@ Ext.define( 'WebBuilder.module.TemplatesManager.TemplateEditor',
 
 	setData : function( data )
 	{
-		console.log( 'set data ', data );
+		var me = this;
+
+		me.idField.setValue( data.ID );
+		me.parentIdField.setValue( data.parentID );
+		me.nameField.setValue( data.name );
+		me.templateEditor.setValue( data.template );
 	},
 
 	getData : function()
@@ -68,6 +81,8 @@ Ext.define( 'WebBuilder.module.TemplatesManager.TemplateEditor',
 		var me = this;
 
 		return {
+			ID       : me.idField.getValue(),
+			parentID : me.parentIdField.getValue(),
 			name     : me.nameField.getValue(),
 			template : me.templateEditor.getValue()
 		};

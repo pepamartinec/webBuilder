@@ -210,10 +210,9 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 	 */
 	parseSlotId : function( slotDom )
 	{
-		var match = slotDom.id.match( this.slotIdRe ),
-	        id    = parseInt( match[1] );
+		var match = slotDom.id.match( this.slotIdRe );
 
-		return isNaN( id ) ? null : id;
+		return match && match[1];
 	},
 
 	/**

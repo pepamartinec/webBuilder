@@ -49,7 +49,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 
 		me.module = me.env.getModule( me.module );
 
-		me.initData();
+		me.initStores();
 
 		// init internal components
 		var ddGroup = me.getId();
@@ -97,13 +97,19 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		});
 
 		me.callParent( arguments );
+		me.initField();
 	},
 
-	initData : function( cb, cbScope )
+	initStores : function( cb, cbScope )
 	{
 		var me = this;
 
-		me.instancesStore = Ext.create( 'WebBuilder.EditorStore' );
+		me.instancesStore = Ext.create( 'WebBuilder.EditorStore', {
+			listeners : {
+				scope  : me,
+				change : me.handleInstancesStoreChange
+			}
+		});
 
 		me.blocksStore = extAdmin.Store.create({
 			env        : me.env,
@@ -123,66 +129,63 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 
 	onBlocksLoad : function( blocksStore, blocks )
 	{
-		var me = this;
+		var me    = this,
+		    value = me.getValue();
 
 		// fill some default content
-		if( me.value == null ) {
-			me.value = {
+		if( value == null ) {
+			value = {
 				blockID    : 4,
 				templateID : 10
 			};
 		}
-//
-//		// convert value to block instance
-//		if( me.value ) {
-//
-//		// no value, create empty root instance
-//		} else {
-//			var block    = blocksStore.getById( defaultBlockId ),
-//			    template = block.templates().getById( defaultTemplateId ),
-//			    root     = Ext.create( 'WebBuilder.BlockInstance', block, template );
-//
-//			me.instancesStore.setRoot( root );
-//		}
 
-		// init field mixin
+		// init real field value
 		// this must be done after block load
 		// so we have all data for instances creation
-		me.initField();
+		me.setValue( me.value );
 	},
 
 	/**
-	 * Returns the current data value of the field.
+	 * Refreshes the field value with current instances store content
 	 *
-	 * @return {Object} value The field value
+	 * @protected
 	 */
-	getValue : function()
+	handleInstancesStoreChange : function()
 	{
-		var root = this.instancesStore.getRoot();
+		var me    = this,
+		    root  = me.instancesStore.getRoot(),
+		    value = me.handleInstancesStoreChange_instance( root );
 
-		return this.getValue_instance( root );
+		me.mixins.field.setValue.call( me, value );
 	},
 
 	/**
 	 * @ignore
+	 * @private
 	 */
-	getValue_instance : function( instance )
+	handleInstancesStoreChange_instance : function( instance )
 	{
+		if( instance == null ) {
+			return null;
+		}
+
 		return {
 			blockID : instance.block.getId(),
 			config  : Ext.clone( instance.config ),
 
 			templateID : instance.template && instance.template.getId(),
-			slots      : instance.slots    && Ext.Object.map( instance.slots, this.getValue_walkInstanceSlot, this )
+			slots      : instance.slots    && Ext.Object.map( instance.slots, this.handleInstancesStoreChange_walkInstanceSlot, this )
 		};
 	},
 
 	/**
 	 * @ignore
+	 * @private
 	 */
-	getValue_walkInstanceSlot : function( name, children )
+	handleInstancesStoreChange_walkInstanceSlot : function( name, children )
 	{
-		return Ext.Array.map( children, this.getValue_instance, this );
+		return Ext.Array.map( children, this.handleInstancesStoreChange_instance, this );
 	},
 
 	/**
@@ -193,28 +196,42 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	 */
 	setValue : function( value )
 	{
-		var me    = this,
-		    store = me.instancesStore;
+		var me = this;
 
-		// clear data storage
-		store.clear();
+		// blocks store is not inited yet
+		// just the value as the inner field value
+		if( me.blocksStore.isLoading() === true ) {
+			return me.mixins.field.setValue.apply( me, arguments );
+		}
 
+		// route the value to the instances store
+		// it updates its internal values and
+		// thru the 'change' event changes the local
+		// inner field value
 		var root = me.setValue_createInstance( value );
-		store.setRoot( root );
+		me.instancesStore.setRoot( root );
 
-		me.checkChange();
-
-		return me;
+		return this;
 	},
 
 	/**
 	 * @ignore
+	 * @private
 	 */
 	setValue_createInstance : function( value )
 	{
-		var me       = this,
-		    block    = me.blocksStore.getById( value.blockID ),
-		    template = value.templateID && block.templates().getById( value.templateID ),
+		if( value == null ) {
+			return null;
+		}
+
+		var me    = this,
+		    block = me.blocksStore.getById( value.blockID );
+
+		if( block == null ) {
+			return null;
+		}
+
+		var template = value.templateID && block.templates().getById( value.templateID ),
 		    config   = value.config;
 
 		// create instance
@@ -222,11 +239,11 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 
 		// create children
 		if( value.slots ) {
-			Ext.Object.each( value.slots, function( name, children ) {
-				Ext.Array.forEach( children, function( child ) {
+			Ext.Object.each( value.slots, function( id, children ) {
+				Ext.iterate( children, function( child ) {
 					var childInstance = me.setValue_createInstance( child );
 
-					instance.addChild( childInstance );
+					instance.addChild( childInstance, id );
 				});
 			});
 		}

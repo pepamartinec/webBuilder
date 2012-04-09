@@ -63,11 +63,6 @@ Ext.define( 'WebBuilder.BlockInstance', {
 			return me;
 		}
 
-		// notify store
-		if( me.notifyStore( 'beforeAddChild', arguments ) === false ) {
-			return;
-		}
-
 		// remove instance from its original parent first
 		instance.remove();
 
@@ -91,11 +86,6 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	removeChild : function( instance )
 	{
 		var me = this;
-
-		// notify store
-		if( me.notifyStore( 'beforeRemoveChild', arguments ) === false ) {
-			return;
-		}
 
 		var slotId      = null,
 		    instanceIdx = -1;
@@ -154,12 +144,6 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	{
 		var me = this;
 
-		// notify store
-		if( me.notifyStore( 'beforeTemplateChange', [ template ] ) === false ) {
-			return;
-		}
-
-
 		var oldTemplate = me.template,
 		    oldSlots    = me.slots || {};
 
@@ -167,16 +151,17 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		me.slots    = {};
 
 		template.slots().each( function( slot ) {
-			me.slots[ slot.getId() ] = [];
+			me.slots[ slot.get('codeName') ] = [];
 		});
 
 		Ext.Object.each( oldSlots, function( id, children ) {
-			var oldSlot = oldTemplate.slots().getById( id ),
-			    newSlot = template.slots().findRecord( 'codeName', oldSlot.get('codeName') );
+			var codeName = id,
+//			    oldSlot  = oldTemplate.slots().findRecord( 'codeName', codeName ),
+			    newSlot  = template.slots().findRecord( 'codeName', codeName );
 
 			// transfer children between equally named slots
 			if( newSlot ) {
-				me.slots[ newSlot.getId() ] = children;
+				me.slots[ newSlot.get('codeName') ] = children;
 
 			// remove children of slots that name does not match
 			// TODO is this the right way?
@@ -204,11 +189,6 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	setConfig : function( config )
 	{
 		var me = this;
-
-		// notify store
-		if( me.notifyStore( 'beforeConfigChange', arguments ) === false ) {
-			return;
-		}
 
 		var myConfig = me.config;
 		for( var idx in config ) {
