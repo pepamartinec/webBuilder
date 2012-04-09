@@ -89,26 +89,29 @@ class DatabaseLoader implements BlocksLoaderInterface
 		$result = $this->database->fetchArray();
 
 		foreach( $result as $r ) {
+			$instanceID = (int)$r['instance_ID'];
+			$parentID   = (int)$r['parent_instance_ID'];
+
 			// touch block instance
-			if( isset( $instances[ $r['instance_ID'] ] ) === false ) {
-				$instances[ $r['instance_ID'] ] = new BlockInstance( $r['instance_ID'] );
+			if( isset( $instances[ $instanceID ] ) === false ) {
+				$instances[ $instanceID ] = new BlockInstance( $instanceID );
 			}
 
-			$block = $instances[ $r['instance_ID'] ];
+			$block = $instances[ $instanceID ];
 
-			$block->blockID      = $r['block_ID'];
+			$block->blockID      = (int)$r['block_ID'];
 			$block->blockName    = $r['block_name'];
-			$block->templateID   = $r['template_ID'];
+			$block->templateID   = (int)$r['template_ID'];
 			$block->templateFile = $r['template_filename'];
 
 			// block instance has parent block instance defined
-			if( $r['parent_instance_ID'] ) {
+			if( $parentID ) {
 				// touch parent block instance
-				if( isset( $instances[ $r['parent_instance_ID'] ] ) === false ) {
-					$instances[ $r['parent_instance_ID'] ] = new BlockInstance( $r['parent_instance_ID'] );
+				if( isset( $instances[ $parentID ] ) === false ) {
+					$instances[ $parentID ] = new BlockInstance( $parentID );
 				}
 
-				$parent = $instances[ $r['parent_instance_ID'] ];
+				$parent = $instances[ $parentID ];
 				$parent->addChild( $block, $r['parent_slot_name'], $r['parent_slot_position'] );
 
 			} else {
