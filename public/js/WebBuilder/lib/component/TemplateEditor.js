@@ -127,6 +127,15 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		});
 	},
 
+	/**
+	 * Blocks store data load handler
+	 *
+	 * Initializes the real field value. This must be done after the blocks store load,
+	 * so we have all the data for instances creation.
+	 *
+	 * @param {Ext.data.Store} [blocksStore]
+	 * @param {WebBuilder.model.Block[]} [blocks]
+	 */
 	onBlocksLoad : function( blocksStore, blocks )
 	{
 		var me    = this,
@@ -143,7 +152,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		// init real field value
 		// this must be done after block load
 		// so we have all data for instances creation
-		me.setValue( me.value );
+		me.setValue( value );
 	},
 
 	/**
