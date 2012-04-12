@@ -258,10 +258,7 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 
 		var position  = this.findInsertPosition( slotDom, e ),
 		    slotId    = this.parseSlotId( slotDom ),
-		    instance  = Ext.create( 'WebBuilder.BlockInstance', block );
-
-		// select default template
-		instance.setTemplate( block.templates().getAt(0) );
+		    instance  = Ext.create( 'WebBuilder.BlockInstance', null, block, block.templates().getAt(0) );
 
 		// insert instance
 		targetInstance.addChild( instance, slotId, position );

@@ -184,11 +184,6 @@ class TemplateEditor extends DataEditor
 		return $response;
 	}
 
-	private function loadData_record_buildInstanceData()
-	{
-
-	}
-
 	/**
 	 * Loads data for creating template copy
 	 *
@@ -462,11 +457,14 @@ class TemplateEditor extends DataEditor
 			$blockSetsFeeder->save( $blocksSet );
 
 			// save blocks instances (template items)
+			$validInstanceIDs = array();
+			$this->saveData_saveInstance( $blocksSet->getID(), $instance, $validInstanceIDs );
 
 			$sql = "DELETE FROM blocks_instances WHERE blocks_set_ID = {$blocksSet->getID()}";
+			if( sizeof( $validInstanceIDs ) > 0 ) {
+				$sql .= ' AND ID NOT IN ('. implode( ',', $validInstanceIDs ) .')';
+			}
 			$this->database->query( $sql );
-
-			$this->saveData_saveInstance( $blocksSet->getID(), $instance );
 
 			$this->database->transactionCommit();
 
@@ -485,6 +483,7 @@ class TemplateEditor extends DataEditor
 	private function saveData_safeInputBlock( array $rawBlock, array &$slotIDs )
 	{
 		$instance = array(
+			'ID'         => AbstractRequest::secureData( $rawBlock, 'ID', 'int' ) ?: null,
 			'templateID' => AbstractRequest::secureData( $rawBlock, 'templateID', 'int' ),
 			'slots'      => array()
 		);
@@ -582,16 +581,27 @@ class TemplateEditor extends DataEditor
 		$instance['slots'] = $slotsByIDs;
 	}
 
-	private function saveData_saveInstance( $blocksSetID, array &$instance )
+	private function saveData_saveInstance( $blocksSetID, array &$instance, array &$validInstanceIDs )
 	{
-		$sql = "INSERT INTO blocks_instances ( blocks_set_ID, template_ID ) VALUES ( {$blocksSetID}, {$instance['templateID']} )";
-		$this->database->query( $sql );
+		if( $instance['ID'] ) {
+			$sql  = "UPDATE blocks_instances SET template_ID = {$instance['templateID']} WHERE ID = {$instance['ID']}";
+			$this->database->query( $sql );
 
-		$instance['ID'] = $this->database->getLastInsertedId();
+			$sql = "DELETE FROM blocks_instances_subblocks WHERE parent_instance_ID = {$instance['ID']}";
+			$this->database->query( $sql );
+
+		} else {
+			$sql = "INSERT INTO blocks_instances ( blocks_set_ID, template_ID ) VALUES ( {$blocksSetID}, {$instance['templateID']} )";
+			$this->database->query( $sql );
+
+			$instance['ID'] = $this->database->getLastInsertedId();
+		}
+
+		$validInstanceIDs[] = $instance['ID'];
 
 		foreach( $instance['slots'] as $slotID => $children ) {
 			foreach( $children as $position => &$child ) {
-				$this->saveData_saveInstance( $blocksSetID, $child );
+				$this->saveData_saveInstance( $blocksSetID, $child, $validInstanceIDs );
 
 				$sql = "INSERT INTO blocks_instances_subblocks ( parent_instance_ID, parent_slot_ID, position, inserted_instance_ID ) VALUES ( {$instance['ID']}, {$slotID}, {$position}, {$child['ID']} )";
 				$this->database->query( $sql );

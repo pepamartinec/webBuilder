@@ -23,11 +23,11 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	 * @param {WebBuilder.model.Block} [block]
 	 * @param {WebBuilder.model.BlockTemplate} [template=null]
 	 */
-	constructor : function( block, template )
+	constructor : function( ID, block, template )
 	{
 		var me = this;
 
-		me.id     = me.self.genId();
+		me.id     = ID || ( 'blockInstance-'+ me.self.genId() );
 		me.block  = block;
 		me.config = {};
 
@@ -36,7 +36,25 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		}
 	},
 
-	notifyStore : function( event, args )
+	/**
+	 * Returns server-side instance ID
+	 *
+	 * @returns {Number/Null}
+	 */
+	getPersistentId : function()
+	{
+		return Ext.isNumber( this.id ) ? this.id : null;
+	},
+
+
+	storeChangeStart : function()
+	{
+		if( this.store ) {
+			this.store.startChange();
+		}
+	},
+
+	storeChangeCommit : function( event, args )
 	{
 		if( this.store == null ) {
 			return true;
@@ -45,7 +63,8 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		args = Array.prototype.slice.call( args, 0 );
 		args.unshift( this );
 
-		return this.store[ 'on'+ Ext.String.capitalize( event ) ].apply( this.store, args );
+		this.store[ 'on'+ Ext.String.capitalize( event ) ].apply( this.store, args );
+		this.store.commitChange();
 	},
 
 	addChild : function( instance, slotId, position )
@@ -63,6 +82,8 @@ Ext.define( 'WebBuilder.BlockInstance', {
 			return me;
 		}
 
+		me.storeChangeStart();
+
 		// remove instance from its original parent first
 		instance.remove();
 
@@ -78,7 +99,7 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		instance.parent = me;
 
 		// notify store
-		me.notifyStore( 'addChild', arguments );
+		me.storeChangeCommit( 'addChild', arguments );
 
 		return me;
 	},
@@ -86,6 +107,8 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	removeChild : function( instance )
 	{
 		var me = this;
+
+		me.storeChangeStart();
 
 		var slotId      = null,
 		    instanceIdx = -1;
@@ -123,7 +146,7 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		instance.parent = null;
 
 		// notify store
-		me.notifyStore( 'removeChild', arguments );
+		me.storeChangeCommit( 'removeChild', arguments );
 
 		return instance;
 	},
@@ -143,6 +166,8 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	setTemplate : function( template )
 	{
 		var me = this;
+
+		me.storeChangeStart();
 
 		var oldTemplate = me.template,
 		    oldSlots    = me.slots || {};
@@ -175,13 +200,13 @@ Ext.define( 'WebBuilder.BlockInstance', {
 					instance.parent = null;
 
 					// notify store
-					me.notifyStore( 'removeChild', [ instance ] );
+					me.storeNotify( 'removeChild', [ instance ] );
 				});
 			}
 		});
 
 		// notify store
-		me.notifyStore( 'configTemplate', [ oldTemplate, oldSlots ] );
+		me.storeChangeCommit( 'configTemplate', [ oldTemplate, oldSlots ] );
 
 		return this;
 	},
@@ -189,6 +214,8 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	setConfig : function( config )
 	{
 		var me = this;
+
+		me.storeChangeStart();
 
 		var myConfig = me.config;
 		for( var idx in config ) {
@@ -204,7 +231,7 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		}
 
 		// notify store
-		me.notifyStore( 'configChange', arguments );
+		me.storeChangeCommit( 'configChange', arguments );
 
 		return this;
 	}

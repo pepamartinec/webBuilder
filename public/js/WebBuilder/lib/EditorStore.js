@@ -93,7 +93,7 @@ Ext.define( 'WebBuilder.EditorStore', {
 
 		// suspend change event
 		// so clients do just bulk get 'change' notification
-		++me.suspendChangeEvt;
+		me.startChange();
 
 		// remove current root
 		var oldRoot = me.root;
@@ -111,9 +111,7 @@ Ext.define( 'WebBuilder.EditorStore', {
 			me.fireEvent( 'add', me, instance, null, null, null );
 		}
 
-		--me.suspendChangeEvt;
-
-		me.onChange();
+		me.commitChange();
 
 		return oldRoot;
 	},
@@ -201,7 +199,7 @@ Ext.define( 'WebBuilder.EditorStore', {
 
 		// remove existing data
 		if( me.root ) {
-			me.removeInstance( root );
+			me.removeInstance( me.root );
 
 			me.root = null;
 		}
@@ -227,14 +225,21 @@ Ext.define( 'WebBuilder.EditorStore', {
 		}
 	},
 
-	onChange : function()
+// ====================== INSTANCES NOTIFICATION INTERFACE ====================== //
+
+	startChange : function()
 	{
+		++this.suspendChangeEvt;
+	},
+
+	commitChange : function()
+	{
+		--this.suspendChangeEvt;
+
 		if( this.suspendChangeEvt === 0 ) {
 			this.fireEvent( 'change', this );
 		}
 	},
-
-// ====================== INSTANCES NOTIFICATION INTERFACE ====================== //
 
 	onAddChild : function( instance, child, slotId, position )
 	{
@@ -245,7 +250,6 @@ Ext.define( 'WebBuilder.EditorStore', {
 
 		// notify about addition
 		me.fireEvent( 'add', me, child, instance, slotId, position );
-		me.onChange();
 	},
 
 	onRemoveChild : function( instance, child, slotId, position )
@@ -257,18 +261,15 @@ Ext.define( 'WebBuilder.EditorStore', {
 
 		// notify about removal
 		me.fireEvent( 'remove', me, child, instance, slotId, position );
-		me.onChange();
 	},
 
 	onTemplateChange : function( instance, oldTemplate )
 	{
 		this.fireEvent( 'templatechange', this, instance, oldTemplate );
-		me.onChange();
 	},
 
 	onConfigChange : function( instance, config )
 	{
 		this.fireEvent( 'configchange', this, instance, Ext.Object.getKeys( config ) );
-		me.onChange();
 	}
 });

@@ -180,6 +180,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		}
 
 		return {
+			ID      : instance.getPersistentId(),
 			blockID : instance.block.getId(),
 			config  : Ext.clone( instance.config ),
 
@@ -244,7 +245,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		    config   = value.config;
 
 		// create instance
-		var instance = Ext.create( 'WebBuilder.BlockInstance', block, template );
+		var instance = Ext.create( 'WebBuilder.BlockInstance', value.ID, block, template );
 
 		// create children
 		if( value.slots ) {
