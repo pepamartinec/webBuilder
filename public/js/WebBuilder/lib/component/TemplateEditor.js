@@ -250,11 +250,22 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		// create children
 		if( value.slots ) {
 			Ext.Object.each( value.slots, function( id, children ) {
-				Ext.iterate( children, function( child ) {
-					var childInstance = me.setValue_createInstance( child );
+				if( Ext.isIterable( children ) ) {
+					Ext.Array.each( children, function( child, position ) {
+						var childInstance = me.setValue_createInstance( child );
 
-					instance.addChild( childInstance, id );
-				});
+						instance.addChild( childInstance, id );
+					});
+					
+				} else {
+					Ext.Object.each( children, function( position, child ) {
+						var childInstance = me.setValue_createInstance( child );
+
+						instance.addChild( childInstance, id );
+					});
+				}
+				
+
 			});
 		}
 
