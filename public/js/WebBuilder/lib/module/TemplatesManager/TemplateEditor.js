@@ -70,6 +70,8 @@ Ext.define( 'WebBuilder.module.TemplatesManager.TemplateEditor',
 	{
 		var me = this;
 
+		data = data || {};
+		
 		me.idField.setValue( data.ID );
 		me.parentIdField.setValue( data.parentID );
 		me.nameField.setValue( data.name );
