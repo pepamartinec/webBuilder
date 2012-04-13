@@ -1,6 +1,8 @@
 <?php
 namespace WebBuilder\WebBuilder\ExtAdmin\TemplatesManager;
 
+use WebBuilder\WebBuilder\DataDependencies\Solver;
+
 use ExtAdmin\Request\AbstractRequest;
 
 use WebBuilder\WebBuilder\BlocksLoaders\DatabaseLoader;
@@ -436,35 +438,16 @@ class TemplateEditor extends DataEditor
 	 */
 	public function saveData( RequestInterface $request )
 	{
-		$ID       = $request->getData( 'ID', 'int' );
-		$name     = $request->getData( 'name', 'string' );
-		$slotIDs  = array();
-		$instance = $this->saveData_safeInputBlock( $request->getRawData( 'template' ), $slotIDs );
-
 		try {
 			$this->database->transactionStart();
 
-			// convert slot identificators
-			$this->convertSlotIdentificators( $instance );
-
-			// create blocksSet (template)
-			$blocksSet = new BlocksSet( array(
-				'ID'   => $ID,
-				'name' => $name
-			) );
-
 			$blockSetsFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\BlocksSet', $this->database );
-			$blockSetsFeeder->save( $blocksSet );
 
-			// save blocks instances (template items)
-			$validInstanceIDs = array();
-			$this->saveData_saveInstance( $blocksSet->getID(), $instance, $validInstanceIDs );
+			// save blocksSet
+			$blockSet = $this->saveBlocksSet( $blockSetsFeeder, $request );
 
-			$sql = "DELETE FROM blocks_instances WHERE blocks_set_ID = {$blocksSet->getID()}";
-			if( sizeof( $validInstanceIDs ) > 0 ) {
-				$sql .= ' AND ID NOT IN ('. implode( ',', $validInstanceIDs ) .')';
-			}
-			$this->database->query( $sql );
+			// save blocks structure
+			$instance = $this->saveBlockInstances( $blockSetsFeeder, $blockSet, $request );
 
 			$this->database->transactionCommit();
 
@@ -473,147 +456,58 @@ class TemplateEditor extends DataEditor
 			throw $e;
 		}
 
-		// reload updated data
 		$response = new ActionResponse( true );
-		$response->setData( $this->loadTemplateData( $blocksSet->getID(), $response ) );
+		$response->setData( array(
+			'ID'       => $blockSet->getID(),
+			'name'     => $blockSet->getName(),
+			'parentID' => $blockSet->getParentID(),
+			'template' => $instance->export(),
+		) );
 
 		return $response;
 	}
 
-	private function saveData_safeInputBlock( array $rawBlock, array &$slotIDs )
+	/**
+	 * Saves BlocksSet
+	 *
+	 * @param RequestInterface $request
+	 * @return BlocksSet
+	 */
+	private function saveBlocksSet( cDBFeederBase $blockSetsFeeder, RequestInterface $request )
 	{
-		$instance = array(
-			'ID'         => AbstractRequest::secureData( $rawBlock, 'ID', 'int' ) ?: null,
-			'templateID' => AbstractRequest::secureData( $rawBlock, 'templateID', 'int' ),
-			'slots'      => array()
-		);
+		$ID   = $request->getData( 'ID', 'int' );
+		$name = $request->getData( 'name', 'string' );
 
-		$instances[] = &$instance;
+		$blocksSet = new BlocksSet( array(
+			'ID'   => $ID,
+			'name' => $name
+		) );
 
-		foreach( $rawBlock['slots'] as $rawSlotID => $children ) {
-			$slotID = AbstractRequest::secureValue( $rawSlotID, 'string' );
+		$blockSetsFeeder->save( $blocksSet );
 
-			$slotIDs[] = $slotID;
-
-			$instance['slots'][ $slotID ] = array();
-			$slot = &$instance['slots'][ $slotID ];
-
-			foreach( $children as $rawChild ) {
-				$slot[] = $this->saveData_safeInputBlock( $rawChild, $slotIDs );
-			}
-		}
-
-		return $instance;
+		return $blocksSet;
 	}
 
-	private function convertSlotIdentificators( array &$rootInstance )
+	/**
+	 * Saves BlockInstances structure
+	 *
+	 * @param RequestInterface $request
+	 * @return array
+	 */
+	private function saveBlockInstances( cDBFeederBase $blockSetsFeeder, BlocksSet $blockSet, RequestInterface $request )
 	{
-		// collect used codeNames
-		$slotCodeNames = array();
-		$this->convertSlotIdentificators_collectSlots( $rootInstance, $slotCodeNames );
+		// save client data
+		$updater = new BlockInstancesUpdater( $this->database );
+		$updater->saveBlockInstances( $blockSet, $request->getRawData('template') );
 
-		// load slots
-		$filter = array();
-		foreach( $slotCodeNames as $templateID => $codeNames ) {
-			$codeNames = implode( "','", $codeNames );
+		// reload fresh data
+		$loader    = new DatabaseLoader( $blockSetsFeeder );
+		$instances = $loader->fetchBlocksInstances( $blockSet );
 
-			$filter[] = "( template_ID = {$templateID} AND code_name IN ('{$codeNames}') )";
-		}
+		// solve data dependencies
+		$solver = new Solver( $this->database );
+		$solver->solveMissingDependencies( $instances );
 
-		$slotsFeeder = new cDBFeederBase( '\\WebBuilder\\WebBuilder\\DataObjects\\BlockTemplateSlot', $this->database );
-		$slots       = $slotsFeeder->where( implode( ' OR ', $filter ) )->groupBy( 'template_ID' )->indexBy( 'code_name' )->get();
-
-		// convert identificators
-		$this->convertSlotIdentificators_convert( $rootInstance, $slots );
-	}
-
-	private function convertSlotIdentificators_collectSlots( array $instance, array &$slots )
-	{
-		// skip blocks with no slots
-		if( $instance['slots'] == null ) {
-			return;
-		}
-
-		$templateID = $instance['templateID'];
-
-		foreach( $instance['slots'] as $codeName => $children ) {
-			$slots[ $templateID ][] = $codeName;
-
-			foreach( $children as $child ) {
-				$this->convertSlotIdentificators_collectSlots( $child, $slots );
-			}
-		}
-	}
-
-	private function convertSlotIdentificators_convert( array &$instance, array $slots )
-	{
-		// skip blocks with no slots
-		if( $instance['slots'] == null ) {
-			return;
-		}
-
-		$templateID = $instance['templateID'];
-
-		if( isset( $slots[ $templateID ] ) === false ) {
-			// ERROR
-		}
-
-		$templateSlots = $slots[ $templateID ];
-		$slotsByIDs    = array();
-
-		foreach( $instance['slots'] as $codeName => $children ) {
-			if( isset( $templateSlots[ $codeName ] ) === false ) {
-				// ERROR
-			}
-
-			$slot = $templateSlots[ $codeName ];
-
-			$slotsByIDs[ $slot->getID() ] = array();
-			$newChildren = &$slotsByIDs[ $slot->getID() ];
-
-			foreach( $children as &$child ) {
-				$this->convertSlotIdentificators_convert( $child, $slots );
-
-				$newChildren[] = $child;
-			}
-		}
-
-		$instance['slots'] = $slotsByIDs;
-	}
-
-	private function saveData_saveInstance( $blocksSetID, array &$instance, array &$validInstanceIDs )
-	{
-		if( $instance['ID'] ) {
-			$sql  = "UPDATE blocks_instances SET template_ID = {$instance['templateID']} WHERE ID = {$instance['ID']}";
-			$this->database->query( $sql );
-
-			$sql = "DELETE FROM blocks_instances_subblocks WHERE parent_instance_ID = {$instance['ID']}";
-			$this->database->query( $sql );
-
-		} else {
-			$sql = "INSERT INTO blocks_instances ( blocks_set_ID, template_ID ) VALUES ( {$blocksSetID}, {$instance['templateID']} )";
-			$this->database->query( $sql );
-
-			$instance['ID'] = $this->database->getLastInsertedId();
-		}
-
-		$validInstanceIDs[] = $instance['ID'];
-
-		foreach( $instance['slots'] as $slotID => $children ) {
-			foreach( $children as $position => &$child ) {
-				$this->saveData_saveInstance( $blocksSetID, $child, $validInstanceIDs );
-
-				$sql = "INSERT INTO blocks_instances_subblocks ( parent_instance_ID, parent_slot_ID, position, inserted_instance_ID ) VALUES ( {$instance['ID']}, {$slotID}, {$position}, {$child['ID']} )";
-				$this->database->query( $sql );
-			}
-		}
-	}
-}
-
-class DummyBuilder implements WebBuilderInterface
-{
-	public function render( WebStructureItem $structureItem )
-	{
-
+		return reset( $instances );
 	}
 }

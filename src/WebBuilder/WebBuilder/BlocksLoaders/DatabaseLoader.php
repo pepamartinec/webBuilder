@@ -132,6 +132,7 @@ class DatabaseLoader implements BlocksLoaderInterface
 
 		$this->database->query("
 			SELECT
+				requirements.ID,
 				requirements.property
 
 			FROM blocks_instances instances
@@ -144,7 +145,7 @@ class DatabaseLoader implements BlocksLoaderInterface
 
 		if( $result != null ) {
 			foreach( $result as $item ) {
-				$properties[ $item['property'] ] = new UndefinedData( $instance, $item['property'] );
+				$properties[ $item['property'] ] = new UndefinedData( $instance, (int)$item['ID'], $item['property'] );
 			}
 		}
 

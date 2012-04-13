@@ -44,7 +44,7 @@ class WebBuilder implements WebBuilderInterface
 			'debug'               => $this->debug,
 			'base_template_class' => '\WebBuilder\WebBuilder\Twig\WebBuilderTemplate'
 		) );
-		
+
 		$this->twig->addExtension( new WebBuilderExtension( $this ) );
 	}
 
@@ -60,26 +60,26 @@ class WebBuilder implements WebBuilderInterface
 	{
 		// load blocks set for given web structure item
 		$blocksSet = $this->getBlocksSet( $structureItem, true );
-		
+
 		// create blocks builder
 		$blocksFactory   = new WebBlocksFactory( $this->database );
 		$buildersFactory = new BlocksBuildersFactory( $blocksFactory, $this->twig );
 		$blocksBuilder   = $buildersFactory->getBlocksBuilder( $blocksSet, true );
-		
+
 		$rootBlock = $blocksSet->getRootBlock();
 		if( $rootBlock === null ) {
 			throw new BlocksSetIntegrityException( "Blocks set {$blocksSet->getName()}[{$blocksSet->getID()}] has no root block defined" );
 		}
-		
+
 		// setup root block data
 		$rootData = array(
 			'structureItem' => $structureItem
 		);
-		
+
 		foreach( $rootBlock->dataDependencies as &$dependency ) {
 			/* @var $dependency \WebBuilder\WebBuilder\DataDependencyInterface */
 			$property = $dependency->getProperty();
-			
+
 			if( array_key_exists( $property, $rootData ) ) {
 				$dependency = new ConstantData( $property, $rootData[ $property ] );
 			}
@@ -99,7 +99,7 @@ class WebBuilder implements WebBuilderInterface
 	protected function getBlocksSet( WebStructureItem $structureItem, $forceRegeneration = false )
 	{
 		$blocksSet = $this->blocksSetsFeeder->whereID( $structureItem->getBlocksSetID() )->getOne();
-		
+
 		if( $blocksSet === null ) {
 			throw new InvalidBlockException( 'Invalid BlocksSet requested' );
 		}
@@ -112,7 +112,7 @@ class WebBuilder implements WebBuilderInterface
 		}
 
 		$blocks = $blocksLoader->fetchBlocksInstances( $blocksSet );
-		
+
 		$blocksSet->setBlocks( $blocks );
 
 		return $blocksSet;

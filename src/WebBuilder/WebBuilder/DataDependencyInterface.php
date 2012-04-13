@@ -9,14 +9,14 @@ interface DataDependencyInterface
 	 * @return string
 	 */
 	public function getProperty();
-	
+
 	/**
 	* Returns data provider
 	*
 	* @return \WebBuilder\WebBuilder\BlockInstance|null
 	*/
 	public function getProvider();
-	
+
 	/**
 	 * Returns dependency target data
 	 *

@@ -87,9 +87,11 @@ class CrossDependenciesBuilder implements BlocksBuilderInterface
 				}
 			}
 
-			if( $initDependencies ) {
-				$this->dependencies[ $provider->ID ][] = $block->ID;
-			}
+// FIXME this was commented, because provider can be null in this section
+// is this important or can it be just removed?
+//			if( $initDependencies ) {
+//				$this->dependencies[ $provider->ID ][] = $block->ID;
+//			}
 
 			// pick data
 			$block->data[ $property ] = $dependency->getTargetData();

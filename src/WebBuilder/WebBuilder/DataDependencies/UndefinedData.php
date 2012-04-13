@@ -14,26 +14,45 @@ class UndefinedData implements DataDependencyInterface
 	 * @var BlockInstance
 	 */
 	protected $instance;
-	
+
+	/**
+	 * ID of BlockDataRequirement instance
+	 *
+	 * @var integer
+	 */
+	protected $propertyID;
+
 	/**
 	 * Dependent property
 	 *
 	 * @var string
 	 */
 	protected $property;
-	
+
 	/**
 	 * Constructor
 	 *
 	 * @param BlockInstance $instance
-	 * @param string         $property
+	 * @param int           $propertyID
+	 * @param string        $property
 	 */
-	public function __construct( BlockInstance $instance, $property )
+	public function __construct( BlockInstance $instance, $propertyID, $property )
 	{
-		$this->instance = $instance;
-		$this->property = $property;
+		$this->instance   = $instance;
+		$this->propertyID = $propertyID;
+		$this->property   = $property;
 	}
-	
+
+	/**
+	 * Returns ID of BlockDataRequirement
+	 *
+	 * @return int
+	 */
+	public function getPropertyID()
+	{
+		return $this->propertyID;
+	}
+
 	/**
 	 * Returns target block property name
 	 *
@@ -43,7 +62,7 @@ class UndefinedData implements DataDependencyInterface
 	{
 		return $this->property;
 	}
-	
+
 	/**
 	 * Returns data provider
 	 *
@@ -53,7 +72,7 @@ class UndefinedData implements DataDependencyInterface
 	{
 		return null;
 	}
-	
+
 	/**
 	 * Returns dependency target data
 	 *

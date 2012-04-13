@@ -61,5 +61,5 @@ interface WebBlockInterface
 	 *
 	 * @return string|null
 	 */
-	public static function wireframe();
+//	public static function wireframe();
 }
