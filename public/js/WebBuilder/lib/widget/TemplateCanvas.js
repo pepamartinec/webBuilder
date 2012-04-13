@@ -114,13 +114,13 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 	 * @private
 	 * @property {RegExp} instanceIdRe
 	 */
-	instanceIdRe : new RegExp( 'template-block-instance-(\\d+)' ),
+	instanceIdRe : new RegExp( 'template-block-instance-((?:blockInstance-)?\\d+)' ),
 
 	/**
 	 * @private
 	 * @property {RegExp} slotIdRe
 	 */
-	slotIdRe : new RegExp( 'template-block-instance-\\d+-slot-(\\w+)' ),
+	slotIdRe : new RegExp( 'template-block-instance-(?:blockInstance-)?\\d+-slot-(\\w+)' ),
 
 	/**
 	 * Drop position pointer DOM node
