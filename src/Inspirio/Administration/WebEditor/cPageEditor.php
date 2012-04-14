@@ -4,7 +4,7 @@ namespace WebBuilder\Administration\WebEditor;
 use Inspirio\Database\cDatabase;
 use ExtAdmin\Module\DataEditor\DataEditor;
 
-class PageEditor extends DataEditor
+class cPageEditor extends DataEditor
 {
 	/**
 	 * @var cDatabase

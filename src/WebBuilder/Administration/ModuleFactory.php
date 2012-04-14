@@ -31,15 +31,17 @@ class ModuleFactory implements ModuleFactoryInterface
 	/**
 	 * Returns list of available module names
 	 *
+	 * FIXME this should be dynamic
+	 *
 	 * @return array
 	 */
 	public function getModulesList()
 	{
 		return array(
+			__NAMESPACE__.'\\BlockManager\\BlocksList',
+			__NAMESPACE__.'\\BlockManager\\CategoryEditor',
 			__NAMESPACE__.'\\TemplateManager\\TemplateList',
 			__NAMESPACE__.'\\TemplateManager\\TemplateEditor',
-			__NAMESPACE__.'\\TemplateManager\\PageList',
-			__NAMESPACE__.'\\TemplateManager\\PageEditor',
 		);
 	}
 
