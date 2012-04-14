@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\Administration\TemplatesManager;
+namespace WebBuilder\Administration\TemplateManager;
 
 use WebBuilder\DataDependencies\Solver;
 
@@ -89,7 +89,7 @@ class TemplateEditor extends DataEditor
 	public function viewConfiguration()
 	{
 		return array(
-			'type'       => 'WebBuilder.module.TemplatesManager.TemplateEditor',
+			'type'       => 'WebBuilder.module.TemplateManager.TemplateEditor',
 			'loadAction' => 'loadData_record',
 			'saveAction' => 'saveData',
 

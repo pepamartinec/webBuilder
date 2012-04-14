@@ -53,7 +53,7 @@ class PagesList extends GridList
 // 				'type'    => 'form',
 // 				'dataDep' => true,
 // 				'params'  => array(
-// 					'form' => 'WebBuilder.module.TemplatesManager.TemplateEditor',
+// 					'form' => 'WebBuilder.module.TemplateManager.TemplateEditor',
 // 					'mode' => 'inline',
 // 					'data' => 'record'
 // 				),

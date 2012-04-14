@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\Administration\TemplatesManager;
+namespace WebBuilder\Administration\TemplateManager;
 
 use ExtAdmin\Request\AbstractRequest;
 

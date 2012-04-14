@@ -75,7 +75,7 @@ Ext.define( 'WebBuilder.module.WebEditor.pageEditor.Template',
 		var me = this;
 		
 		if( me.templateSelectorPopup == null ) {
-			var loadAction = [ '\\WebBuilder\\Administration\\TemplatesManager\\TemplateEditor', 'loadData_record' ];
+			var loadAction = [ '\\WebBuilder\\Administration\\TemplateManager\\TemplateEditor', 'loadData_record' ];
 			
 			me.templateSelectorPopup = Ext.create( 'WebBuilder.component.TemplateSelectorPopup', {
 				env         : me.env,

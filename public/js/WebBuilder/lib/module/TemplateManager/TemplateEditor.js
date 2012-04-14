@@ -1,4 +1,4 @@
-Ext.define( 'WebBuilder.module.TemplatesManager.TemplateEditor',
+Ext.define( 'WebBuilder.module.TemplateManager.TemplateEditor',
 {
 	extend : 'Ext.tab.Panel',
 

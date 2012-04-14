@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\Administration\TemplatesManager;
+namespace WebBuilder\Administration\TemplateManager;
 
 use ExtAdmin\Module\DataBrowser\GridList;
 use WebBuilder\DataObjects\BlocksSet;

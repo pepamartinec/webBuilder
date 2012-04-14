@@ -20,7 +20,7 @@ $factory  = new \WebBuilder\Administration\ModuleFactory( $database, $labels );
 $extAdmin->registerModuleFactory( '\\WebBuilder', $factory );
 
 // handle client request
-$module     = '\\WebBuilder\\Administration\\TemplatesManager\\TemplateEditor';
+$module     = '\\WebBuilder\\Administration\\TemplateManager\\TemplateEditor';
 $action     = 'loadData_record';
 $parameters = null;
 $data       = array(
