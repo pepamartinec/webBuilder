@@ -15,7 +15,7 @@ $factory  = new \Inspirio\ExtAdmin\cModuleFactory( $database, $labels );
 $extAdmin->registerModuleFactory( '\\Inspirio', $factory );
 
 // register WebBuilder modules factory
-$factory  = new \WebBuilder\WebBuilder\ExtAdmin\ModulesFactory( $database, $labels );
+$factory  = new \WebBuilder\ExtAdmin\ModulesFactory( $database, $labels );
 
 $extAdmin->registerModuleFactory( '\\WebBuilder', $factory );
 

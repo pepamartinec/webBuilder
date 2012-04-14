@@ -1,9 +1,9 @@
 <?php
 namespace WebBuilder\Blocks\MainPage;
 
-use WebBuilder\WebBuilder\DataObjects\WebStructureItem;
+use WebBuilder\DataObjects\WebStructureItem;
 
-use WebBuilder\WebBuilder\WebBlock;
+use WebBuilder\WebBlock;
 
 class MasterPage extends WebBlock
 {

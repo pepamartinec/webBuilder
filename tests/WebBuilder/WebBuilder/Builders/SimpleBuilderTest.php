@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\WebBuilder\Builders;
+namespace WebBuilder\Builders;
 
 
 require_once '/home/joker806/Development/school/DPP/webBuilder/src/WebBuilder/WebBuilder/Builders/SimpleBuilder.php';
@@ -33,7 +33,7 @@ class SimpleBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers WebBuilder\WebBuilder\Builders\SimpleBuilder::renderBlock
+     * @covers WebBuilder\Builders\SimpleBuilder::renderBlock
      * @todo Implement testRenderBlock().
      */
     public function testRenderBlock()
@@ -45,7 +45,7 @@ class SimpleBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers WebBuilder\WebBuilder\Builders\SimpleBuilder::renderSlot
+     * @covers WebBuilder\Builders\SimpleBuilder::renderSlot
      * @todo Implement testRenderSlot().
      */
     public function testRenderSlot()
@@ -57,7 +57,7 @@ class SimpleBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers WebBuilder\WebBuilder\Builders\SimpleBuilder::testBlocks
+     * @covers WebBuilder\Builders\SimpleBuilder::testBlocks
      * @todo Implement testTestBlocks().
      */
     public function testTestBlocks()

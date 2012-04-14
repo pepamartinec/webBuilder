@@ -1,11 +1,11 @@
 <?php
 namespace WebBuilder\Blocks\Navigation;
 
-use WebBuilder\WebBuilder\DataObjects\WebStructureItem;
+use WebBuilder\DataObjects\WebStructureItem;
 
 use Inspirio\Database\cDBFeederBase;
 
-use WebBuilder\WebBuilder\WebBlock;
+use WebBuilder\WebBlock;
 
 class Menu extends WebBlock
 {
@@ -25,7 +25,7 @@ class Menu extends WebBlock
 
 	public function setupData( WebStructureItem $structureItem )
 	{
-		$itemsFeeder = new cDBFeederBase( '\WebBuilder\WebBuilder\DataObjects\WebStructureItem', $this->database );
+		$itemsFeeder = new cDBFeederBase( '\WebBuilder\DataObjects\WebStructureItem', $this->database );
 		$items       = $itemsFeeder->indexBy( 'ID' )->get();
 		
 		$roots    = array();

@@ -1,7 +1,7 @@
 <?php
 namespace WebBuilder\Blocks\Core;
 
-use WebBuilder\WebBuilder\WebBlock;
+use WebBuilder\WebBlock;
 
 class WebPage extends WebBlock
 {

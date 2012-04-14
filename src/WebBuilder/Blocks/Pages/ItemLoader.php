@@ -2,7 +2,7 @@
 namespace WebBuilder\Blocks\Pages;
 
 use Inspirio\Database\cDBFeederBase;
-use WebBuilder\WebBuilder\WebBlock;
+use WebBuilder\WebBlock;
 
 class ItemLoader extends WebBlock
 {

@@ -1,7 +1,7 @@
 <?php
 namespace WebBuilder\Blocks\Layouts;
 
-use WebBuilder\WebBuilder\WebBlock;
+use WebBuilder\WebBlock;
 
 class Box extends WebBlock
 {

@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\WebBuilder;
+namespace WebBuilder;
 
 
 require_once '/home/joker806/Development/school/DPP/webBuilder/src/WebBuilder/WebBuilder/BlockInstance.php';
@@ -33,7 +33,7 @@ class BlockInstanceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers WebBuilder\WebBuilder\BlockInstance::addChild
+     * @covers WebBuilder\BlockInstance::addChild
      * @todo Implement testAddChild().
      */
     public function testAddChild()
@@ -45,7 +45,7 @@ class BlockInstanceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers WebBuilder\WebBuilder\BlockInstance::__toString
+     * @covers WebBuilder\BlockInstance::__toString
      * @todo Implement test__toString().
      */
     public function test__toString()
@@ -57,7 +57,7 @@ class BlockInstanceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers WebBuilder\WebBuilder\BlockInstance::__sleep
+     * @covers WebBuilder\BlockInstance::__sleep
      * @todo Implement test__sleep().
      */
     public function test__sleep()
