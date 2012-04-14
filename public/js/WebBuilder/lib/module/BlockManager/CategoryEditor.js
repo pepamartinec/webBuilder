@@ -1,4 +1,4 @@
-Ext.define( 'WebBuilder.module.BlocksManager.CategoryEditor',
+Ext.define( 'WebBuilder.module.BlockManager.CategoryEditor',
 {
 	extend : 'Ext.form.Panel',
 	

@@ -1,4 +1,4 @@
-Ext.define( 'WebBuilder.module.BlocksManager.BlocksList',
+Ext.define( 'WebBuilder.module.BlockManager.BlocksList',
 {
 	extend : 'Ext.tree.Panel',
 	mixins : {

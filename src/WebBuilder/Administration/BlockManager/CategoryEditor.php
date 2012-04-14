@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\Administration\BlocksManager;
+namespace WebBuilder\Administration\BlockManager;
 
 use WebBuilder\DataObjects\BlocksCategory;
 
@@ -65,7 +65,7 @@ class CategoryEditor extends DataEditor
 	public function viewConfiguration()
 	{
 		return array(
-			'type'       => 'WebBuilder.module.BlocksManager.CategoryEditor',
+			'type'       => 'WebBuilder.module.BlockManager.CategoryEditor',
 			'loadAction' => 'loadData_record',
 			'saveAction' => 'saveData',
 

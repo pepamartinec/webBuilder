@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\Administration\BlocksManager;
+namespace WebBuilder\Administration\BlockManager;
 
 use ExtAdmin\Response\DataBrowserResponse;
 
@@ -88,7 +88,7 @@ class BlocksList extends TreeList
 	public function viewConfiguration()
 	{
 		return array(
-			'type' => 'WebBuilder.module.BlocksManager.BlocksList',
+			'type' => 'WebBuilder.module.BlockManager.BlocksList',
 			'loadAction' => 'loadListData',
 
 			'barActions' => array(
