@@ -1,4 +1,4 @@
-Ext.define( 'WebBuilder.module.TemplateManager.TemplatesList',
+Ext.define( 'WebBuilder.module.TemplateManager.TemplateList',
 {
 	extend : 'extAdmin.component.dataBrowser.DataBrowser',
 	
@@ -13,7 +13,7 @@ Ext.define( 'WebBuilder.module.TemplateManager.TemplatesList',
 		me.store = me.module.createStore({
 			action : 'loadListData',
 			
-			model : 'WebBuilder.module.TemplateManager.TemplatesList.Template'
+			model : 'WebBuilder.module.TemplateManager.TemplateList.Template'
 			
 //			sorters       : {
 //				property  : viewConfig.sort.column,
@@ -39,7 +39,7 @@ Ext.define( 'WebBuilder.module.TemplateManager.TemplatesList',
 	
 }, function() {
 	
-	Ext.define( 'WebBuilder.module.TemplateManager.TemplatesList.Template', {
+	Ext.define( 'WebBuilder.module.TemplateManager.TemplateList.Template', {
 		extend : 'extAdmin.component.dataBrowser.Model',
 		
 		fields : [

@@ -9,7 +9,7 @@ use ExtAdmin\RequestInterface;
 use Inspirio\Database\cDBFeederBase;
 use Inspirio\Database\cDatabase;
 
-class TemplatesList extends GridList
+class TemplateList extends GridList
 {
 	/**
 	 * @var cDatabase
