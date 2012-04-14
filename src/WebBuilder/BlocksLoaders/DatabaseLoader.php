@@ -7,7 +7,7 @@ use WebBuilder\DataDependencies\UndefinedData;
 use WebBuilder\DataDependencies\InheritedData;
 use WebBuilder\DataDependencies\ConstantData;
 use WebBuilder\BlockInstance;
-use WebBuilder\DataObjects\BlocksSet;
+use WebBuilder\DataObjects\BlockSet;
 use WebBuilder\BlocksLoaderInterface;
 
 class DatabaseLoader implements BlocksLoaderInterface
@@ -20,36 +20,36 @@ class DatabaseLoader implements BlocksLoaderInterface
 	/**
 	 * @var \Inspirio\Database\cDBFeederBase
 	 */
-	protected $blocksSetsFeeder;
+	protected $blockSetsFeeder;
 
 	/**
 	 * Constructs
 	 *
-	 * @param \Database $blocksSetsFeeder
+	 * @param \Database $blockSetsFeeder
 	 */
-	public function __construct( cDBFeederBase $blocksSetsFeeder )
+	public function __construct( cDBFeederBase $blockSetsFeeder )
 	{
-		$this->database         = $blocksSetsFeeder->database();
-		$this->blocksSetsFeeder = $blocksSetsFeeder;
+		$this->database         = $blockSetsFeeder->database();
+		$this->blockSetsFeeder = $blockSetsFeeder;
 	}
 
 	/**
-	 * Loads and initializes blocks instances used in given BlocksSet
+	 * Loads and initializes blocks instances used in given BlockSet
 	 *
-	 * @param  BlocksSet $blocksSet blocks set
+	 * @param  BlockSet $blockSet blocks set
 	 * @return array                 array( BlockInstance )
 	 *
-	 * @throws InvalidBlocksSetException
+	 * @throws InvalidBlockSetException
 	 * @throws \DatabaseException
 	 */
-	public function fetchBlocksInstances( BlocksSet $blocksSet )
+	public function fetchBlocksInstances( BlockSet $blockSet )
 	{
-		// merge BlocksSet with parent
-		if( $blocksSet->getParentID() ) {
-			$parentSet = $this->blocksSetsFeeder->whereID( $blocksSet->getParentID() )->getOne();
+		// merge BlockSet with parent
+		if( $blockSet->getParentID() ) {
+			$parentSet = $this->blockSetsFeeder->whereID( $blockSet->getParentID() )->getOne();
 
 			if( $parentSet === null ) {
-				throw new InvalidBlocksSetException("BlocksSet '{$blocksSet->getID()}' has invalid parent '{$blocksSet->getParentID()}'");
+				throw new InvalidBlockSetException("BlockSet '{$blockSet->getID()}' has invalid parent '{$blockSet->getParentID()}'");
 			}
 
 			$instances = $this->fetchBlocksInstances( $parentSet );
@@ -82,7 +82,7 @@ class DatabaseLoader implements BlocksLoaderInterface
 			LEFT JOIN blocks_templates_slots     parent_blocks_slots ON ( parent_blocks_slots.ID = blocks_to_blocks.parent_slot_ID )
 			LEFT JOIN blocks_templates           parent_templates    ON ( parent_templates.ID = parent_blocks_slots.template_ID )
 
-			WHERE instances.blocks_set_ID = {$blocksSet->getID()}
+			WHERE instances.block_set_ID = {$blockSet->getID()}
 			ORDER BY parent_instance_ID ASC, position ASC
 		");
 

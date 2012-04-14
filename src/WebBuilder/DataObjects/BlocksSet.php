@@ -3,7 +3,7 @@ namespace WebBuilder\DataObjects;
 
 use Inspirio\Database\aDataObject;
 
-class BlocksSet extends aDataObject
+class BlockSet extends aDataObject
 {
 	/**
 	 * DataObject properties configuration
@@ -68,7 +68,7 @@ class BlocksSet extends aDataObject
 	 * @var array
 	 */
 	protected static $meta = array(
-		'tableName' => 'blocks_sets',
+		'tableName' => 'block_sets',
 	);
 	
 	/**

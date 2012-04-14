@@ -2,7 +2,7 @@
 namespace WebBuilder\Administration\TemplateManager;
 
 use ExtAdmin\Module\DataBrowser\GridList;
-use WebBuilder\DataObjects\BlocksSet;
+use WebBuilder\DataObjects\BlockSet;
 use ExtAdmin\Request\DataRequestDecorator;
 use ExtAdmin\Response\DataBrowserResponse;
 use ExtAdmin\RequestInterface;
@@ -80,7 +80,7 @@ class TemplateList extends GridList
 			'delete' => array(
 				'title'   => 'Smazat',
 				'type'    => 'delete',
-// 				'enabled' => function( BlocksSet $record ) {
+// 				'enabled' => function( BlockSet $record ) {
 // 					return ( $record->getID() % 2 ) == 0;
 // 				}
 			),
@@ -128,7 +128,7 @@ class TemplateList extends GridList
 	{
 		$request = new DataRequestDecorator( $request );
 
-		$dataFeeder = new cDBFeederBase( 'WebBuilder\\DataObjects\\BlocksSet', $this->database );
+		$dataFeeder = new cDBFeederBase( 'WebBuilder\\DataObjects\\BlockSet', $this->database );
 		$data       = $dataFeeder->get();
 		$count      = $dataFeeder->getCount();
 
@@ -136,7 +136,7 @@ class TemplateList extends GridList
 			$data = array();
 		}
 
-		return new DataBrowserResponse( true, $data, $count, function( BlocksSet $record ) {
+		return new DataBrowserResponse( true, $data, $count, function( BlockSet $record ) {
 			return array(
 				'ID'    => $record->getID(),
 				'name'  => $record->getName(),
@@ -155,7 +155,7 @@ class TemplateList extends GridList
 	{
 		var_dump( $request->getParameter( 'recordID', 'int' ) );
 exit;
-// 		$dataFeeder = new cDBFeederBase( 'WebBuilder\\DataObjects\\BlocksSet', $this->database );
+// 		$dataFeeder = new cDBFeederBase( 'WebBuilder\\DataObjects\\BlockSet', $this->database );
 // 		$data       = $dataFeeder->get();
 // 		$count      = $dataFeeder->getCount();
 	}

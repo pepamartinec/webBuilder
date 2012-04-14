@@ -23,8 +23,8 @@ class WebPage extends aDataObject implements WebPageInterface
 			'sanitize' => 'foreingKey',
 		),
 
-		'blocksSetID' => array(
-			'dbColumn' => 'blocks_set_ID',
+		'blockSetID' => array(
+			'dbColumn' => 'block_set_ID',
 			'type' => 'integer',
 			'sanitize' => 'foreingKey',
 		),
@@ -83,5 +83,10 @@ class WebPage extends aDataObject implements WebPageInterface
 	public function __toString()
 	{
 		return $this->get( 'title' );
+	}
+
+	public function getBlockSetID()
+	{
+		return $this->get( 'blockSetID' );
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 namespace WebBuilder\BlocksLoaders;
 
-use WebBuilder\DataObjects\BlocksSet;
+use WebBuilder\DataObjects\BlockSet;
 use WebBuilder\BlocksLoaderInterface;
 
 class SerializedCacheProxy implements BlocksLoaderInterface
@@ -9,7 +9,7 @@ class SerializedCacheProxy implements BlocksLoaderInterface
 	/**
 	 * @var \DBFeederBase
 	 */
-	protected $blocksSetsFeeder;
+	protected $blockSetsFeeder;
 
 	/**
 	 * @var BlocksLoaderInterface
@@ -26,9 +26,9 @@ class SerializedCacheProxy implements BlocksLoaderInterface
 	 *
 	 * @param BlocksLoaderInterface $loader
 	 */
-	public function __construct( \DBFeederBase $blocksSetsFeeder, BlocksLoaderInterface $loader )
+	public function __construct( \DBFeederBase $blockSetsFeeder, BlocksLoaderInterface $loader )
 	{
-		$this->blocksSetsFeeder  = $blocksSetsFeeder;
+		$this->blockSetsFeeder  = $blockSetsFeeder;
 		$this->loader            = $loader;
 		$this->forceRegeneration = false;
 	}
@@ -46,20 +46,20 @@ class SerializedCacheProxy implements BlocksLoaderInterface
 	/**
 	 * Return complete blocks structure for given blocks set
 	 *
-	 * @param  BlocksSet $blocksSet         desired blocks set
+	 * @param  BlockSet $blockSet         desired blocks set
 	 * @param  bool       $forceRegeneration if TRUE, any cached data will be regenerated
 	 * @return array                         array[ WebPageInterface ]
 	 */
-	public function fetchBlocksInstances( BlocksSet $blocksSet )
+	public function fetchBlocksInstances( BlockSet $blockSet )
 	{
-		$blocksStructure = $blocksSet->getPregeneratedStructure( $blocksSetID );
+		$blocksStructure = $blockSet->getPregeneratedStructure();
 
 		if( $blocksStructure !== null && $this->forceRegeneration === false ) {
 			return unserialize( $blocksStructure );
 		}
 
-		$blocksSet->setPregeneratedStructure( $this->blocksSetsFeeder->database()->escape( serialize( $blocksStructure ) ) );
-		$this->blocksSetsFeeder->save( $blocksSet );
+		$blockSet->setPregeneratedStructure( $this->blockSetsFeeder->database()->escape( serialize( $blocksStructure ) ) );
+		$this->blockSetsFeeder->save( $blockSet );
 
 		return $blocksStructure;
 	}

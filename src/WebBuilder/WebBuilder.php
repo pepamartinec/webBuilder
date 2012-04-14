@@ -22,7 +22,7 @@ class WebBuilder implements WebBuilderInterface
 	/**
 	 * @var Inspirio\Database\cDBFeederBase
 	 */
-	protected $blocksSetsFeeder;
+	protected $blockSetsFeeder;
 
 	/**
 	 * Constructor
@@ -34,7 +34,7 @@ class WebBuilder implements WebBuilderInterface
 		$this->database = $database;
 		$this->debug    = $debug;
 
-		$this->blocksSetsFeeder = new cDBFeederBase( '\WebBuilder\DataObjects\BlocksSet', $this->database );
+		$this->blockSetsFeeder = new cDBFeederBase( '\WebBuilder\DataObjects\BlockSet', $this->database );
 
 		// init Twig
 		$loader     = new \Twig_Loader_Filesystem( PATH_TO_ROOT );
@@ -53,21 +53,21 @@ class WebBuilder implements WebBuilderInterface
 	 * @param  WebPage $webPage
 	 * @return string
 	 *
-	 * @throws BlocksSetIntegrityException
+	 * @throws BlockSetIntegrityException
 	 */
 	public function render( WebPageInterface $webPage )
 	{
 		// load blocks set for given web structure item
-		$blocksSet = $this->getBlocksSet( $webPage, true );
+		$blockSet = $this->getBlockSet( $webPage, true );
 
 		// create blocks builder
 		$blocksFactory   = new WebBlocksFactory( $this->database );
 		$buildersFactory = new BlocksBuildersFactory( $blocksFactory, $this->twig );
-		$blocksBuilder   = $buildersFactory->getBlocksBuilder( $blocksSet, true );
+		$blocksBuilder   = $buildersFactory->getBlocksBuilder( $blockSet, true );
 
-		$rootBlock = $blocksSet->getRootBlock();
+		$rootBlock = $blockSet->getRootBlock();
 		if( $rootBlock === null ) {
-			throw new BlocksSetIntegrityException( "Blocks set {$blocksSet->getName()}[{$blocksSet->getID()}] has no root block defined" );
+			throw new BlockSetIntegrityException( "Blocks set {$blockSet->getName()}[{$blockSet->getID()}] has no root block defined" );
 		}
 
 		// setup root block data
@@ -89,31 +89,31 @@ class WebBuilder implements WebBuilderInterface
 	}
 
 	/**
-	 * Loads BlocksSet belongig to given WebPage and fills underlying blocks definitions
+	 * Loads BlockSet belongig to given WebPage and fills underlying blocks definitions
 	 *
 	 * @param  WebPageInterface $wePage
 	 * @param  bool $forceRegenreration
-	 * @return \WebBuilder\DataObjects\BlocksSet
+	 * @return \WebBuilder\DataObjects\BlockSet
 	 */
-	protected function getBlocksSet( WebPageInterface $wePage, $forceRegeneration = false )
+	protected function getBlockSet( WebPageInterface $wePage, $forceRegeneration = false )
 	{
-		$blocksSet = $this->blocksSetsFeeder->whereID( $wePage->getBlocksSetID() )->getOne();
+		$blockSet = $this->blockSetsFeeder->whereID( $wePage->getBlockSetID() )->getOne();
 
-		if( $blocksSet === null ) {
-			throw new InvalidBlockException( 'Invalid BlocksSet requested' );
+		if( $blockSet === null ) {
+			throw new InvalidBlockException( 'Invalid BlockSet requested' );
 		}
 
-		$blocksLoader = new BlocksLoaders\DatabaseLoader( $this->blocksSetsFeeder );
+		$blocksLoader = new BlocksLoaders\DatabaseLoader( $this->blockSetsFeeder );
 
 		if( $this->debug === false ) {
-			$blocksLoader = new BlocksLoaders\SerializedCacheProxy( $this->blocksSetsFeeder, $blocksLoader );
+			$blocksLoader = new BlocksLoaders\SerializedCacheProxy( $this->blockSetsFeeder, $blocksLoader );
 //			$blocksLoader->forceRegeneration( $forceRegeneration );
 		}
 
-		$blocks = $blocksLoader->fetchBlocksInstances( $blocksSet );
+		$blocks = $blocksLoader->fetchBlocksInstances( $blockSet );
 
-		$blocksSet->setBlocks( $blocks );
+		$blockSet->setBlocks( $blocks );
 
-		return $blocksSet;
+		return $blockSet;
 	}
 }

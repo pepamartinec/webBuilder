@@ -16,11 +16,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `blocks_sets`
+-- Table `block_sets`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `blocks_sets` ;
+DROP TABLE IF EXISTS `block_sets` ;
 
-CREATE  TABLE IF NOT EXISTS `blocks_sets` (
+CREATE  TABLE IF NOT EXISTS `block_sets` (
   `ID` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(255) NOT NULL ,
   `parent_ID` INT UNSIGNED NULL DEFAULT NULL ,
@@ -30,10 +30,10 @@ CREATE  TABLE IF NOT EXISTS `blocks_sets` (
   `edited_on` DATETIME NULL DEFAULT NULL ,
   `edited_by` INT NULL DEFAULT NULL ,
   PRIMARY KEY (`ID`) ,
-  INDEX `FK__blocks_sets__parent_ID` (`parent_ID` ASC) ,
-  CONSTRAINT `FK__blocks_sets__parent_ID`
+  INDEX `FK__block_sets__parent_ID` (`parent_ID` ASC) ,
+  CONSTRAINT `FK__block_sets__parent_ID`
     FOREIGN KEY (`parent_ID` )
-    REFERENCES `blocks_sets` (`ID` )
+    REFERENCES `block_sets` (`ID` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
@@ -47,7 +47,7 @@ DROP TABLE IF EXISTS `web_pages` ;
 CREATE  TABLE IF NOT EXISTS `web_pages` (
   `ID` INT NOT NULL AUTO_INCREMENT ,
   `parent_ID` INT UNSIGNED NULL DEFAULT NULL ,
-  `blocks_set_ID` INT UNSIGNED NOT NULL ,
+  `block_set_ID` INT UNSIGNED NOT NULL ,
   `entity_type` VARCHAR(255) NULL DEFAULT NULL ,
   `entity_ID` INT UNSIGNED NULL ,
   `url_name` VARCHAR(255) NOT NULL ,
@@ -57,15 +57,15 @@ CREATE  TABLE IF NOT EXISTS `web_pages` (
   `edited_by` INT NULL DEFAULT NULL ,
   PRIMARY KEY (`ID`) ,
   INDEX `FK__web_pages__parent_ID` (`parent_ID` ASC) ,
-  INDEX `FK__web_pages__blocks_set_ID` (`blocks_set_ID` ASC) ,
+  INDEX `FK__web_pages__block_set_ID` (`block_set_ID` ASC) ,
   CONSTRAINT `FK__web_pages__parent_ID`
     FOREIGN KEY (`parent_ID` )
-    REFERENCES `web_pages` (`blocks_set_ID` )
+    REFERENCES `web_pages` (`block_set_ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `FK__web_pages__blocks_set_ID`
-    FOREIGN KEY (`blocks_set_ID` )
-    REFERENCES `blocks_sets` (`ID` )
+  CONSTRAINT `FK__web_pages__block_set_ID`
+    FOREIGN KEY (`block_set_ID` )
+    REFERENCES `block_sets` (`ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
@@ -118,19 +118,19 @@ DROP TABLE IF EXISTS `blocks_instances` ;
 
 CREATE  TABLE IF NOT EXISTS `blocks_instances` (
   `ID` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `blocks_set_ID` INT UNSIGNED NOT NULL ,
+  `block_set_ID` INT UNSIGNED NOT NULL ,
   `template_ID` INT UNSIGNED NOT NULL ,
   PRIMARY KEY (`ID`) ,
   INDEX `FK__blocks_instances__template_ID` (`template_ID` ASC) ,
-  INDEX `FK__blocks_instances__blocks_set_ID` (`blocks_set_ID` ASC) ,
+  INDEX `FK__blocks_instances__block_set_ID` (`block_set_ID` ASC) ,
   CONSTRAINT `FK_blocks_instances_tempate_ID`
     FOREIGN KEY (`template_ID` )
     REFERENCES `blocks_templates` (`ID` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
-  CONSTRAINT `FK_blocks_instances_blocks_set_ID`
-    FOREIGN KEY (`blocks_set_ID` )
-    REFERENCES `blocks_sets` (`ID` )
+  CONSTRAINT `FK_blocks_instances_block_set_ID`
+    FOREIGN KEY (`block_set_ID` )
+    REFERENCES `block_sets` (`ID` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;

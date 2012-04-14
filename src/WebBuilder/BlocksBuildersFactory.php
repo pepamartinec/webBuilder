@@ -1,7 +1,7 @@
 <?php
 namespace WebBuilder;
 
-use WebBuilder\DataObjects\BlocksSet;
+use WebBuilder\DataObjects\BlockSet;
 
 class BlocksBuildersFactory
 {
@@ -16,7 +16,7 @@ class BlocksBuildersFactory
 	protected $twig;
 
 	/**
-	 * Constructs new BlocksSetFacotry
+	 * Constructs new BlockSetFacotry
 	 *
 	 * @param WebBlocksFactory  $blocksFactory
 	 * @param \Twig_Environment $twig
@@ -45,10 +45,10 @@ class BlocksBuildersFactory
 	/**
 	 * Analyzes given blocks set and suggests which builder would fit best
 	 *
-	 * @param  BlocksSet $blocksSet
+	 * @param  BlockSet $blockSet
 	 * @return string
 	 */
-	public static function analyzeBlockSet( BlocksSet $blocksSet )
+	public static function analyzeBlockSet( BlockSet $blockSet )
 	{
 		// TODO
 		return 'CrossDependenciesBuilder';
@@ -57,19 +57,19 @@ class BlocksBuildersFactory
 	/**
 	 * Creates blocks builder for given blocks set
 	 *
-	 * @param  BlocksSet     $blocksSet
+	 * @param  BlockSet     $blockSet
 	 * @param  bool           $forceAnalysis
 	 * @return BlocksBuilderInterface
 	 *
 	 * @throws WebBuilder\InvalidBuilderTypeException
 	 */
-	public function getBlocksBuilder( BlocksSet $blocksSet, $forceAnalysis = false )
+	public function getBlocksBuilder( BlockSet $blockSet, $forceAnalysis = false )
 	{
-		$builderType = $blocksSet->getBuilderType();
+		$builderType = $blockSet->getBuilderType();
 
 		// no pregenerated type or analysis forced
 		if( $builderType == null || $forceAnalysis === true ) {
-			$builderType = self::analyzeBlockSet( $blocksSet );
+			$builderType = self::analyzeBlockSet( $blockSet );
 		}
 
 		// invalid builder type

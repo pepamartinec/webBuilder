@@ -7,7 +7,7 @@ use ExtAdmin\Request\AbstractRequest;
 
 use WebBuilder\BlocksLoaders\DatabaseLoader;
 
-use WebBuilder\DataObjects\BlocksSet;
+use WebBuilder\DataObjects\BlockSet;
 use WebBuilder\BlockInstance;
 use ExtAdmin\Request\Request;
 use Inspirio\Database\aDataObject;
@@ -117,20 +117,20 @@ class TemplateEditor extends DataEditor
 	/**
 	 * Loads template by ID
 	 *
-	 * @param  int                $blocksSetID
+	 * @param  int                $blockSetID
 	 * @param  RessponseInterface $response
-	 * @return BlocksSet
+	 * @return BlockSet
 	 */
-	private function loadTemplateData( $blocksSetID, ResponseInterface $response )
+	private function loadTemplateData( $blockSetID, ResponseInterface $response )
 	{
-		/* @var $template BlocksSet */
-		$blocksSet = null;
+		/* @var $template BlockSet */
+		$blockSet = null;
 
 		// load blocks set
-		$blocksSetsFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlocksSet', $this->database );
-		$blocksSet        = $blocksSetsFeeder->whereID( $blocksSetID )->getOne();
+		$blockSetsFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockSet', $this->database );
+		$blockSet        = $blockSetsFeeder->whereID( $blockSetID )->getOne();
 
-		if( $blocksSet === null ) {
+		if( $blockSet === null ) {
 			$response->setSuccess( false )
 			         ->setMessage( 'Template not found' );
 
@@ -138,14 +138,14 @@ class TemplateEditor extends DataEditor
 		}
 
 		// load template blocks
-		$blocksLoader = new \WebBuilder\BlocksLoaders\DatabaseLoader( $blocksSetsFeeder );
-		$blocks       = $blocksLoader->fetchBlocksInstances( $blocksSet );
+		$blocksLoader = new \WebBuilder\BlocksLoaders\DatabaseLoader( $blockSetsFeeder );
+		$blocks       = $blocksLoader->fetchBlocksInstances( $blockSet );
 		$rootBlock    = reset( $blocks );
 
 		return array(
-			'ID'       => $blocksSet->getID(),
-			'name'     => $blocksSet->getName(),
-			'parentID' => $blocksSet->getParentID(),
+			'ID'       => $blockSet->getID(),
+			'name'     => $blockSet->getName(),
+			'parentID' => $blockSet->getParentID(),
 			'template' => $rootBlock->export()
 		);
 	}
@@ -444,10 +444,10 @@ class TemplateEditor extends DataEditor
 		try {
 			$this->database->transactionStart();
 
-			$blockSetsFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlocksSet', $this->database );
+			$blockSetsFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockSet', $this->database );
 
-			// save blocksSet
-			$blockSet = $this->saveBlocksSet( $blockSetsFeeder, $request );
+			// save blockSet
+			$blockSet = $this->saveBlockSet( $blockSetsFeeder, $request );
 
 			// save blocks structure
 			$instance = $this->saveBlockInstances( $blockSetsFeeder, $blockSet, $request );
@@ -471,24 +471,24 @@ class TemplateEditor extends DataEditor
 	}
 
 	/**
-	 * Saves BlocksSet
+	 * Saves BlockSet
 	 *
 	 * @param RequestInterface $request
-	 * @return BlocksSet
+	 * @return BlockSet
 	 */
-	private function saveBlocksSet( cDBFeederBase $blockSetsFeeder, RequestInterface $request )
+	private function saveBlockSet( cDBFeederBase $blockSetsFeeder, RequestInterface $request )
 	{
 		$ID   = $request->getData( 'ID', 'int' );
 		$name = $request->getData( 'name', 'string' );
 
-		$blocksSet = new BlocksSet( array(
+		$blockSet = new BlockSet( array(
 			'ID'   => $ID,
 			'name' => $name
 		) );
 
-		$blockSetsFeeder->save( $blocksSet );
+		$blockSetsFeeder->save( $blockSet );
 
-		return $blocksSet;
+		return $blockSet;
 	}
 
 	/**
@@ -497,7 +497,7 @@ class TemplateEditor extends DataEditor
 	 * @param RequestInterface $request
 	 * @return array
 	 */
-	private function saveBlockInstances( cDBFeederBase $blockSetsFeeder, BlocksSet $blockSet, RequestInterface $request )
+	private function saveBlockInstances( cDBFeederBase $blockSetsFeeder, BlockSet $blockSet, RequestInterface $request )
 	{
 		// save client data
 		$updater = new BlockInstancesUpdater( $this->database );

@@ -9,7 +9,7 @@ interface WebBuilderInterface
 	 * @param  WebPageInterface $webPage
 	 * @return string
 	 *
-	 * @throws BlocksSetIntegrityException
+	 * @throws BlockSetIntegrityException
 	 */
 	public function render( WebPageInterface $webPage );
 }

@@ -5,7 +5,7 @@ use ExtAdmin\Request\AbstractRequest;
 
 use Inspirio\Database\cDatabase;
 use WebBuilder\BlocksLoaders\DatabaseLoader;
-use WebBuilder\DataObjects\BlocksSet;
+use WebBuilder\DataObjects\BlockSet;
 
 use ExtAdmin\RequestInterface;
 
@@ -103,7 +103,7 @@ class BlockInstancesUpdater
 	 * @param RequestInterface $request
 	 * @return array
 	 */
-	public function saveBlockInstances( BlocksSet $blocksSet, array $clientData )
+	public function saveBlockInstances( BlockSet $blockSet, array $clientData )
 	{
 		// secure user data
 		$rootInstance = $this->secureClientData( $clientData );
@@ -114,9 +114,9 @@ class BlockInstancesUpdater
 
 		// save blocks instances
 		$validInstanceIDs = array();
-		$this->writeBlockInstances( $blocksSet->getID(), $rootInstance, $validInstanceIDs );
+		$this->writeBlockInstances( $blockSet->getID(), $rootInstance, $validInstanceIDs );
 
-		$sql = "DELETE FROM blocks_instances WHERE blocks_set_ID = {$blocksSet->getID()}";
+		$sql = "DELETE FROM blocks_instances WHERE block_set_ID = {$blockSet->getID()}";
 		if( sizeof( $validInstanceIDs ) > 0 ) {
 			$sql .= ' AND ID NOT IN ('. implode( ',', $validInstanceIDs ) .')';
 		}
@@ -398,11 +398,11 @@ class BlockInstancesUpdater
 	/**
 	 * Saves proccessed BlockInstances
 	 *
-	 * @param int $blocksSetID
+	 * @param int $blockSetID
 	 * @param array& $instance
 	 * @param array& $validInstanceIDs
 	 */
-	private function writeBlockInstances( $blocksSetID, array &$instance, array &$validInstanceIDs )
+	private function writeBlockInstances( $blockSetID, array &$instance, array &$validInstanceIDs )
 	{
 		// save block instance
 		if( $instance['ID'] ) {
@@ -416,7 +416,7 @@ class BlockInstancesUpdater
 			$this->database->query( $sql );
 
 		} else {
-			$sql = "INSERT INTO blocks_instances ( blocks_set_ID, template_ID ) VALUES ( {$blocksSetID}, {$instance['templateID']} )";
+			$sql = "INSERT INTO blocks_instances ( block_set_ID, template_ID ) VALUES ( {$blockSetID}, {$instance['templateID']} )";
 			$this->database->query( $sql );
 
 			$instance['ID'] = $this->database->getLastInsertedId();
@@ -435,7 +435,7 @@ class BlockInstancesUpdater
 		// save subblocks
 		foreach( $instance['slots'] as $slotID => $children ) {
 			foreach( $children as $position => &$child ) {
-				$this->writeBlockInstances( $blocksSetID, $child, $validInstanceIDs );
+				$this->writeBlockInstances( $blockSetID, $child, $validInstanceIDs );
 
 				$sql = "INSERT INTO blocks_instances_subblocks ( parent_instance_ID, parent_slot_ID, position, inserted_instance_ID ) VALUES ( {$instance['ID']}, {$slotID}, {$position}, {$child['ID']} )";
 				$this->database->query( $sql );

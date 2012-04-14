@@ -1,7 +1,7 @@
 <?php
 namespace WebBuilder;
 
-class BlocksSetIntegrityException extends WebBuilderException
+class BlockSetIntegrityException extends WebBuilderException
 {
 	
 }

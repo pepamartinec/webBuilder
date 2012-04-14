@@ -3,7 +3,7 @@ namespace WebBuilder\BlocksLoaders;
 
 use WebBuilder\BlocksLoaderException;
 
-class InvalidBlocksSetException extends BlocksLoaderException
+class InvalidBlockSetException extends BlocksLoaderException
 {
 	
 }

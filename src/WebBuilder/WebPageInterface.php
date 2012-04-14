@@ -8,5 +8,5 @@ interface WebPageInterface
 	 *
 	 * @return int
 	 */
-	public function getBlocksSetID();
+	public function getBlockSetID();
 }

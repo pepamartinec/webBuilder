@@ -1,7 +1,7 @@
 <?php
 namespace WebBuilder\Administration\WebEditor;
 
-use WebBuilder\DataObjects\BlocksSet;
+use WebBuilder\DataObjects\BlockSet;
 use ExtAdmin\Response\DataBrowserResponse;
 use Inspirio\Database\cDBFeederBase;
 use ExtAdmin\Request\DataRequestDecorator;
