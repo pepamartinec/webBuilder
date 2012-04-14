@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\Blocks\Pages;
+namespace Inspirio\BuilderBlocks\Pages;
 
 use Inspirio\Database\cDBFeederBase;
 

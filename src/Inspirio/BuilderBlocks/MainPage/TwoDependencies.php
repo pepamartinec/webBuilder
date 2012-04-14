@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\Blocks\MainPage;
+namespace Inspirio\BuilderBlocks\MainPage;
 
 use WebBuilder\WebBlock;
 

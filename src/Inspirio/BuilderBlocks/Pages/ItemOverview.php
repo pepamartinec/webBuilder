@@ -1,11 +1,11 @@
 <?php
-namespace WebBuilder\Blocks\Pages;
+namespace Inspirio\BuilderBlocks\Pages;
 
 use Inspirio\Database\cDBFeederBase;
 
 use WebBuilder\WebBlock;
 
-class ItemDetail extends WebBlock
+class ItemOverview extends WebBlock
 {
 	public static function requires()
 	{

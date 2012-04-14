@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\Blocks\Navigation;
+namespace Inspirio\BuilderBlocks\Navigation;
 
 use WebBuilder\WebPageInterface;
 use Inspirio\Database\cDBFeederBase;

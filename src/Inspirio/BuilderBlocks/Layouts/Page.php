@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\Blocks\Layouts;
+namespace Inspirio\BuilderBlocks\Layouts;
 
 use WebBuilder\WebBlock;
 
