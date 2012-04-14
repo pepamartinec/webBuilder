@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\Administration\WebEditor;
+namespace Inspirio\Administration\WebEditor;
 
 use WebBuilder\DataObjects\BlockSet;
 use ExtAdmin\Response\DataBrowserResponse;
@@ -9,7 +9,7 @@ use ExtAdmin\RequestInterface;
 use Inspirio\Database\cDatabase;
 use ExtAdmin\Module\DataBrowser\GridList;
 
-class cPageList extends GridList
+class PageList extends GridList
 {
 	/**
 	 * @var cDatabase

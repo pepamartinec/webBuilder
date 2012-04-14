@@ -10,7 +10,7 @@ $extAdmin = new \ExtAdmin\ExtAdmin();
 // register Inspirio modules factory
 $database = new \Inspirio\Database\cDatabase( DATABASE, HOST, USER, PASSWORD );
 $labels   = new \SimpleXMLElement('<root></root>');
-$factory  = new \Inspirio\ExtAdmin\cModuleFactory( $database, $labels );
+$factory  = new \Inspirio\Administration\cModuleFactory( $database, $labels );
 
 $extAdmin->registerModuleFactory( '\\Inspirio', $factory );
 

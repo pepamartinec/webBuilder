@@ -1,10 +1,10 @@
 <?php
-namespace WebBuilder\Administration\WebEditor;
+namespace Inspirio\Administration\WebEditor;
 
 use Inspirio\Database\cDatabase;
 use ExtAdmin\Module\DataEditor\DataEditor;
 
-class cPageEditor extends DataEditor
+class PageEditor extends DataEditor
 {
 	/**
 	 * @var cDatabase
