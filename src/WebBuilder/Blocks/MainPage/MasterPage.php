@@ -1,8 +1,7 @@
 <?php
 namespace WebBuilder\Blocks\MainPage;
 
-use WebBuilder\DataObjects\WebPage;
-
+use WebBuilder\WebPageInterface;
 use WebBuilder\WebBlock;
 
 class MasterPage extends WebBlock
@@ -10,7 +9,7 @@ class MasterPage extends WebBlock
 	public static function requires()
 	{
 		return array(
-			'structureItem' => 'dWebPage'
+			'structureItem' => 'WebPageInterface'
 		);
 	}
 
@@ -21,14 +20,14 @@ class MasterPage extends WebBlock
 		);
 	}
 
-	public function setupData( WebPage $structureItem )
+	public function setupData( WebPageInterface $webPage )
 	{
 		$entity = null;
 
-		if( $structureItem->getEntityType() && $structureItem->getEntityID() ) {
-			$entityType = $structureItem->getEntityType();
-			$entityID   = $structureItem->getEntityID();
-			
+		if( $webPage->getEntityType() && $webPage->getEntityID() ) {
+			$entityType = $webPage->getEntityType();
+			$entityID   = $webPage->getEntityID();
+
 			$entitiesFeeder = new \cDBFeederBase( $entityType, $this->database );
 			$entity = $entitiesFeeder->whereID( $entityID )->getOne();
 

@@ -13,7 +13,6 @@ use ExtAdmin\Request\Request;
 use Inspirio\Database\aDataObject;
 use WebBuilder\DataObjects\Block;
 use WebBuilder\WebBuilderInterface;
-use WebBuilder\DataObjects\WebPage;
 use ExtAdmin\Response\HtmlResponse;
 use WebBuilder\Twig\WebBuilderExtension;
 use ExtAdmin\Response\CssResponse;

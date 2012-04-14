@@ -2,7 +2,6 @@
 namespace WebBuilder;
 
 use WebBuilder\DataDependencies\ConstantData;
-use WebBuilder\DataObjects\WebPage;
 use WebBuilder\Twig\WebBuilderExtension;
 
 use Inspirio\Database\cDBFeederBase;
@@ -51,15 +50,15 @@ class WebBuilder implements WebBuilderInterface
 	/**
 	 * Renders page for given web structure item
 	 *
-	 * @param  WebPage $sItem
+	 * @param  WebPage $webPage
 	 * @return string
 	 *
 	 * @throws BlocksSetIntegrityException
 	 */
-	public function render( WebPage $structureItem )
+	public function render( WebPageInterface $webPage )
 	{
 		// load blocks set for given web structure item
-		$blocksSet = $this->getBlocksSet( $structureItem, true );
+		$blocksSet = $this->getBlocksSet( $webPage, true );
 
 		// create blocks builder
 		$blocksFactory   = new WebBlocksFactory( $this->database );
@@ -73,7 +72,7 @@ class WebBuilder implements WebBuilderInterface
 
 		// setup root block data
 		$rootData = array(
-			'structureItem' => $structureItem
+			'structureItem' => $webPage
 		);
 
 		foreach( $rootBlock->dataDependencies as &$dependency ) {
@@ -92,13 +91,13 @@ class WebBuilder implements WebBuilderInterface
 	/**
 	 * Loads BlocksSet belongig to given WebPage and fills underlying blocks definitions
 	 *
-	 * @param  WebPage $structureItem
-	 * @param  bool              $forceRegenreration
+	 * @param  WebPageInterface $wePage
+	 * @param  bool $forceRegenreration
 	 * @return \WebBuilder\DataObjects\BlocksSet
 	 */
-	protected function getBlocksSet( WebPage $structureItem, $forceRegeneration = false )
+	protected function getBlocksSet( WebPageInterface $wePage, $forceRegeneration = false )
 	{
-		$blocksSet = $this->blocksSetsFeeder->whereID( $structureItem->getBlocksSetID() )->getOne();
+		$blocksSet = $this->blocksSetsFeeder->whereID( $wePage->getBlocksSetID() )->getOne();
 
 		if( $blocksSet === null ) {
 			throw new InvalidBlockException( 'Invalid BlocksSet requested' );

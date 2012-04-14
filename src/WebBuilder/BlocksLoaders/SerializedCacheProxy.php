@@ -48,7 +48,7 @@ class SerializedCacheProxy implements BlocksLoaderInterface
 	 *
 	 * @param  BlocksSet $blocksSet         desired blocks set
 	 * @param  bool       $forceRegeneration if TRUE, any cached data will be regenerated
-	 * @return array                         array( WebPage )
+	 * @return array                         array[ WebPageInterface ]
 	 */
 	public function fetchBlocksInstances( BlocksSet $blocksSet )
 	{
@@ -57,10 +57,10 @@ class SerializedCacheProxy implements BlocksLoaderInterface
 		if( $blocksStructure !== null && $this->forceRegeneration === false ) {
 			return unserialize( $blocksStructure );
 		}
-				
+
 		$blocksSet->setPregeneratedStructure( $this->blocksSetsFeeder->database()->escape( serialize( $blocksStructure ) ) );
 		$this->blocksSetsFeeder->save( $blocksSet );
-		
+
 		return $blocksStructure;
 	}
 }

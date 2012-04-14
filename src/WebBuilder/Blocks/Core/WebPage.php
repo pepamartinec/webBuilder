@@ -8,14 +8,14 @@ class WebPage extends WebBlock
 	public static function requires()
 	{
 		return array(
-			'structureItem' => 'cWebPage'
+			'webPage' => 'WebPageInterface'
 		);
 	}
 
 	public static function provides()
 	{
 		return array(
-			'pageObject' => 'iDataObject'
+			'pageObject' => 'DataObjectInterface'
 		);
 	}
 

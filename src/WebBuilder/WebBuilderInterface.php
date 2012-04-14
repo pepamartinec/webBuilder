@@ -1,17 +1,15 @@
 <?php
 namespace WebBuilder;
 
-use WebBuilder\DataObjects\WebPage;
-
 interface WebBuilderInterface
 {
 	/**
 	 * Renders page for given web structure item
 	 *
-	 * @param  WebPage $sItem
+	 * @param  WebPageInterface $webPage
 	 * @return string
 	 *
-	 * @throws WebBuilder\BlocksSetIntegrityException
+	 * @throws BlocksSetIntegrityException
 	 */
-	public function render( WebPage $structureItem );
+	public function render( WebPageInterface $webPage );
 }
