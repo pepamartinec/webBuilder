@@ -1,7 +1,7 @@
 <?php
 namespace WebBuilder\Blocks\MainPage;
 
-use WebBuilder\DataObjects\WebStructureItem;
+use WebBuilder\DataObjects\WebPage;
 
 use WebBuilder\WebBlock;
 
@@ -10,7 +10,7 @@ class MasterPage extends WebBlock
 	public static function requires()
 	{
 		return array(
-			'structureItem' => 'dWebStructureItem'
+			'structureItem' => 'dWebPage'
 		);
 	}
 
@@ -21,7 +21,7 @@ class MasterPage extends WebBlock
 		);
 	}
 
-	public function setupData( WebStructureItem $structureItem )
+	public function setupData( WebPage $structureItem )
 	{
 		$entity = null;
 

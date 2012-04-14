@@ -8,7 +8,7 @@ class WebPage extends WebBlock
 	public static function requires()
 	{
 		return array(
-			'structureItem' => 'cWebStructureItem'
+			'structureItem' => 'cWebPage'
 		);
 	}
 

@@ -61,7 +61,7 @@ if( $route === 'admin' || $route === 'admin/' ) {
 <?php
 	
 } else {
-	$wsFeeder = new Inspirio\Database\cDBFeederBase( 'WebBuilder\DataObjects\WebStructureItem', $database );
+	$wsFeeder = new Inspirio\Database\cDBFeederBase( 'WebBuilder\DataObjects\WebPage', $database );
 	$wsItem = $wsFeeder->whereColumnEq( 'url_name', $route )->getOne();
 	
 	// 404

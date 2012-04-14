@@ -1,7 +1,7 @@
 <?php
 namespace WebBuilder\Blocks\Navigation;
 
-use WebBuilder\DataObjects\WebStructureItem;
+use WebBuilder\DataObjects\WebPage;
 
 use Inspirio\Database\cDBFeederBase;
 
@@ -12,27 +12,27 @@ class Menu extends WebBlock
 	public static function requires()
 	{
 		return array(
-			'structureItem' => 'WebStructureItem'
+			'structureItem' => 'WebPage'
 		);
 	}
 	
 	public static function provides()
 	{
 		return array(
-			'menuItems' => 'array[ WebStructureItem ]'
+			'menuItems' => 'array[ WebPage ]'
 		);
 	}
 
-	public function setupData( WebStructureItem $structureItem )
+	public function setupData( WebPage $structureItem )
 	{
-		$itemsFeeder = new cDBFeederBase( '\WebBuilder\DataObjects\WebStructureItem', $this->database );
+		$itemsFeeder = new cDBFeederBase( '\WebBuilder\DataObjects\WebPage', $this->database );
 		$items       = $itemsFeeder->indexBy( 'ID' )->get();
 		
 		$roots    = array();
 		$itemsBag = array();
 		
 		foreach( $items as $item ) {
-			/* @var $item cWebStructureItem */
+			/* @var $item cWebPage */
 			$itemID   = $item->getID();
 			$parentID = $item->getParentID();
 			

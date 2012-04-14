@@ -9,7 +9,7 @@ interface BlocksLoaderInterface
 	 * Return complete blocks structure for given blocks set
 	 *
 	 * @param  BlocksSet $blocksSet desired blocks set
-	 * @return array                 array( WebStructureItem )
+	 * @return array                 array( WebPage )
 	 */
 	public function fetchBlocksInstances( BlocksSet $blocksSet );
 }

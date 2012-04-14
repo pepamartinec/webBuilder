@@ -2,7 +2,7 @@
 namespace WebBuilder;
 
 use WebBuilder\DataDependencies\ConstantData;
-use WebBuilder\DataObjects\WebStructureItem;
+use WebBuilder\DataObjects\WebPage;
 use WebBuilder\Twig\WebBuilderExtension;
 
 use Inspirio\Database\cDBFeederBase;
@@ -51,12 +51,12 @@ class WebBuilder implements WebBuilderInterface
 	/**
 	 * Renders page for given web structure item
 	 *
-	 * @param  WebStructureItem $sItem
+	 * @param  WebPage $sItem
 	 * @return string
 	 *
 	 * @throws BlocksSetIntegrityException
 	 */
-	public function render( WebStructureItem $structureItem )
+	public function render( WebPage $structureItem )
 	{
 		// load blocks set for given web structure item
 		$blocksSet = $this->getBlocksSet( $structureItem, true );
@@ -90,13 +90,13 @@ class WebBuilder implements WebBuilderInterface
 	}
 
 	/**
-	 * Loads BlocksSet belongig to given WebStructureItem and fills underlying blocks definitions
+	 * Loads BlocksSet belongig to given WebPage and fills underlying blocks definitions
 	 *
-	 * @param  WebStructureItem $structureItem
+	 * @param  WebPage $structureItem
 	 * @param  bool              $forceRegenreration
 	 * @return \WebBuilder\DataObjects\BlocksSet
 	 */
-	protected function getBlocksSet( WebStructureItem $structureItem, $forceRegeneration = false )
+	protected function getBlocksSet( WebPage $structureItem, $forceRegeneration = false )
 	{
 		$blocksSet = $this->blocksSetsFeeder->whereID( $structureItem->getBlocksSetID() )->getOne();
 

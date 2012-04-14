@@ -48,7 +48,7 @@ class SerializedCacheProxy implements BlocksLoaderInterface
 	 *
 	 * @param  BlocksSet $blocksSet         desired blocks set
 	 * @param  bool       $forceRegeneration if TRUE, any cached data will be regenerated
-	 * @return array                         array( WebStructureItem )
+	 * @return array                         array( WebPage )
 	 */
 	public function fetchBlocksInstances( BlocksSet $blocksSet )
 	{

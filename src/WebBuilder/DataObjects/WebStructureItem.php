@@ -3,7 +3,7 @@ namespace WebBuilder\DataObjects;
 
 use Inspirio\Database\aDataObject;
 
-class WebStructureItem extends aDataObject
+class WebPage extends aDataObject
 {	
 	/**
 	 * DataObject properties configuration
@@ -70,7 +70,7 @@ class WebStructureItem extends aDataObject
 		),
 		
 		'descendants' => array(
-			'type' => 'array[ WebStructureItem ]'
+			'type' => 'array[ WebPage ]'
 		)
 	);
 	
@@ -80,6 +80,6 @@ class WebStructureItem extends aDataObject
 	 * @var array
 	 */
 	protected static $meta = array(
-		'tableName' => 'web_structure_items',
+		'tableName' => 'web_pages',
 	);
 }
