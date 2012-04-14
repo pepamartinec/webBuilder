@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\ExtAdmin\BlocksManager;
+namespace WebBuilder\Administration\BlocksManager;
 
 use WebBuilder\DataObjects\BlocksCategory;
 

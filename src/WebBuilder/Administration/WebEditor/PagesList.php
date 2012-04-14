@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\ExtAdmin\WebEditor;
+namespace WebBuilder\Administration\WebEditor;
 
 use WebBuilder\DataObjects\BlocksSet;
 use ExtAdmin\Response\DataBrowserResponse;

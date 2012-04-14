@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\ExtAdmin;
+namespace WebBuilder\Administration;
 
 use Inspirio\Database\cDatabase;
 use ExtAdmin\ModuleFactoryInterface;

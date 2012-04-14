@@ -32,7 +32,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	/**
 	 * @cfg {extAdmin.Module/String} module
 	 */
-	module : '\\WebBuilder\\ExtAdmin\\TemplatesManager\\TemplateEditor',
+	module : '\\WebBuilder\\Administration\\TemplatesManager\\TemplateEditor',
 
 	/**
 	 * @cfg {Array/String} blocksLoadAction

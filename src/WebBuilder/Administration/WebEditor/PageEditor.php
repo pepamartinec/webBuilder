@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\ExtAdmin\WebEditor;
+namespace WebBuilder\Administration\WebEditor;
 
 use Inspirio\Database\cDatabase;
 use ExtAdmin\Module\DataEditor\DataEditor;

@@ -16,7 +16,7 @@ Ext.define( 'WebBuilder.component.TemplateSelectorPopup',
 	/**
 	 * @cfg {extAdmin.Module/String} module
 	 */
-	module : '\\WebBuilder\\ExtAdmin\\TemplatesManager\\TemplatesList',
+	module : '\\WebBuilder\\Administration\\TemplatesManager\\TemplatesList',
 
 	/**
 	 * @cfg {Array/String} blocksLoadAction
