@@ -182,7 +182,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		return {
 			ID      : instance.getPersistentId(),
 			blockID : instance.block.getId(),
-			config  : Ext.clone( instance.config ),
+			data    : Ext.clone( instance.config ),
 
 			templateID : instance.template && instance.template.getId(),
 			slots      : instance.slots    && Ext.Object.map( instance.slots, this.handleInstancesStoreChange_walkInstanceSlot, this )
@@ -241,11 +241,12 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 			return null;
 		}
 
-		var template = value.templateID && block.templates().getById( value.templateID ),
-		    config   = value.config;
-
 		// create instance
-		var instance = Ext.create( 'WebBuilder.BlockInstance', value.ID, block, template );
+		var instance = Ext.create( 'WebBuilder.BlockInstance', value.ID, block ),
+		    template = value.templateID && block.templates().getById( value.templateID );
+		
+		instance.setConfig( value.data || {} );
+		instance.setTemplate( template );
 
 		// create children
 		if( value.slots ) {

@@ -281,11 +281,15 @@ class TemplateEditor extends DataEditor
 			/* @var $block Block */
 			$blockID = $block->getID();
 
+			$className = $block->getCodeName();
+
 			$blockData = array(
 				'ID'         => $blockID,
 				'categoryID' => $block->getCategoryID(),
 				'title'      => $block->getTitle(),
 				'codeName'   => $block->getCodeName(),
+				'requires'   => $className::requires(),
+				'provides'   => $className::provides(),
 				'templates'  => array(),
 			);
 

@@ -84,4 +84,14 @@ class UndefinedData implements DataDependencyInterface
 	{
 		throw new DataIntegrityException( "Unresolvable property '{$this->property}' in block '{$this->instance}'" );
 	}
+
+	/**
+	 * Exports internal data for client-side usage
+	 *
+	 * @return mixed
+	 */
+	public function export()
+	{
+		return null;
+	}
 }

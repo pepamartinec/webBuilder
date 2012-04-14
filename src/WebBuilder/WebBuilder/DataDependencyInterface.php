@@ -25,4 +25,11 @@ interface DataDependencyInterface
 	 * @throws DataIntegrityException
 	 */
 	public function getTargetData();
+
+	/**
+	 * Exports internal data for client-side usage
+	 *
+	 * @return mixed
+	 */
+	public function export();
 }

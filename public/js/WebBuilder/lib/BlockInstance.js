@@ -27,10 +27,18 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	{
 		var me = this;
 
+		// assign ID & block
 		me.id     = ID || ( 'blockInstance-'+ me.self.genId() );
 		me.block  = block;
+		
+		// create config
 		me.config = {};
-
+		
+		Ext.Object.each( block.get('requires') || {}, function( property, type ) {
+			me.config[ property ] = null;
+		});
+		
+		// assign template
 		if( template ) {
 			me.setTemplate( template );
 		}
@@ -214,7 +222,7 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	setConfig : function( config )
 	{
 		var me = this;
-
+		
 		me.storeChangeStart();
 
 		var myConfig = me.config;
@@ -234,5 +242,10 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		me.storeChangeCommit( 'configChange', arguments );
 
 		return this;
+	},
+	
+	getConfig : function()
+	{
+		return this.config;
 	}
 });

@@ -128,28 +128,46 @@ class BlockInstance
 	}
 
 	/**
-	 * Exports instance data so it can be reconstructed lately somewhere else
+	 * Exports internal data for client-side usage
 	 *
-	 * This method does not export all internal data, only IDs of references
-	 *
-	 * @return array
+	 * @return mixed
 	 */
 	public function export()
 	{
-		return self::export_block( $this );
+		return $this->export_block( $this );
 	}
 
+	/**
+	 * Exports BlockInstance content
+	 *
+	 * @param BlockInstance $block
+	 * @return array
+	 */
 	private static function export_block( BlockInstance $block )
 	{
-		return array(
+		$data = array(
 			'ID'         => $block->ID,
 			'blockID'    => $block->blockID,
 			'templateID' => $block->templateID,
-			'slots'      => array_map( array( 'self', 'export_blockSlot' ), $block->slots )
+			'slots'      => array_map( array( 'self', 'export_blockSlot' ), $block->slots ),
+			'data'       => array(),
 		);
+
+		foreach( $block->dataDependencies as $dependency ) {
+			/* @var $dependency DataDependencyInterface */
+			$data['data'][ $dependency->getProperty() ] = $dependency->export();
+		}
+
+		return $data;
 	}
 
-	private static function export_blockSlot( $children )
+	/**
+	 * Exports slot content
+	 *
+	 * @param array $children
+	 * @return array
+	 */
+	private static function export_blockSlot( array $children )
 	{
 		return array_map( array( 'self', 'export_block' ), $children );
 	}

@@ -126,4 +126,17 @@ class InheritedData implements DataDependencyInterface
 
 		return $data;
 	}
+
+	/**
+	 * Exports internal data for client-side usage
+	 *
+	 * @return mixed
+	 */
+	public function export()
+	{
+		return array(
+			'providerID'       => $this->provider->ID,
+			'providerProperty' => $this->providerProperty
+		);
+	}
 }

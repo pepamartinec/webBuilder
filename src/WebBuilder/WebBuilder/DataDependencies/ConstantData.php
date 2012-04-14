@@ -59,4 +59,14 @@ class ConstantData implements DataDependencyInterface
 	{
 		return $this->value;
 	}
+
+	/**
+	 * Exports internal data for client-side usage
+	 *
+	 * @return mixed
+	 */
+	public function export()
+	{
+		return $this->value;
+	}
 }

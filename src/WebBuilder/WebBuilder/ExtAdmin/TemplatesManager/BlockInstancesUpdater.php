@@ -14,6 +14,9 @@ class BlockInstancesUpdater
 	const SLOT_KEY_ID       = 'id';
 	const SLOT_KEY_CODENAME = 'codeName';
 
+	const DATA_KEY_ID       = 'id';
+	const DATA_KEY_CODENAME = 'codeName';
+
 	/**
 	 * @var \cDatabase
 	 */
@@ -23,6 +26,11 @@ class BlockInstancesUpdater
 	 * @var string
 	 */
 	protected $slotKey;
+
+	/**
+	 * @var string
+	 */
+	protected $dataKey;
 
 	/**
 	 * Constructor
@@ -39,10 +47,12 @@ class BlockInstancesUpdater
 		}
 
 		$config += array(
-			'slotKey' => self::SLOT_KEY_CODENAME
+			'slotKey' => self::SLOT_KEY_CODENAME,
+			'dataKey' => self::DATA_KEY_CODENAME
 		);
 
 		$this->setSlotKey( $config['slotKey'] );
+		$this->setDataKey( $config['dataKey'] );
 	}
 
 	/**
@@ -67,6 +77,27 @@ class BlockInstancesUpdater
 	}
 
 	/**
+	 * Sets the data key config
+	 *
+	 * @param string $dataKey TemplateUpdater::DATA_KEY_*
+	 * @return TemplateUpdater
+	 */
+	public function setDataKey( $dataKey )
+	{
+		// check value
+		$valid = array( self::DATA_KEY_CODENAME, self::DATA_KEY_ID );
+
+		if( ! in_array( $dataKey, $valid ) ) {
+			throw new \Exception( "Invalid data key type '{$dataKey}'" );
+		}
+
+		// setup value
+		$this->dataKey = $dataKey;
+
+		return $this;
+	}
+
+	/**
 	 * Saves BlockInstances structure
 	 *
 	 * @param RequestInterface $request
@@ -77,8 +108,9 @@ class BlockInstancesUpdater
 		// secure user data
 		$rootInstance = $this->secureClientData( $clientData );
 
-		// convert slot identificators
+		// convert slot && data identificators
 		$this->convertSlotIdentificators( $rootInstance );
+		$this->convertDataIdentificators( $rootInstance );
 
 		// save blocks instances
 		$validInstanceIDs = array();
@@ -105,19 +137,36 @@ class BlockInstancesUpdater
 		$instance = array(
 			'ID'         => AbstractRequest::secureData( $rawBlock, 'ID', 'int' ) ?: null,
 			'templateID' => AbstractRequest::secureData( $rawBlock, 'templateID', 'int' ),
-			'slots'      => array()
+			'data'       => array(),
+			'slots'      => array(),
 		);
 
 		$instances[] = &$instance;
 
-		foreach( $rawBlock['slots'] as $rawSlotID => $children ) {
-			$slotID = AbstractRequest::secureValue( $rawSlotID, 'string' );
+		if( isset( $rawBlock['data'] ) ) {
+			foreach( $rawBlock['data'] as $rawProperty => $rawValue ) {
+				// FIXME handle also inherited data ( object[ $property => $providerID ] )
+				if( ! is_string( $rawValue ) ) {
+					continue;
+				}
 
-			$instance['slots'][ $slotID ] = array();
-			$slot = &$instance['slots'][ $slotID ];
+				$property = AbstractRequest::secureValue( $rawProperty, 'string' );
+				$value    = AbstractRequest::secureValue( $rawValue, 'string' );
 
-			foreach( $children as $rawChild ) {
-				$slot[] = $this->secureClientData( $rawChild );
+				$instance['data'][ $property ] = $value;
+			}
+		}
+
+		if( isset( $rawBlock['slots'] ) ) {
+			foreach( $rawBlock['slots'] as $rawSlotID => $children ) {
+				$slotID = AbstractRequest::secureValue( $rawSlotID, 'string' );
+
+				$instance['slots'][ $slotID ] = array();
+				$slot = &$instance['slots'][ $slotID ];
+
+				foreach( $children as $rawChild ) {
+					$slot[] = $this->secureClientData( $rawChild );
+				}
 			}
 		}
 
@@ -228,6 +277,125 @@ class BlockInstancesUpdater
 	}
 
 	/**
+	 * Converts codeName data identificators, used on the client side, to IDs
+	 *
+	 * @param array& $rootInstance
+	 */
+	private function convertDataIdentificators( array &$rootInstance )
+	{
+		if( $this->dataKey === self::DATA_KEY_ID ) {
+			return;
+		}
+
+		// collect used codeNames
+		$dataProperties = array();
+		$this->convertDataIdentificators_collectData( $rootInstance, $dataProperties );
+
+		if( sizeof( $dataProperties ) === 0 ) {
+			return;
+		}
+
+		// load property IDs
+		$filter = array();
+		foreach( $dataProperties as $templateID => $properties ) {
+			$propertyStr = implode( "','", array_map( array( $this->database, 'escape' ), $properties ) );
+
+			$filter[] = "( bt.ID = {$templateID} AND bdr.property IN ('{$propertyStr}') )";
+		}
+
+		$filterStr = implode( ' OR ', $filter );
+		$sql = "
+			SELECT
+				bdr.property,
+				bdr.ID,
+				bt.ID template_ID
+
+			FROM blocks_data_requirements bdr
+			JOIN blocks_templates bt ON ( bt.block_ID = bdr.block_ID )
+
+			WHERE {$filterStr}
+		";
+		$this->database->query( $sql );
+		$resultSet = $this->database->fetchArray();
+
+		// build property -> ID map
+		$propertyMap = array();
+		if( $resultSet != null ) {
+			foreach( $resultSet as $resultItem ) {
+				$ID         = (int)$resultItem['ID'];
+				$property   = $resultItem['property'];
+				$templateID = (int)$resultItem['template_ID'];
+
+				if( ! isset( $propertyMap[ $templateID ] ) ) {
+					$propertyMap[ $templateID ] = array();
+				}
+
+				$propertyMap[ $templateID ][ $property ] = $ID;
+			}
+		}
+
+		// convert identificators
+		$this->convertDataIdentificators_convert( $rootInstance, $propertyMap );
+	}
+
+	private function convertDataIdentificators_collectData( array $instance, array &$data )
+	{
+		// skip blocks with no slots
+		if( $instance['data'] != null ) {
+			$templateID = $instance['templateID'];
+
+			if( ! isset( $data[ $templateID ] ) ) {
+				$data[ $templateID ] = array();
+			}
+
+			$data[ $templateID ] = array_merge( $data[ $templateID ], array_keys( $instance['data'] ) );
+		}
+
+		if( isset( $instance['slots'] ) ) {
+			foreach( $instance['slots'] as $children ) {
+				foreach( $children as $child ) {
+					$this->convertDataIdentificators_collectData( $child, $data );
+				}
+			}
+		}
+	}
+
+	private function convertDataIdentificators_convert( array &$instance, array $propertyMap )
+	{
+		if( $instance['data'] != null ) {
+			$templateID = $instance['templateID'];
+
+			if( ! isset( $propertyMap[ $templateID ] ) ) {
+				// ERROR
+			}
+
+			$templateData = $propertyMap[ $templateID ];
+			$dataByIDs    = array();
+
+			foreach( $instance['data'] as $property => $value ) {
+				if( ! isset( $templateData[ $property ] ) ) {
+					// ERROR
+					continue;
+				}
+
+				$propertyID = $templateData[ $property ];
+
+				$dataByIDs[ $propertyID ] = $value;
+			}
+
+			$instance['data'] = $dataByIDs;
+		}
+
+		if( isset( $instance['slots'] ) ) {
+			foreach( $instance['slots'] as &$children ) {
+				foreach( $children as &$child ) {
+					$this->convertDataIdentificators_convert( $child, $propertyMap );
+				}
+			}
+		}
+	}
+
+	/**
 	 * Saves proccessed BlockInstances
 	 *
 	 * @param int $blocksSetID
@@ -236,11 +404,15 @@ class BlockInstancesUpdater
 	 */
 	private function writeBlockInstances( $blocksSetID, array &$instance, array &$validInstanceIDs )
 	{
+		// save block instance
 		if( $instance['ID'] ) {
 			$sql  = "UPDATE blocks_instances SET template_ID = {$instance['templateID']} WHERE ID = {$instance['ID']}";
 			$this->database->query( $sql );
 
 			$sql = "DELETE FROM blocks_instances_subblocks WHERE parent_instance_ID = {$instance['ID']}";
+			$this->database->query( $sql );
+
+			$sql = "DELETE FROM blocks_instances_data_constant WHERE instance_ID = {$instance['ID']}";
 			$this->database->query( $sql );
 
 		} else {
@@ -252,6 +424,15 @@ class BlockInstancesUpdater
 
 		$validInstanceIDs[] = $instance['ID'];
 
+		// save constant data
+		foreach( $instance['data'] as $propertyID => $value ) {
+			$value = $this->database->escape( $value );
+
+			$sql = "INSERT INTO blocks_instances_data_constant ( instance_ID, property_ID, value ) VALUES ( {$instance['ID']}, {$propertyID}, '{$value}' )";
+			$this->database->query( $sql );
+		}
+
+		// save subblocks
 		foreach( $instance['slots'] as $slotID => $children ) {
 			foreach( $children as $position => &$child ) {
 				$this->writeBlockInstances( $blocksSetID, $child, $validInstanceIDs );

@@ -5,7 +5,8 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 		'extAdmin.patch.DropZoneTargetInitialization',
 
 		'WebBuilder.widget.templateCanvas.DragZone',
-		'WebBuilder.widget.templateCanvas.DropZone'
+		'WebBuilder.widget.templateCanvas.DropZone',
+		'WebBuilder.widget.ConfigPopup'
 	],
 
 	/**
@@ -80,7 +81,6 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 	 * @cfg {String} slotCls
 	 */
 	slotCls : Ext.baseCSSPrefix +'slot',
-
 
 	/**
 	 * ClassName of slot title nodes
@@ -158,14 +158,11 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 
         // create insert position pointer instance
         me.insertPtrDom = Ext.DomHelper.createDom( me.insertPtrDom );
-
-        // create block-tools instance
-//        me.toolsEl      = Ext.get( Ext.DomHelper.createDom( me.toolsEl ) );
-//        me.configToolEl = me.toolsDom.down( Ext.baseCSSPrefix +'config' );
-//        me.removeToolEl = me.toolsDom.down( Ext.baseCSSPrefix +'remove' );
-//
-//        me.configToolEl.on( 'click', function() { console.log('config'); } );
-//        me.removeToolEl.on( 'click', me.handleRemoveToolClick, me );
+        
+        // create config popup
+        me.configPopup = Ext.create( 'WebBuilder.widget.ConfigPopup', {
+        	closeAction : 'hide'
+        });
 	},
 
 	/**
@@ -178,6 +175,7 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 		var me = this;
 
 		me.cleanupIframe();
+		me.configPopup.destroy();
 
 		me.callParent();
 	},
@@ -350,7 +348,8 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 			if( instance ) {
 				// CONFIG
 				if( target.hasCls( me.configToolCls ) ) {
-					console.log( instance.block.get('title') );
+					me.configPopup.setInstance( instance );
+					me.configPopup.show();
 
 				// REMOVE
 				} else if( target.hasCls( me.removeToolCls ) ) {
