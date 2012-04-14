@@ -9,7 +9,7 @@ use ExtAdmin\RequestInterface;
 use Inspirio\Database\cDatabase;
 use ExtAdmin\Module\DataBrowser\GridList;
 
-class PagesList extends GridList
+class PageList extends GridList
 {
 	/**
 	 * @var cDatabase

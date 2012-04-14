@@ -38,7 +38,7 @@ class ModuleFactory implements ModuleFactoryInterface
 		return array(
 			__NAMESPACE__.'\\TemplateManager\\TemplateList',
 			__NAMESPACE__.'\\TemplateManager\\TemplateEditor',
-			__NAMESPACE__.'\\TemplateManager\\PagesList',
+			__NAMESPACE__.'\\TemplateManager\\PageList',
 			__NAMESPACE__.'\\TemplateManager\\PageEditor',
 		);
 	}
