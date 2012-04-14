@@ -7,11 +7,13 @@ Ext.define( 'WebBuilder.module.WebEditor.PageEditor',
 	},
 	
 	requires : [
-		'Ext.container.Container',
-		'WebBuilder.component.TemplateEditor'
+		'Ext.layout.container.Fit',		
+		'WebBuilder.module.WebEditor.pageEditor.General',
+		'WebBuilder.module.WebEditor.pageEditor.Content',
+		'WebBuilder.module.WebEditor.pageEditor.Template'
 	],
 	
-	width : 800,
+	width  : 800,
 	height : 600,
 	
 	/**

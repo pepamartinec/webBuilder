@@ -3,53 +3,64 @@ Ext.define( 'WebBuilder.module.WebEditor.pageEditor.Template',
 	extend : 'Ext.panel.Panel',
 	
 	requires : [
-		'WebBuilder.component.TemplateEditor'
+		'Ext.layout.container.Fit',
+		'WebBuilder.component.TemplateEditor',
+		'WebBuilder.component.TemplateSelectorPopup'
 	],
 	
-	title : 'Šablona',
-	layout : 'fit',
+	/**
+	 * @required
+	 * @cfg {extAdmin.Environment} env
+	 */
+	env : null,
 	
 	initComponent : function()
 	{
 		var me = this;
 		
-		me.items = [{
-			xtype : 'templateeditor',
+		me.templateEditor = Ext.create( 'WebBuilder.component.TemplateEditor', {
 			env   : me.env
-		}],
+		});
 		
-		me.dockedItems = [{
-			dock  : 'top',
-			xtype : 'toolbar',
+		Ext.apply( me, {
+			title  : 'Šablona',
+			layout : 'fit',
 			
-			items : [{
-				xtype   : 'button',
-				text    : 'Náhled',
-				iconCls : 'i-monitor',
+			items : [ me.templateEditor ],
+			
+			dockedItems : [{
+				dock  : 'top',
+				xtype : 'toolbar',
 				
-				handler : me.preview,
-				scope   : me
-			},{
-				xtype : 'button',
-				text  : 'Načíst předdefinovanou',
-				iconCls : 'i-folder',
-				
-				handler : me.loadPredefined,
-				scope   : me
-			},{
-				xtype   : 'button',
-				text    : 'Uložit mezi předdefinované',
-				iconCls : 'i-disk',
-				
-				handler : me.saveAsPredefined,
-				scope   : me
-			},{
-				xtype : 'tbfill'
-			},{
-				xtype   : 'button',
-				iconCls : 'i-arrow-out'
+				items : [{
+					xtype   : 'button',
+					text    : 'Náhled',
+					iconCls : 'i-monitor',
+					
+					handler : me.preview,
+					scope   : me
+				},{
+					xtype : 'button',
+					text  : 'Načíst předdefinovanou',
+					iconCls : 'i-folder',
+					
+					handler : me.loadPredefined,
+					scope   : me
+				},{
+					xtype   : 'button',
+					text    : 'Uložit mezi předdefinované',
+					iconCls : 'i-disk',
+					
+					handler : me.saveAsPredefined,
+					scope   : me
+				},{
+					xtype : 'tbfill'
+				},{
+					xtype   : 'button',
+					iconCls : 'i-arrow-out'
+				}]
 			}]
-		}];
+		});
 		
 		me.callParent();
 	},
@@ -61,19 +72,30 @@ Ext.define( 'WebBuilder.module.WebEditor.pageEditor.Template',
 	
 	loadPredefined : function()
 	{
-		return;
+		var me = this;
 		
-		var lookup = Ext.create( 'extAdmin.component.lookup.Popup', {
-// TODO		readOnly : true,
+		if( me.templateSelectorPopup == null ) {
+			var loadAction = [ '\\WebBuilder\\WebBuilder\\ExtAdmin\\TemplatesManager\\TemplateEditor', 'loadData_record' ];
 			
-			layout : 'fit',
-			items  : [{
-				xtype   : 'grid',
-				columns : [{
-					
-				}]
-			}]
-		});
+			me.templateSelectorPopup = Ext.create( 'WebBuilder.component.TemplateSelectorPopup', {
+				env         : me.env,
+				closeAction : 'hide',
+				
+				handler : function( records ) {
+					me.env.runAction( loadAction, {
+						data : { ID : records[0].getId() },
+						
+						success : function( data ) {
+							me.templateEditor.setValue( data.data.template );
+						}
+					});
+				},
+				
+				socpe : me
+			});
+		}
+		
+		me.templateSelectorPopup.show();
 	},
 	
 	saveAsPredefined : function()

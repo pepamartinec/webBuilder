@@ -99,6 +99,11 @@ Ext.define( 'WebBuilder.EditorStore', {
 		var oldRoot = me.root;
 
 		me.clearInstances();
+		
+		if( oldRoot ) {
+			// notify about removal
+			me.fireEvent( 'remove', me, oldRoot, null, null, null );
+		}
 
 		if( instance ) {
 			// remove new root from its original place
