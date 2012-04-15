@@ -78,6 +78,7 @@ Ext.define( 'WebBuilder.module.WebEditor.pageEditor.General',
 	},{
 		xtype      : 'htmleditor',
 		fieldLabel : 'Perex',
+		name       : 'perex',
 		labelAlign : 'top',
 		flex       : 1
 	}],

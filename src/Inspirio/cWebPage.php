@@ -29,15 +29,9 @@ class cWebPage extends aDataObject implements WebPageInterface
 			'sanitize' => 'foreingKey',
 		),
 
-		'entityType' => array(
-			'dbColumn' => 'entity_type',
+		'type' => array(
+			'dbColumn' => 'type',
 			'type' => 'string',
-		),
-
-		'entityID' => array(
-			'dbColumn' => 'entity_ID',
-			'type' => 'integer',
-			'sanitize' => 'foreingKey',
 		),
 
 		'title' => array(
@@ -48,11 +42,6 @@ class cWebPage extends aDataObject implements WebPageInterface
 		'urlName' => array(
 			'dbColumn' => 'url_name',
 			'type' => 'string',
-		),
-
-		'titleImageID' => array(
-			'dbColumn' => 'title_image_ID',
-			'type' => 'int'
 		),
 
 		'createdOn' => array(

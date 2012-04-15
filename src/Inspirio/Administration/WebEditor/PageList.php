@@ -45,7 +45,7 @@ class PageList extends GridList
 				'title'  => 'Vytvořit',
 				'type'   => 'create',
 				'params' => array(
-					'editor'     => 'PageEditor',
+					'editor'     => 'SimplePageEditor',
 					'loadAction' => 'loadData_new',
 				),
 			),
@@ -54,7 +54,7 @@ class PageList extends GridList
 				'title'  => 'Upravit',
 				'type'   => 'edit',
 				'params' => array(
-					'editor'      => 'PageEditor',
+					'editor'      => 'SimplePageEditor',
 					'loadDefault' => 'loadData_record',
 				),
 			),
@@ -101,6 +101,10 @@ class PageList extends GridList
 
 		$dataFeeder = new cDBFeederBase( '\\Inspirio\\cWebPage', $this->database );
 		$data       = $dataFeeder->get();
+
+		if( $data === null ) {
+			$data = array();
+		}
 
 		return new DataBrowserResponse( true, $data, sizeof( $data ), function( cWebPage $webPage ) {
 			return $webPage->getInnerValues();
