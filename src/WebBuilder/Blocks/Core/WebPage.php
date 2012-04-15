@@ -12,13 +12,6 @@ class WebPage extends WebBlock
 		);
 	}
 
-	public static function provides()
-	{
-		return array(
-			'pageObject' => 'DataObjectInterface'
-		);
-	}
-
 	public static function config()
 	{
 		return array(

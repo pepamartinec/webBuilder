@@ -1,10 +1,10 @@
 <?php
-namespace Inspirio\BuilderBlocks\Pages;
+namespace Inspirio\BuilderBlocks\SimplePages;
 
 use Inspirio\Database\cDBFeederBase;
 use WebBuilder\WebBlock;
 
-class ItemLoader extends WebBlock
+class PageLoader extends WebBlock
 {
 	public static function requires()
 	{
@@ -12,19 +12,19 @@ class ItemLoader extends WebBlock
 			'pageID' => 'int'
 		);
 	}
-	
+
 	public static function provides()
 	{
 		return array(
-			'page' => 'cPage'
+			'page' => 'cSimplePage'
 		);
 	}
-	
+
 	public function setupData( $pageID )
 	{
-		$pagesFeeder = new cDBFeederBase( '\\Inspirio\\cPage', $this->database );
-		$page = $pagesFeeder->whereID( $pageID )->getOne();
-		
+		$pageFeeder = new cDBFeederBase( '\\Inspirio\\cSimplePage', $this->database );
+		$page       = $pagesFeeder->whereID( $pageID )->getOne();
+
 		return array(
 			'page' => $page
 		);

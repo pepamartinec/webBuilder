@@ -42,9 +42,9 @@ class BlocksGenerator
 	public function registerBlock( ClassReflectionInterface $block, array $existingBlocks, array &$validBlocks )
 	{
 		$blockClassName = $block->getFullName();
-		
+
 		echo "- registering block {$blockClassName}\n";
-		
+
 		$this->database->beginTransaction();
 
 		try {
@@ -53,7 +53,7 @@ class BlocksGenerator
 				$blockID = $existingBlocks[ $blockClassName ];
 
 			// otherwise insert new into DB
-			} else {		
+			} else {
 				$this->database->exec( 'INSERT INTO '.self::TABLE_BLOCKS.' ( code_name ) VALUES ( '.$this->database->quote( $blockClassName ).' )' );
 				$blockID = $this->database->lastInsertId();
 			}
@@ -93,7 +93,7 @@ class BlocksGenerator
 			} else {
 				$sql = 'DELETE FROM '.self::TABLE_REQUIREMENTS." WHERE block_ID = {$blockID} AND ID NOT IN (".implode( ',', $validDependencies ).');';
 			}
-			
+
 			$this->database->exec( $sql );
 
 		} catch( \DatabaseException $e ) {
@@ -107,39 +107,42 @@ class BlocksGenerator
 	/**
 	 * Registers blocks to system
 	 *
-	 * @param string $directory
-	 * @param bool   $recursive
+	 * @param array $dirs
+	 * @param bool  $recursive
 	 *
 	 * @throws DatabaseException
 	 */
-	public function registerBlocks( $directory, $recursive )
+	public function registerBlocks( array $dirs )
 	{
 		// load existing blocks
 		$existingBlocks = array();
-		
+
 		$sql = 'SELECT ID, code_name FROM '.self::TABLE_BLOCKS;
 		foreach( $this->database->query( $sql ) as $r ) {
 			$existingBlocks[ $r['code_name'] ] = $r['ID'];
 		}
-		
+
 		$validBlocks = array();
 
 		// search for blocks
 		$analyzer  = new PhpReflector();
-		$analyzer->analyzeDirectory( $directory, $recursive );
-		
+
+		foreach( $dirs as $dir ) {
+			$analyzer->analyzeDirectory( $dir );
+		}
+
 		foreach( $analyzer->getNamespacesIterator() as $namespace ) {
 			/* @var $namespace NamespaceReflectionInterface */
-			
+
 			foreach( $namespace->getClassIterator() as $class ) {
 				/* @var $class ClassReflectionInterface */
-				
+
 				if( $class->implementsInterface( '\WebBuilder\WebBlockInterface' ) && $class->isAbstract() === false ) {
-					$this->registerBlock( $class, $existingBlocks, &$validBlocks );
+					$this->registerBlock( $class, $existingBlocks, $validBlocks );
 				}
 			}
 		}
-		
+
 		// remove unknown block
 		if( sizeof( $validBlocks ) == 0 ) {
 			$this->database->exec( 'DELETE FROM '.self::TABLE_BLOCKS );
@@ -158,7 +161,7 @@ class BlocksGenerator
 	public function registerTemplate( TemplateReflection $template, array $existingTemplates, array &$validTemplates )
 	{
 		echo "- registering template {$template->getPathname()} (block {$template->getParentBlock()})\n";
-		
+
 		$this->database->beginTransaction();
 
 		try {
@@ -190,7 +193,7 @@ class BlocksGenerator
 
 			// SLOTS
 			$validSlots    = array();
-			
+
 			$existingSlots = array();
 			$sql = 'SELECT ID, code_name FROM '.self::TABLE_SLOTS.' WHERE template_ID = '.$templateID;
 			foreach( $this->database->query( $sql ) as $r ) {
@@ -232,15 +235,15 @@ class BlocksGenerator
 	/**
 	 * Registers templates
 	 *
-	 * @param string $directory
-	 * @param bool   $recursive
+	 * @param array $dirs
+	 * @param bool $recursive
 	 *
 	 * @throws \DatabaseException
 	 */
-	public function registerTemplates( $directory, $recursive )
+	public function registerTemplates( array $dirs )
 	{
 		$existingTemplates = array();
-		
+
 		// load existing templates
 		$sql = 'SELECT ID, block_ID, filename FROM '.self::TABLE_TEMPLATES;
 		foreach( $this->database->query( $sql ) as $r ) {
@@ -251,11 +254,14 @@ class BlocksGenerator
 
 		// search for blocks
 		$analyzer = new TwigReflector();
-		$analyzer->analyzeDirectory( $directory, $recursive );
-		
+
+		foreach( $dirs as $dir ) {
+			$analyzer->analyzeDirectory( $dir );
+		}
+
 		foreach( $analyzer->getNamespacesIterator() as $template ) {
 			/* $template TemplateReflection */
-			$this->registerTemplate( $template, $existingTemplates, &$validTemplates );
+			$this->registerTemplate( $template, $existingTemplates, $validTemplates );
 		}
 
 		// remove unknown templates
@@ -264,7 +270,7 @@ class BlocksGenerator
 		} else {
 			$sql = 'DELETE FROM '.self::TABLE_TEMPLATES." WHERE ID NOT IN (".implode( ',', $validTemplates ).')';
 		}
-		
+
 		$this->database->exec( $sql );
 
 	}

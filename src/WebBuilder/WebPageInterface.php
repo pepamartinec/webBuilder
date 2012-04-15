@@ -9,4 +9,11 @@ interface WebPageInterface
 	 * @return int
 	 */
 	public function getBlockSetID();
+
+	/**
+	 * Returns the title of the page
+	 *
+	 * @return string
+	 */
+	public function getTitle();
 }

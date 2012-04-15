@@ -62,6 +62,16 @@ class cWebPage extends aDataObject implements WebPageInterface
 		'editedBy' => array(
 			'dbColumn' => 'edited_by',
 			'type' => 'integer',
+		),
+
+
+
+		'children' => array(
+			'type' => 'array[ cWebPage ]'
+		),
+
+		'contentItem' => array(
+			'type' => 'mixed'
 		)
 	);
 
@@ -82,5 +92,10 @@ class cWebPage extends aDataObject implements WebPageInterface
 	public function getBlockSetID()
 	{
 		return $this->get( 'blockSetID' );
+	}
+
+	public function getTitle()
+	{
+		return $this->get( 'title' );
 	}
 }

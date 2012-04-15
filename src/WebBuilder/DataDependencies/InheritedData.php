@@ -107,7 +107,7 @@ class InheritedData implements DataDependencyInterface
 		$property = array_shift( $path );
 
 		if( array_key_exists( $property, $data ) === false ) {
-			throw new DataIntegrityException( "Invalid property '{$property}' required from provider '{$this->provider}'" );
+			throw new DataIntegrityException( "'{$this->target}' requires invalid data '{$property}' from '{$this->provider}'" );
 		}
 
 		$data = $data[ $property ];
@@ -118,7 +118,7 @@ class InheritedData implements DataDependencyInterface
 			$propsStack .= '.'.$part;
 
 			if( is_callable( array( $data, $methodName ) ) === false ) {
-				throw new DataIntegrityException( "Invalid property '{$propsStack}' required from provider '{$this->provider}'" );
+				throw new DataIntegrityException( "'{$this->target}' requires invalid data '{$propsStack}' from '{$this->provider}'" );
 			}
 
 			$data = $data->$methodName();

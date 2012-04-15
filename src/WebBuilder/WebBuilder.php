@@ -72,7 +72,7 @@ class WebBuilder implements WebBuilderInterface
 
 		// setup root block data
 		$rootData = array(
-			'structureItem' => $webPage
+			'webPage' => $webPage
 		);
 
 		foreach( $rootBlock->dataDependencies as &$dependency ) {

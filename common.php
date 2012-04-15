@@ -31,3 +31,28 @@ function determineLanguage()
 {
 	return 'cs';
 }
+
+function findCommonPrefix( array $strings )
+{
+	$leader = array_shift( $strings );
+
+	// find shortest string
+	$minLen = strlen( $leader );
+	foreach( $strings as $string ) {
+		$len = strlen( $string );
+
+		if( $len < $minLen ) {
+			$minLen = $len;
+		}
+	}
+
+	for( $i = 0; $i < $minLen; ++$i ) {
+		foreach( $strings as $string ) {
+			if( $string[ $i ] !== $leader[ $i ] ) {
+				return $i - 1;
+			}
+		}
+	}
+
+	return $minLen;
+}

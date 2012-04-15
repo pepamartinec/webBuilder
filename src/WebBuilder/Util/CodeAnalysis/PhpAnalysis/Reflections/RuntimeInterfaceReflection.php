@@ -38,16 +38,16 @@ class RuntimeInterfaceReflection implements InterfaceReflectionInterface, Runtim
 
 		list( $nsName, $itName ) = Tokenizer::explodeName( '\\'.$this->reflection->getName() );
 		$this->namespace = $f->getNamespace( $nsName );
-		
+
 		$parentReflection = $this->reflection->getParentClass();
 		$this->parent = $parentReflection === false ? null : new RuntimeReflectionInterface( $parentReflection, $f );
 
 		if( $this->parent !== null ) {
 			$this->interfaces = $this->parent->getInterfaces();
-			$this->interfaces[ $this->name ] = $this;
+			$this->interfaces[ $this->getName() ] = $this;
 
 		} else {
-			$this->interfaces = array( $this->name => $this );
+			$this->interfaces = array( $this->getName() => $this );
 		}
 	}
 

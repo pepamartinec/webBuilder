@@ -144,8 +144,8 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		// fill some default content
 		if( value == null ) {
 			value = {
-				blockID    : 4,
-				templateID : 10
+				blockID    : 2,
+				templateID : 3
 			};
 		}
 

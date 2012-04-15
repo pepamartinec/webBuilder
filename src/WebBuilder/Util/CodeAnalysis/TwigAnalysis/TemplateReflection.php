@@ -15,30 +15,33 @@ class TemplateReflection implements TemplateReflectionInterface
 	 * Constructor
 	 *
 	 * @param ReflectionFactory $analyzer
-	 * @param string            $filename template filename
+	 * @param array $repository
+	 * @param string $filename
 	 */
-	public function __construct( ReflectionFactory $analyzer, $filename )
+	public function __construct( ReflectionFactory $analyzer, $repository, $filename )
 	{
-		$this->pathname = realpath( $filename );
+		$baseNs  = $repository['namespace'];
+		$baseDir = $repository['baseDir'];
+		$tplDir  = $repository['tplDir'];
 
-		// TODO right path matching
-		$this->pathname = substr( $this->pathname, strlen( PATH_TO_ROOT ) );
+		$this->pathname = realpath( $filename );
+		$this->pathname = substr( $this->pathname, strlen( $baseDir ) );
 
 		$code = file_get_contents( $filename );
 
 		// pick parent block
 		$pattern = '/^\{% container (?P<name>[^ ]+) %\}/i';
+		$matches = array();
 		preg_match( $pattern, $code, $matches );
 
-		// TODO implement right matching
-		$localPath = substr( $this->pathname, strlen( 'templates/' ), -( strlen( basename( $this->pathname ) ) + 1 ) );
-		$pathParts = explode( '/', $localPath );
-		
-		foreach( $pathParts as &$part ) {
-			$part = ucfirst( $part );
-		}
+		$localPath      = substr( $this->pathname, strlen( $tplDir ), -( strlen( basename( $this->pathname ) ) + 1 ) );
+		$blockNameParts = explode( '/', $localPath );
 
-		$this->parentBlock = '\\WebBuilder\\Blocks\\'. implode( '\\', $pathParts ) .'\\'. $matches['name'];
+		array_unshift( $blockNameParts, $baseNs );
+		array_push( $blockNameParts, $matches['name'] );
+		array_walk( $blockNameParts, function( $value, $key ) { return ucfirst( $value ); } );
+
+		$this->parentBlock = implode( '\\', $blockNameParts );
 
 
 		// pick defined slots

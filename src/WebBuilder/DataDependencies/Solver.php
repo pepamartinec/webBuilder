@@ -75,7 +75,7 @@ class Solver
 					$providersMap[ $propertyID ] = array();
 				}
 
-				$providersMap[ $propertyID ][ $providerID ] = array( $providerID, $providerProperty );
+				$providersMap[ $propertyID ][ $providerBlockID ] = array( $providerID, $providerProperty );
 			}
 		}
 

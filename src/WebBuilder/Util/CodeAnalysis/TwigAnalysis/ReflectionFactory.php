@@ -10,12 +10,12 @@ class ReflectionFactory
 	 * @var array
 	 */
 	protected $templates;
-	
+
 	/**
 	 * @var array
 	 */
 	protected $analyzedFiles;
-	
+
 	/**
 	 * Constructs new analyzer
 	 */
@@ -24,18 +24,32 @@ class ReflectionFactory
 		$this->templates     = array();
 		$this->analyzedFiles = array();
 	}
-	
+
 	/**
 	 * Analyzes whole directory
 	 *
-	 * @param string $dirName
-	 * @param bool   $recursive
+	 * @param array $repository
 	 */
-	public function analyzeDirectory( $dirName, $recursive = true )
+	public function analyzeDirectory( $repository )
 	{
-		$iterator = $recursive ?
-			new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( $dirName ) ) :
-			new \DirectoryIterator( $dirName );
+		$baseNs  = &$repository['namespace'];
+		$baseDir = &$repository['baseDir'];
+		$tplDir  = &$repository['tplDir'];
+
+		// normalize paths
+		if( substr( $baseDir, -1 ) !== '/' ) {
+			$baseDir .= '/';
+		}
+
+		if( $tplDir === '/' ) {
+			$tplDir = substr( $tplDir, 1 );
+		}
+
+		if( substr( $tplDir, -1 ) !== '/' ) {
+			$tplDir .= '/';
+		}
+
+		$iterator = new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( $baseDir.'/'.$tplDir ) );
 
 		foreach( $iterator as $item ) {
 			if( $item->isDir() ) {
@@ -46,16 +60,17 @@ class ReflectionFactory
 				continue;
 			}
 
-			$this->analyzeFile( $item->getPathname() );
+			$this->analyzeFile( $repository, $item->getPathname() );
 		}
 	}
 
 	/**
 	 * Analyzes whole file
 	 *
+	 * @param array  $repository
 	 * @param string $fileName
 	 */
-	public function analyzeFile( $fileName )
+	public function analyzeFile( $repository, $fileName )
 	{
 		if( in_array( $fileName, $this->analyzedFiles ) ) {
 			return;
@@ -67,9 +82,9 @@ class ReflectionFactory
 
 		$this->analyzedFiles[] = $fileName;
 
-		$this->templates[] = new TemplateReflection( $this, $fileName );
+		$this->templates[] = new TemplateReflection( $this, $repository, $fileName );
 	}
-	
+
 	/**
 	 * Return templates iterator
 	 *
