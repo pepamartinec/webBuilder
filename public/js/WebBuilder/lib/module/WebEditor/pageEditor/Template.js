@@ -18,6 +18,8 @@ Ext.define( 'WebBuilder.module.WebEditor.pageEditor.Template',
 	{
 		var me = this;
 		
+		me.blockSetIdField = Ext.create( 'Ext.form.field.Hidden' );
+		
 		me.templateEditor = Ext.create( 'WebBuilder.component.TemplateEditor', {
 			env   : me.env
 		});
@@ -86,7 +88,11 @@ Ext.define( 'WebBuilder.module.WebEditor.pageEditor.Template',
 						data : { ID : records[0].getId() },
 						
 						success : function( data ) {
-							me.templateEditor.setValue( data.data.template );
+							var template = data.data.template; // TODO why double data?
+						
+							me.clearBlockInstanceID( template );
+							
+							me.templateEditor.setValue( template );
 						}
 					});
 				},
@@ -98,8 +104,35 @@ Ext.define( 'WebBuilder.module.WebEditor.pageEditor.Template',
 		me.templateSelectorPopup.show();
 	},
 	
+	clearBlockInstanceID : function( blockInstance )
+	{
+		blockInstance.ID = null;
+		
+		if( blockInstance.slots ) {
+			Ext.Object.each( blockInstance.slots, function( name, children ) {
+				Ext.Array.each( children, this.clearBlockInstanceID, this );
+			}, this );
+		}
+	},
+	
 	saveAsPredefined : function()
 	{
 		
+	},
+	
+	getData : function()
+	{
+		return {
+			blockSetID : this.blockSetIdField.getValue(),
+			template   : this.templateEditor.getValue()
+		};
+	},
+	
+	setData : function( data )
+	{
+		this.blockSetIdField.setValue( data.blockSetID );
+		this.templateEditor.setValue( data.template );
+		
+		return this;
 	}
 });

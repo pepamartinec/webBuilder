@@ -1,10 +1,10 @@
 <?php
-namespace WebBuilder\DataObjects;
+namespace Inspirio;
 
 use Inspirio\Database\aDataObject;
 use WebBuilder\WebPageInterface;
 
-class WebPage extends aDataObject implements WebPageInterface
+class cWebPage extends aDataObject implements WebPageInterface
 {
 	/**
 	 * DataObject properties configuration
@@ -48,6 +48,11 @@ class WebPage extends aDataObject implements WebPageInterface
 		'urlName' => array(
 			'dbColumn' => 'url_name',
 			'type' => 'string',
+		),
+
+		'titleImageID' => array(
+			'dbColumn' => 'title_image_ID',
+			'type' => 'int'
 		),
 
 		'createdOn' => array(

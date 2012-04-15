@@ -1,12 +1,19 @@
 Ext.define( 'WebBuilder.module.WebEditor.pageEditor.Content',
 {
-	extend : 'Ext.form.Panel',
+	extend : 'Ext.form.field.HtmlEditor',
 	
 	title : 'Obsah',
 	
-	layout : 'fit',
+	getData : function() {
+		return {
+			content : this.getValue()
+		};
+	},
 	
-	items : [{
-		xtype : 'htmleditor'
-	}]
+	setData : function( data )
+	{
+		this.setValue( data.content );
+		
+		return this;
+	}
 });

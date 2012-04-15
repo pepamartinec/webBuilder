@@ -14,6 +14,10 @@ Ext.define( 'WebBuilder.module.WebEditor.pageEditor.General',
 	},
 	
 	items : [{
+		xtype : 'hiddenfield',
+		name  : 'ID'
+			
+	},{
 		xtype : 'container',
 		layout : {
 			type  : 'hbox',
@@ -76,5 +80,14 @@ Ext.define( 'WebBuilder.module.WebEditor.pageEditor.General',
 		fieldLabel : 'Perex',
 		labelAlign : 'top',
 		flex       : 1
-	}]
+	}],
+	
+	getData : function() {
+		return this.form.getValues();
+	},
+	
+	setData : function( data )
+	{
+		return this.form.setValues( data );
+	}
 });

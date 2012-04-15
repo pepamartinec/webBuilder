@@ -24,15 +24,15 @@ Ext.define( 'WebBuilder.module.WebEditor.PageEditor',
 	{
 		var me = this;
 		
-		var generalTab  = Ext.create( 'WebBuilder.module.WebEditor.pageEditor.General' ),
-		    contentTab  = Ext.create( 'WebBuilder.module.WebEditor.pageEditor.Content' ),
-		    templateTab = Ext.create( 'WebBuilder.module.WebEditor.pageEditor.Template', {
-		    	env : me.env
-		    });
+		me.generalTab  = Ext.create( 'WebBuilder.module.WebEditor.pageEditor.General' ),
+		me.contentTab  = Ext.create( 'WebBuilder.module.WebEditor.pageEditor.Content' ),
+		me.templateTab = Ext.create( 'WebBuilder.module.WebEditor.pageEditor.Template', {
+			env : me.env
+		});
 		
 		
 		me.border = false;
-		me.items  = [ generalTab, contentTab, templateTab ];
+		me.items  = [ me.generalTab, me.contentTab, me.templateTab ];
 		
 		
 		me.title   = 'Úprava stránky';
@@ -46,12 +46,23 @@ Ext.define( 'WebBuilder.module.WebEditor.PageEditor',
 	
 	setData : function( data )
 	{
-		console.log( 'set data ', data );
+		this.generalTab.setData( data );
+		this.contentTab.setData( data );
+		this.templateTab.setData( data );
+		
+		return this;
 	},
 	
 	getData : function()
 	{
-		return {};
+		var me   = this,
+		    data = {};
+		
+		Ext.apply( data, me.generalTab.getData() );
+		Ext.apply( data, me.contentTab.getData() );
+		Ext.apply( data, me.templateTab.getData() );
+		
+		return data;
 	},
 	
 	isDirty : function()

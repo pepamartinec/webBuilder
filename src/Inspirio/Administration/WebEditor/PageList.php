@@ -1,13 +1,15 @@
 <?php
 namespace Inspirio\Administration\WebEditor;
 
-use WebBuilder\DataObjects\BlockSet;
+use ExtAdmin\Response\ResponseTest;
+
 use ExtAdmin\Response\DataBrowserResponse;
 use Inspirio\Database\cDBFeederBase;
 use ExtAdmin\Request\DataRequestDecorator;
 use ExtAdmin\RequestInterface;
 use Inspirio\Database\cDatabase;
 use ExtAdmin\Module\DataBrowser\GridList;
+use Inspirio\cWebPage;
 
 class PageList extends GridList
 {
@@ -48,23 +50,19 @@ class PageList extends GridList
 				),
 			),
 
-// 			'edit' => array(
-// 				'title'   => 'Upravit',
-// 				'type'    => 'form',
-// 				'dataDep' => true,
-// 				'params'  => array(
-// 					'form' => 'WebBuilder.module.TemplateManager.TemplateEditor',
-// 					'mode' => 'inline',
-// 					'data' => 'record'
-// 				),
-// 				'enabled' => true
-// 			),
+			'edit' => array(
+				'title'  => 'Upravit',
+				'type'   => 'edit',
+				'params' => array(
+					'editor'      => 'PageEditor',
+					'loadDefault' => 'loadData_record',
+				),
+			),
 
-// 			'delete' => array(
-// 				'title'   => 'Smazat',
-// 				'type'    => 'delete',
-// 				'enabled' => true
-// 			),
+ 			'delete' => array(
+				'title'   => 'Smazat',
+ 				'type'    => 'delete',
+ 			),
 		);
 	}
 
@@ -79,7 +77,7 @@ class PageList extends GridList
 			'barActions' => array( 'create', 'edit', 'delete' ),
 
 			'fields' => array(
-				'name' => array(
+				'title' => array(
 					'title' => 'Název'
 				),
 
@@ -101,16 +99,21 @@ class PageList extends GridList
 	{
 		$request = new DataRequestDecorator( $request );
 
-		return new DataBrowserResponse( true, array(), 0 );
+		$dataFeeder = new cDBFeederBase( '\\Inspirio\\cWebPage', $this->database );
+		$data       = $dataFeeder->get();
+
+		return new DataBrowserResponse( true, $data, sizeof( $data ), function( cWebPage $webPage ) {
+			return $webPage->getInnerValues();
+		});
 	}
 
 	/**
-	 * Removes selected items
+	 * Deletes selected items
 	 *
 	 * @param  RequestInterface $request
 	 * @return Response
 	 */
-	public function remove( RequestInterface $request )
+	public function delete( RequestInterface $request )
 	{
 
 	}
