@@ -22,6 +22,12 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 		
 		/**
 		 * @protected
+		 * @property {Ext.form.Field} templateField
+		 */
+		me.templateField = null;
+		
+		/**
+		 * @protected
 		 * @property {Array} configItems
 		 */
 		me.configItems = [];
@@ -54,7 +60,7 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 	{
 		var me     = this,
 		    config = instance.getConfig();
-		console.log(config);
+		
 		// instance already active
 		// just update values
 		if( instance === me.currentInstance ) {
@@ -65,15 +71,36 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 		// switch current instance
 		} else {
 			// remove old fields
-			me.removeAll();
+			me.removeAll( true );
 			me.configItems = [];
+			
+			// create template config field
+			me.createTemplateConfigItem( instance );
 			
 			// create new fields
 			Ext.Object.each( config, me.createConfigItem, me );
-			me.add( me.configItems );
 			
+			me.add( me.templateField );
+			me.add( me.configItems );
 			me.currentInstance = instance;			
 		}
+	},
+	
+	createTemplateConfigItem : function( instance )
+	{
+		var templates = instance.block.templates();
+		
+		this.templateField = Ext.create( 'Ext.form.field.ComboBox', {
+			name       : 'template',
+			fieldLabel : 'Šablona',
+			value      : instance.template.getId(),
+			readOnly   : templates.getCount() == 1,
+			
+			store        : instance.block.templates(),
+			displayField : 'title',
+			valueField   : 'ID',
+			queryMode    : 'local'
+		});
 	},
 	
 	createConfigItem : function( name, value )
@@ -113,6 +140,10 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 			
 		// apply config to the current instance
 		} else {	
+			// set template
+			me.currentInstance.setTemplate( me.currentInstance.block.templates().getById( me.templateField.getValue() ) );
+			
+			// apply config
 			var config = {};
 			
 			Ext.Array.forEach( me.configItems, function( field ) {

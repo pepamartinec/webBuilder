@@ -30,14 +30,14 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		// assign ID & block
 		me.id     = ID || ( 'blockInstance-'+ me.self.genId() );
 		me.block  = block;
-		
+
 		// create config
 		me.config = {};
-		
+
 		Ext.Object.each( block.get('requires') || {}, function( property, type ) {
 			me.config[ property ] = null;
 		});
-		
+
 		// assign template
 		if( template ) {
 			me.setTemplate( template );
@@ -175,6 +175,10 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	{
 		var me = this;
 
+		if( template === me.template ) {
+			return;
+		}
+
 		me.storeChangeStart();
 
 		var oldTemplate = me.template,
@@ -204,17 +208,13 @@ Ext.define( 'WebBuilder.BlockInstance', {
 			//  - some advanced alg. to determine target slot
 			} else {
 				Ext.Array.forEach( children, function( instance ) {
-					// remove parent link
-					instance.parent = null;
-
-					// notify store
-					me.storeNotify( 'removeChild', [ instance ] );
+					instance.remove();
 				});
 			}
 		});
 
 		// notify store
-		me.storeChangeCommit( 'configTemplate', [ oldTemplate, oldSlots ] );
+		me.storeChangeCommit( 'templateChange', [ oldTemplate, oldSlots ] );
 
 		return this;
 	},
@@ -222,7 +222,7 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	setConfig : function( config )
 	{
 		var me = this;
-		
+
 		me.storeChangeStart();
 
 		var myConfig = me.config;
@@ -243,7 +243,7 @@ Ext.define( 'WebBuilder.BlockInstance', {
 
 		return this;
 	},
-	
+
 	getConfig : function()
 	{
 		return this.config;

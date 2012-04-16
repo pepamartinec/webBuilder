@@ -14,6 +14,11 @@ Ext.define( 'WebBuilder.model.BlockTemplate',
 		name : 'thumb',
 		type : 'string'
 	},{
+		name    : 'title',
+		convert : function( value, record ) {
+			return record.get('filename').split('/').pop();
+		} 
+	},{
 		name : 'filename',
 		type : 'string'
 	},{

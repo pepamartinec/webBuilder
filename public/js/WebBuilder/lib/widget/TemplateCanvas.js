@@ -507,7 +507,7 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 
 					children : [{
 						tag  : 'span',
-						html : block.get('title')
+						html : block.get('title') +' ['+ instance.template.get('title') +']'
 
 					},{
 				    	tag : 'div',
