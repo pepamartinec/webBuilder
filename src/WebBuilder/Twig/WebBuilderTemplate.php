@@ -25,4 +25,21 @@ abstract class WebBuilderTemplate extends \Twig_Template
 	{
 		$this->block = $block;
 	}
+
+	public function render( array $context )
+	{
+		if( $this->env->isDebug() ) {
+			return
+				'<div class="block">'.
+					'<span class="name">'.
+						$this->block.
+						'<pre class="data">'.print_r( $this->block->data, true ).'</pre>'.
+					'</span>'.
+					parent::render( $context ).
+				'</div>';
+
+		} else {
+			return parent::render( $context );
+		}
+	}
 }

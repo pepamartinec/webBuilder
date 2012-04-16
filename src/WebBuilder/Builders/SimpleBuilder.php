@@ -60,12 +60,7 @@ class SimpleBuilder implements BlocksBuilderInterface
 		$template->setBuilder( $this );
 		$template->setBlock( $block );
 
-		return '<div class="block">'.
-			'<span class="name">'.
-				$block.
-				'<pre class="data">'.print_r( $block->data, true ).'</pre>'.
-			'</span>'.
-			$template->render( $block->data ).'</div>';
+		return $template->render( $block->data );
 	}
 
 	/**

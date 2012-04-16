@@ -1,6 +1,8 @@
 <?php
 namespace WebBuilder\BlocksLoaders;
 
+use Inspirio\Database\cDBFeederBase;
+
 use WebBuilder\DataObjects\BlockSet;
 use WebBuilder\BlocksLoaderInterface;
 
@@ -26,7 +28,7 @@ class SerializedCacheProxy implements BlocksLoaderInterface
 	 *
 	 * @param BlocksLoaderInterface $loader
 	 */
-	public function __construct( \DBFeederBase $blockSetsFeeder, BlocksLoaderInterface $loader )
+	public function __construct( cDBFeederBase $blockSetsFeeder, BlocksLoaderInterface $loader )
 	{
 		$this->blockSetsFeeder  = $blockSetsFeeder;
 		$this->loader            = $loader;

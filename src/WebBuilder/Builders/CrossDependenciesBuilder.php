@@ -123,12 +123,7 @@ class CrossDependenciesBuilder implements BlocksBuilderInterface
 		$template->setBuilder( $this );
 		$template->setBlock( $block );
 
-		return '<div class="block">'.
-			'<span class="name">'.
-				$block.
-				'<pre class="data">'.print_r( $block->data, true ).'</pre>'.
-			'</span>'.
-			$template->render( $block->data ).'</div>';
+		return $template->render( $block->data );
 	}
 
 	protected function invalidateBlock( $instanceID )
@@ -161,7 +156,6 @@ class CrossDependenciesBuilder implements BlocksBuilderInterface
 			$block->data  =  $runtimeData + $block->data;
 		}
 
-		echo '<div class="slot"><span class="name">'.$slotName.'</span>';
 		foreach( $block->slots[ $slotName ] as $innerBlock ) {
 			/* @var $innerBlock \WebBuilder\BlockInstance */
 
@@ -172,7 +166,6 @@ class CrossDependenciesBuilder implements BlocksBuilderInterface
 
 			echo $this->renderBlock( $innerBlock );
 		}
-		echo '</div>';
 
 		if( $originalData !== null ) {
 			$block->data =& $originalData;

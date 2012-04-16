@@ -34,10 +34,19 @@ class WebBuilder implements WebBuilderInterface
 	 *
 	 * @param \Database $database
 	 */
-	public function __construct( cDatabase $database, $debug = false )
+	public function __construct( cDatabase $database, array $config = null )
 	{
 		$this->database = $database;
-		$this->debug    = $debug;
+
+		if( $config === null ) {
+			$config = array();
+		}
+
+		$config += array(
+			'debug' => false
+		);
+
+		$this->debug = $config['debug'];
 
 		$this->blockSetsFeeder = new cDBFeederBase( '\WebBuilder\DataObjects\BlockSet', $this->database );
 
@@ -120,7 +129,8 @@ class WebBuilder implements WebBuilderInterface
 
 		$blocksLoader = new BlocksLoaders\DatabaseLoader( $this->blockSetsFeeder );
 
-		if( $this->debug === false ) {
+		// TODO disable this permanently for now
+		if( $this->debug === false && false ) {
 			$blocksLoader = new BlocksLoaders\SerializedCacheProxy( $this->blockSetsFeeder, $blocksLoader );
 //			$blocksLoader->forceRegeneration( $forceRegeneration );
 		}
