@@ -41,6 +41,9 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		// assign template
 		if( template ) {
 			me.setTemplate( template );
+
+		} else {
+			me.setTemplate( block.templates().getAt(0) );
 		}
 	},
 
