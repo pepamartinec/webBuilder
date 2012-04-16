@@ -50,7 +50,7 @@ class Menu extends WebBlock
 		}
 
 		foreach( $itemsBag as $itemID => $subItems ) {
-			$items[ $itemID ]->setChildren( $subItems );
+			$webPages[ $itemID ]->setChildren( $subItems );
 		}
 
 		return array(
