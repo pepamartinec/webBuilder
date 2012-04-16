@@ -1,17 +1,15 @@
 <?php
 namespace Inspirio\Administration\WebEditor;
 
-use ExtAdmin\Response\ResponseTest;
-
 use ExtAdmin\Response\DataBrowserResponse;
 use Inspirio\Database\cDBFeederBase;
 use ExtAdmin\Request\DataRequestDecorator;
 use ExtAdmin\RequestInterface;
 use Inspirio\Database\cDatabase;
-use ExtAdmin\Module\DataBrowser\GridList;
+use ExtAdmin\Module\DataBrowser\TreeList;
 use Inspirio\cWebPage;
 
-class PageList extends GridList
+class PageList extends TreeList
 {
 	/**
 	 * @var cDatabase
@@ -44,6 +42,7 @@ class PageList extends GridList
 			'create' => array(
 				'title'  => 'Vytvořit',
 				'type'   => 'create',
+				'dataDep' => true,
 				'params' => array(
 					'editor'     => 'SimplePageEditor',
 					'loadAction' => 'loadData_new',
@@ -78,7 +77,8 @@ class PageList extends GridList
 
 			'fields' => array(
 				'title' => array(
-					'title' => 'Název'
+					'title' => 'Název',
+					'type'  => 'treecolumn'
 				),
 
 				'actions' => array(
@@ -99,16 +99,31 @@ class PageList extends GridList
 	{
 		$request = new DataRequestDecorator( $request );
 
-		$dataFeeder = new cDBFeederBase( '\\Inspirio\\cWebPage', $this->database );
-		$data       = $dataFeeder->get();
+		$webPageFeeder = new cDBFeederBase( '\\Inspirio\\cWebPage', $this->database );
+		$webPages      = $webPageFeeder->groupBy( 'parent_ID' )->orderBy( 'parent_ID', 'asc' )->get();
 
-		if( $data === null ) {
-			$data = array();
+		if( $webPages === null ) {
+			$webPages = array();
 		}
 
-		return new DataBrowserResponse( true, $data, sizeof( $data ), function( cWebPage $webPage ) {
-			return $webPage->getInnerValues();
-		});
+		$extractor = function( cWebPage $webPage ) use( &$extractor, $webPages ) {
+			$ID = $webPage->getID();
+
+			if( isset( $webPages[ $ID ] ) ) {
+				$children = $webPages[ $ID ];
+			} else {
+				$children = array();
+			}
+
+			return array(
+				'ID'      => $webPage->getID(),
+				'title'   => $webPage->getTitle(),
+				'actions' => array( 'create', 'edit', 'delete' ),
+				'data'    => array_map( $extractor, $children ),
+			);
+		};
+
+		return new DataBrowserResponse( true, $webPages[''], 0, $extractor );
 	}
 
 	/**
