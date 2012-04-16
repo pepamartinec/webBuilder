@@ -2,7 +2,7 @@
 <nav>
 	<ul>
 	{% for item in menuItems %}
-		<li><a href="{{ item.urlName }}" title="{{ item.title }}">{{ item.title }}</a></li>
+		<li><a href="{{ BASE_HREF }}{{ item.urlName }}" title="{{ item.title }}">{{ item.title }}</a></li>
 	{% endfor %}
 	</ul>
 </nav>

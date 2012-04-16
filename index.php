@@ -26,4 +26,8 @@ if( $webPage == null ) {
 }
 
 $builder = new WebBuilder\WebBuilder( $database, array( 'debug' => true ));
+
+$twig = $builder->getTwig();
+$twig->addGlobal( 'BASE_HREF', BASE_HREF );
+
 echo $builder->render( $webPage );

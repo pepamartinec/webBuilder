@@ -25,6 +25,11 @@ class WebBuilder implements WebBuilderInterface
 	protected $blockSetsFeeder;
 
 	/**
+	 * @var \Twig_Environment
+	 */
+	protected $twig;
+
+	/**
 	 * Constructor
 	 *
 	 * @param \Database $database
@@ -45,6 +50,16 @@ class WebBuilder implements WebBuilderInterface
 		) );
 
 		$this->twig->addExtension( new WebBuilderExtension( $this ) );
+	}
+
+	/**
+	 * Returns the Twig environment instance
+	 *
+	 * @return \Twig_Environment
+	 */
+	public function getTwig()
+	{
+		return $this->twig;
 	}
 
 	/**
