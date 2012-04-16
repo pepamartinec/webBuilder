@@ -9,6 +9,8 @@ namespace WebBuilder;
  *
  * @author Josef Martinec
  */
+use WebBuilder\DataDependencies\UndefinedData;
+
 class BlockInstance
 {
 	/**
@@ -155,6 +157,11 @@ class BlockInstance
 
 		foreach( $block->dataDependencies as $dependency ) {
 			/* @var $dependency DataDependencyInterface */
+
+			if( $dependency instanceof UndefinedData ) {
+				continue;
+			}
+
 			$data['data'][ $dependency->getProperty() ] = $dependency->export();
 		}
 
