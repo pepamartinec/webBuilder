@@ -1,4 +1,4 @@
-Ext.define( 'WebBuilder.module.WebEditor.PageEditor',
+Ext.define( 'Inspirio.module.WebEditor.SimplePageEditor',
 {
 	extend : 'Ext.tab.Panel',
 	
@@ -8,9 +8,9 @@ Ext.define( 'WebBuilder.module.WebEditor.PageEditor',
 	
 	requires : [
 		'Ext.layout.container.Fit',		
-		'WebBuilder.module.WebEditor.pageEditor.General',
-		'WebBuilder.module.WebEditor.pageEditor.Content',
-		'WebBuilder.module.WebEditor.pageEditor.Template'
+		'Inspirio.module.WebEditor.pageEditor.General',
+		'Inspirio.module.WebEditor.pageEditor.Content',
+		'Inspirio.module.WebEditor.pageEditor.Template'
 	],
 	
 	width  : 800,
@@ -24,9 +24,9 @@ Ext.define( 'WebBuilder.module.WebEditor.PageEditor',
 	{
 		var me = this;
 		
-		me.generalTab  = Ext.create( 'WebBuilder.module.WebEditor.pageEditor.General' ),
-		me.contentTab  = Ext.create( 'WebBuilder.module.WebEditor.pageEditor.Content' ),
-		me.templateTab = Ext.create( 'WebBuilder.module.WebEditor.pageEditor.Template', {
+		me.generalTab  = Ext.create( 'Inspirio.module.WebEditor.pageEditor.General' ),
+		me.contentTab  = Ext.create( 'Inspirio.module.WebEditor.pageEditor.Content' ),
+		me.templateTab = Ext.create( 'Inspirio.module.WebEditor.pageEditor.Template', {
 			env : me.env
 		});
 		

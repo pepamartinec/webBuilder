@@ -1,4 +1,4 @@
-Ext.define( 'WebBuilder.component.TemplateSelectorPopup',
+Ext.define( 'Inspirio.component.TemplateSelectorPopup',
 {
 	extend : 'Ext.window.Window',
 	

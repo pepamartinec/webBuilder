@@ -1,11 +1,11 @@
-Ext.define( 'WebBuilder.module.WebEditor.pageEditor.Template',
+Ext.define( 'Inspirio.module.WebEditor.pageEditor.Template',
 {
 	extend : 'Ext.panel.Panel',
 	
 	requires : [
 		'Ext.layout.container.Fit',
 		'WebBuilder.component.TemplateEditor',
-		'WebBuilder.component.TemplateSelectorPopup'
+		'Inspirio.component.TemplateSelectorPopup'
 	],
 	
 	/**
@@ -79,7 +79,7 @@ Ext.define( 'WebBuilder.module.WebEditor.pageEditor.Template',
 		if( me.templateSelectorPopup == null ) {
 			var loadAction = [ '\\WebBuilder\\Administration\\TemplateManager\\TemplateEditor', 'loadData_record' ];
 			
-			me.templateSelectorPopup = Ext.create( 'WebBuilder.component.TemplateSelectorPopup', {
+			me.templateSelectorPopup = Ext.create( 'Inspirio.component.TemplateSelectorPopup', {
 				env         : me.env,
 				closeAction : 'hide',
 				

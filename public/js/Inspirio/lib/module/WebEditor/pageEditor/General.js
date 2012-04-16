@@ -1,4 +1,4 @@
-Ext.define( 'WebBuilder.module.WebEditor.pageEditor.General',
+Ext.define( 'Inspirio.module.WebEditor.pageEditor.General',
 {
 	extend : 'Ext.form.Panel',
 	

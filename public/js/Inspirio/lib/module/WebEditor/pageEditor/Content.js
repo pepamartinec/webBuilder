@@ -1,4 +1,4 @@
-Ext.define( 'WebBuilder.module.WebEditor.pageEditor.Content',
+Ext.define( 'Inspirio.module.WebEditor.pageEditor.Content',
 {
 	extend : 'Ext.form.field.HtmlEditor',
 	
