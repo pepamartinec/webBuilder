@@ -19,11 +19,6 @@ class CrossDependenciesBuilder implements BlocksBuilderInterface
 	protected $blocksFactory;
 
 	/**
-	 * @var \Twig_Environment
-	 */
-	protected $twig;
-
-	/**
 	 * @var array
 	 */
 	protected $states;
@@ -36,13 +31,11 @@ class CrossDependenciesBuilder implements BlocksBuilderInterface
 	/**
 	 * Constructs new tree builder
 	 *
-	 * @param WebBlocksFactoryInterface  $blocksFactory
-	 * @param \Twig_Environment  $twig
+	 * @param WebBlocksFactoryInterface $blocksFactory
 	 */
-	public function __construct( WebBlocksFactoryInterface $blocksFactory, \Twig_Environment $twig )
+	public function __construct( WebBlocksFactoryInterface $blocksFactory )
 	{
 		$this->blocksFactory = $blocksFactory;
-		$this->twig          = $twig;
 		$this->states        = array();
 		$this->dependencies  = array();
 	}
@@ -107,25 +100,6 @@ class CrossDependenciesBuilder implements BlocksBuilderInterface
 		$blockState = self::S_READY;
 	}
 
-	/**
-	 * Renders given block
-	 *
-	 * @param BlockInstance $block
-	 */
-	public function renderBlock( BlockInstance $block )
-	{
-		$this->initBlock( $block );
-
-		/* @var $template \WebBuilder\Twig\WebBuilderTemplate */
-		$template = $this->twig->loadTemplate( $block->templateFile );
-
-		// TODO ugly hack
-		$template->setBuilder( $this );
-		$template->setBlock( $block );
-
-		return $template->render( $block->data );
-	}
-
 	protected function invalidateBlock( $instanceID )
 	{
 		$this->states[ $instanceID ] = self::S_FRESH;
@@ -138,38 +112,20 @@ class CrossDependenciesBuilder implements BlocksBuilderInterface
 	}
 
 	/**
-	 * Renders given block slot
+	 * Renders given block
 	 *
 	 * @param BlockInstance $block
-	 * @param string         $slotName
-	 * @param array          $runtimeData
+	 * @param bool $dataModified
+	 * @return \WebBuilder\Twig\WebBuilderTemplate
 	 */
-	public function renderSlot( BlockInstance $block, $slotName, array $runtimeData = null )
+	public function buildBlock( BlockInstance $block, $dataModified = false )
 	{
-		if( !isset( $block->slots[ $slotName ] ) ) {
-			return;
+		// invalidate dependent blocks
+		if( $dataModified ) {
+			$this->invalidateBlock( $innerBlock->ID );
 		}
 
-		$originalData = null;
-		if( $runtimeData !== null ) {
-			$originalData =& $block->data;
-			$block->data  =  $runtimeData + $block->data;
-		}
-
-		foreach( $block->slots[ $slotName ] as $innerBlock ) {
-			/* @var $innerBlock \WebBuilder\BlockInstance */
-
-			// invalidate dependent blocks
-			if( $runtimeData !== null ) {
-				$this->invalidateBlock( $innerBlock->ID );
-			}
-
-			echo $this->renderBlock( $innerBlock );
-		}
-
-		if( $originalData !== null ) {
-			$block->data =& $originalData;
-		}
+		$this->initBlock( $block );
 	}
 
 	/**

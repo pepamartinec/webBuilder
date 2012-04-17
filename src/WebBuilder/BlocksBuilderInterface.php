@@ -12,17 +12,16 @@ interface BlocksBuilderInterface
 	/**
 	 * Constructs new tree builder
 	 *
-	 * @param WebBlocksFactoryInterface  $blocksFactory
-	 * @param \Twig_Environment  $twig
+	 * @param WebBlocksFactoryInterface $blocksFactory
 	 */
-	public function __construct( WebBlocksFactoryInterface $blocksFactory, \Twig_Environment $twig );
+	public function __construct( WebBlocksFactoryInterface $blocksFactory );
 
 	/**
 	 * Renders given block
 	 *
 	 * @param BlockInstance $block
 	 */
-	public function renderBlock( BlockInstance $block );
+	public function buildBlock( BlockInstance $block );
 
 	/**
 	 * Tests whether builder is capable of rendering given blocks set

@@ -61,7 +61,7 @@ class BlocksBuildersFactory
 	 * @param  bool           $forceAnalysis
 	 * @return BlocksBuilderInterface
 	 *
-	 * @throws WebBuilder\InvalidBuilderTypeException
+	 * @throws InvalidBuilderTypeException
 	 */
 	public function getBlocksBuilder( BlockSet $blockSet, $forceAnalysis = false )
 	{
@@ -79,6 +79,6 @@ class BlocksBuildersFactory
 
 		// create builder
 		$builderClass = __NAMESPACE__ .'\\Builders\\'. $builderType;
-		return new $builderClass( $this->blocksFactory, $this->twig );
+		return new $builderClass( $this->blocksFactory );
 	}
 }

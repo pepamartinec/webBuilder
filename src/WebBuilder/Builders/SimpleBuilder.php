@@ -15,20 +15,13 @@ class SimpleBuilder implements BlocksBuilderInterface
 	protected $blocksFactory;
 
 	/**
-	 * @var \Twig_Environment
-	 */
-	protected $twig;
-
-	/**
 	 * Constructs new tree builder
 	 *
-	 * @param WebBlocksFactoryInterface  $blocksFactory
-	 * @param \Twig_Environment  $twig
+	 * @param WebBlocksFactoryInterface $blocksFactory
 	 */
-	public function __construct( WebBlocksFactoryInterface $blocksFactory, \Twig_Environment $twig )
+	public function __construct( WebBlocksFactoryInterface $blocksFactory )
 	{
 		$this->blocksFactory = $blocksFactory;
-		$this->twig = $twig;
 	}
 
 	/**
@@ -36,13 +29,12 @@ class SimpleBuilder implements BlocksBuilderInterface
 	 *
 	 * @param BlockInstance $block
 	 */
-	public function renderBlock( BlockInstance $block )
+	public function buildBlock( BlockInstance $block )
 	{
 		// init required data
 		$block->data = array();
 		foreach( $block->dataDependencies as $property => $dependency ) {
 			/* @var $dependency \WebBuilder\DataDependencyInterface */
-
 			$block->data[ $property ] = $dependency->getTargetData();
 		}
 
@@ -51,45 +43,6 @@ class SimpleBuilder implements BlocksBuilderInterface
 			$blockObj = $this->blocksFactory->createBlock( $block->blockName );
 
 			$block->data += call_user_func_array( array( $blockObj, 'setupData' ), $block->data );
-		}
-
-		/* @var $template \WebBuilder\Twig\WebBuilderTemplate */
-		$template = $this->twig->loadTemplate( $block->templateFile );
-
-		// TODO ugly hack
-		$template->setBuilder( $this );
-		$template->setBlock( $block );
-
-		return $template->render( $block->data );
-	}
-
-	/**
-	 * Renders given block slot
-	 *
-	 * @param BlockInstance $block
-	 * @param string         $slotName
-	 * @param array          $runtimeData
-	 */
-	public function renderSlot( BlockInstance $block, $slotName, array $runtimeData = null )
-	{
-		if( !isset( $block->slots[ $slotName ] ) ) {
-			return;
-		}
-
-		$originalData = null;
-		if( $runtimeData !== null ) {
-			$originalData =& $block->data;
-			$block->data  =  $runtimeData + $block->data;
-		}
-
-		echo '<div class="slot"><span class="name">'.$slotName.'</span>';
-		foreach( $block->slots[ $slotName ] as $innerBlock ) {
-			echo $this->renderBlock( $innerBlock );
-		}
-		echo '</div>';
-
-		if( $originalData !== null ) {
-			$block->data =& $originalData;
 		}
 	}
 

@@ -12,7 +12,7 @@ class SlotNode extends \Twig_Node
 	{
         $compiler->addDebugInfo( $this );
 
-		$compiler->write( "\$this->builder->renderSlot( \$this->block, '{$this->getAttribute('name')}', " );
+		$compiler->write( "echo \$this->renderSlot( '{$this->getAttribute('name')}', " );
 
 		if( sizeof( $this->getNode('parameters') ) > 0 ) {
 			$compiler->subcompile( $this->getNode('parameters') );

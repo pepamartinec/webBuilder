@@ -53,8 +53,8 @@ class WebBuilder implements WebBuilderInterface
 		// init Twig
 		$loader     = new \Twig_Loader_Filesystem( PATH_TO_ROOT );
 		$this->twig = new \Twig_Environment( $loader, array(
-//			'cache'               => './tmp/',
-			'debug'               => $this->debug,
+			'cache'               => './tmp/',
+			'debug'               => true,
 			'base_template_class' => '\WebBuilder\Twig\WebBuilderTemplate'
 		) );
 
@@ -109,7 +109,13 @@ class WebBuilder implements WebBuilderInterface
 		}
 
 		// build and render blocks
-		return $blocksBuilder->renderBlock( $rootBlock );
+		$blocksBuilder->buildBlock( $rootBlock );
+
+		$template = $this->twig->loadTemplate( $rootBlock->templateFile );
+		$template->setBuilder( $blocksBuilder );
+		$template->setBlock( $rootBlock );
+
+		return $template->render( $rootBlock->data );
 	}
 
 	/**
