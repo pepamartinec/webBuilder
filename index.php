@@ -6,8 +6,7 @@ include_once 'common.php';
 
 $database = new Inspirio\Database\cDatabase( DATABASE, HOST, USER, PASSWORD );
 
-$url = '/'. $_GET['route'];
-
+$url = '/'. $_GET['url'];
 
 $webPageFeeder = new Inspirio\Database\cDBFeederBase( '\\Inspirio\\cWebPage', $database );
 $webPage       = $webPageFeeder->whereColumnEq( 'url_name', $url )->getOne();
