@@ -1,16 +1,12 @@
 {% container Page %}
-
-<div id="header-container">
-	<header class="wrapper">
-		<h1 id="title">{{ webPage.title }}</h1>
-		{% slot head %}
-	</header>
-</div>
-<div id="main" class="wrapper">
+<header>
+	{% slot header %}
+</header>
+<div class="container">
 	{% slot content %}
-</div>
-<div id="footer-container">
-	<footer class="wrapper">
+
+	<hr>
+	<footer>
 		{% slot footer %}
 	</footer>
 </div>

@@ -1,43 +1,33 @@
 {% container WebPage %}
 <!doctype html>
-<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<html>
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-	<title>{% block pageTitle %}{{ webPage.title }}{% endblock %}</title>
-	<meta name="description" content="webBuilder test site">
+	<title>{% block pageTitle %}WebBuilder | {{ webPage.title }}{% endblock %}</title>
 	<meta name="author" content="Josef Martinec <joker806@gmail.com>">
+	<meta name="description" content="webBuilder test site">
+
+    <!-- Le styles -->
+    <link href="public/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+    <link href="public/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="favicon.ico">
 
 	<link rel="stylesheet" href="{{ config.stylesheet }}">
-
-	<style>/*
-		.block, .slot { margin: 1px; padding: 16 3 3 3; }
-
-		.block { border: 2px solid red; }
-		.block > .name { background-color: red; }
-
-		.slot { border: 2px solid lime; }
-		.slot > .name { background-color: lime; }
-		*/
-
-		.block, .slot { margin: 0px; padding: 2px; }
-		.block { border : 1px solid red; }
-		.block > .name { display: block; background-color: red; }
-
-		.slot { border : 1px solid blue; }
-		.slot > .name { display: block; background-color: blue; }
-
-		.name { font-size: 9px; font-weight: bold; padding: 2px 5px; margin: -16 1 1 -3; float: left; }
-
-		span.name > .data { float: right; display: none; background: #ddd; }
-		span.name:hover > .data { display: block; }
-
-		.content div { display: inline; }
-	</style>
 </head>
 <body>
 	{% slot masterContent %}

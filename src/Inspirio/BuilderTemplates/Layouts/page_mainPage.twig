@@ -1,21 +1,18 @@
 {% container Page %}
-<div id="header-container">
-	<header class="wrapper">
-		<h1 id="title">{{ webPage.title }}</h1>
-		<nav>
-			<ul>
-				<li><a href="#">Some</a></li>
-				<li><a href="#">navigation</a></li>
-				<li><a href="#">links</a></li>
-			</ul>
-		</nav>
-	</header>
-</div>
-<div id="main" class="wrapper">
-	{% slot masterContent %}
-</div>
-<div id="footer-container">
-	<footer class="wrapper">
-		<h3>{% slot footer %}</h3>
+<header>
+	{% slot header %}
+</header>
+<div class="container">
+	<div class="hero-unit">
+		{% slot welcomeText %}
+	</div>
+
+	<div class="row">
+		{% slot smallText %}
+	</div>
+
+	<hr>
+	<footer>
+		{% slot footer %}
 	</footer>
 </div>
