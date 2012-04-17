@@ -122,7 +122,7 @@ class CrossDependenciesBuilder implements BlocksBuilderInterface
 	{
 		// invalidate dependent blocks
 		if( $dataModified ) {
-			$this->invalidateBlock( $innerBlock->ID );
+			$this->invalidateBlock( $block->ID );
 		}
 
 		$this->initBlock( $block );

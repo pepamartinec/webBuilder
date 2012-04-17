@@ -1,9 +1,20 @@
 {% container Page %}
-<header>
-	{% slot header %}
-</header>
 <div class="container">
-	{% slot content %}
+	<header>
+		{% slot header %}
+	</header>
+
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span8">
+				{% slot content %}
+			</div>
+
+			<div class="span4">
+				{% slot rightColumn %}
+			</div>
+		</div>
+	</div>
 
 	<hr>
 	<footer>

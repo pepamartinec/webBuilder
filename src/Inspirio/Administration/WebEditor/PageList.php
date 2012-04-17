@@ -44,8 +44,8 @@ class PageList extends TreeList
 				'type'   => 'create',
 				'dataDep' => true,
 				'params' => array(
-					'editor'     => 'SimplePageEditor',
-					'loadAction' => 'loadData_new',
+					'editor'      => 'SimplePageEditor',
+					'loadDefault' => 'loadData_new',
 				),
 			),
 

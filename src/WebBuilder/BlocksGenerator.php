@@ -152,6 +152,19 @@ class BlocksGenerator
 	public function registerTemplate( TemplateReflection $template, array $existingTemplates, array &$validTemplates )
 	{
 		echo "- registering template {$template->getPathname()} (block {$template->getParentBlock()})\n";
+		echo "  - slots:";
+
+		$slots = $template->getSlots();
+		if( $slots == null ) {
+			echo " none\n";
+
+		} else {
+			foreach( $slots as $slot ) {
+				echo " {$slot}\n          ";
+			}
+			echo "\r";
+		}
+		echo "\n";
 
 		$pathname = $template->getPathname();
 		// TODO make path relative to web root

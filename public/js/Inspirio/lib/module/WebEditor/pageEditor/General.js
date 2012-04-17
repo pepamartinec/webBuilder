@@ -18,6 +18,10 @@ Ext.define( 'Inspirio.module.WebEditor.pageEditor.General',
 		name  : 'ID'
 
 	},{
+		xtype : 'hiddenfield',
+		name  : 'parentID'
+
+	},{
 		xtype : 'container',
 		layout : {
 			type  : 'hbox',

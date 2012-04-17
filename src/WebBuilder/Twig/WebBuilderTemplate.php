@@ -6,6 +6,8 @@ use WebBuilder\BlocksBuilderInterface;
 
 abstract class WebBuilderTemplate extends \Twig_Template
 {
+	const CLS_BLOCK = "wb-block";
+
 	/**
 	 * @var BlocksBuilderInterface
 	 */
@@ -72,7 +74,7 @@ abstract class WebBuilderTemplate extends \Twig_Template
 			$template->setBuilder( $this->builder );
 			$template->setBlock( $innerBlock );
 
-			echo '<div class="block">'. $template->render( $innerBlock->data ) .'</div>';
+			echo '<div class="'. self::CLS_BLOCK .'">'. $template->render( $innerBlock->data ) .'</div>';
 		}
 
 		if( $hasRuntimeData ) {

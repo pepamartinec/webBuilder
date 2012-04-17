@@ -2,10 +2,10 @@
 
 {% if items|length == 0 %}
 	prazdno
-{% else %} 
+{% else %}
 <table>
 	{% for item in items %}
-		<tr><td>{% slot item with [ 'item' : item ] %}</td></tr>
+		<tr><td>{% slot item with { 'item' : item } %}</td></tr>
 	{% endfor %}
 </table>
 {% endif %}

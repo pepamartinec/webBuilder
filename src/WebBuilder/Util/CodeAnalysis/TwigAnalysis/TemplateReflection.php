@@ -45,7 +45,7 @@ class TemplateReflection implements TemplateReflectionInterface
 
 
 		// pick defined slots
-		$pattern = '/\{% \s+ slot \s+ (?P<name>[^ ]+) (?: \s+ with \s+ \[ [^\[\]]+ \] )? \s+ %\}/xi';
+		$pattern = '/\{% \s+ slot \s+ (?P<name>[^ ]+) (?: \s+ with \s+ { [^\[\]]+ } )? \s+ %\}/xi';
 		preg_match_all( $pattern, $code, $matches );
 
 		$this->slots = $matches['name'];

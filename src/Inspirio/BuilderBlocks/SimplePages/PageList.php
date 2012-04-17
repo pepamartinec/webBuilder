@@ -25,7 +25,7 @@ class PageList extends WebBlock
 		$simplePages = null;
 
 		$webPageFeeder = new cDBFeederBase( '\\Inspirio\\cWebPage', $this->database );
-		$webPages      = $pageFeeder->whereColumnEq( 'parent_ID', $parentID )->indexBy( 'ID' )->get();
+		$webPages      = $webPageFeeder->whereColumnEq( 'parent_ID', $parentID )->indexBy( 'ID' )->get();
 
 		if( $webPages ) {
 			$simplePageFeeder = new cDBFeederBase( '\\Inspirio\\cSimplePage', $this->database );
@@ -33,13 +33,16 @@ class PageList extends WebBlock
 
 			if( $simplePages ) {
 				foreach( $simplePages as $simplePage ) {
-					$simplePage->setWebPage( $webPages[ $simplePage->getWebPageID() ] );
+					$webPage = $webPages[ $simplePage->getWebPageID() ];
+
+					$simplePage->setWebPage( $webPage );
+					$webPage->setContentItem( $simplePage );
 				}
 			}
 		}
 
 		return array(
-			'pages' => $simplePages
+			'pages' => $webPages
 		);
 	}
 }

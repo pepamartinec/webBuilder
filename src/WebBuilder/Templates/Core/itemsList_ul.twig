@@ -2,7 +2,7 @@
 
 {% if items|length == 0 %}
 	prazdno
-{% else %} 
+{% else %}
 <ul>
 	{% for item in items %}
 		<li>{% slot item with [ 'item' : item ] %}</li>
