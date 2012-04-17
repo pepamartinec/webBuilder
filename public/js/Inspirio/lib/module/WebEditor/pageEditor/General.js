@@ -1,38 +1,38 @@
 Ext.define( 'Inspirio.module.WebEditor.pageEditor.General',
 {
 	extend : 'Ext.form.Panel',
-	
+
 	title : 'Obecné',
-	
+
 	defaults : {
 		anchor : '100%'
 	},
-	
+
 	layout : {
 		type  : 'vbox',
 		align : 'stretch'
 	},
-	
+
 	items : [{
 		xtype : 'hiddenfield',
 		name  : 'ID'
-			
+
 	},{
 		xtype : 'container',
 		layout : {
 			type  : 'hbox',
 			align : 'stretchMax'
 		},
-		
+
 		items : [{
 			xtype  : 'container',
 			layout : {
 				type  : 'vbox',
 				align : 'stretch'
 			},
-			
+
 			flex : 1,
-			
+
 			items : [{
 				xtype      : 'textfield',
 				fieldLabel : 'Titulek',
@@ -48,13 +48,13 @@ Ext.define( 'Inspirio.module.WebEditor.pageEditor.General',
 				type  : 'vbox',
 				align : 'stretch'
 			},
-			
+
 			flex : 1,
-			
+
 			items : [{
 				xtype      : 'fieldcontainer',
 				fieldLabel : 'Platnost',
-				
+
 				items : [{
 					xtype : 'component',
 					html  : 'od'
@@ -71,10 +71,10 @@ Ext.define( 'Inspirio.module.WebEditor.pageEditor.General',
 			},{
 				xtype      : 'checkboxfield',
 				fieldLabel : 'Publikovat',
-				name       : 'publish'
+				name       : 'published'
 			}]
 		}]
-		
+
 	},{
 		xtype      : 'htmleditor',
 		fieldLabel : 'Perex',
@@ -82,11 +82,11 @@ Ext.define( 'Inspirio.module.WebEditor.pageEditor.General',
 		labelAlign : 'top',
 		flex       : 1
 	}],
-	
+
 	getData : function() {
 		return this.form.getValues();
 	},
-	
+
 	setData : function( data )
 	{
 		return this.form.setValues( data );

@@ -53,7 +53,7 @@ class WebBuilder implements WebBuilderInterface
 		// init Twig
 		$loader     = new \Twig_Loader_Filesystem( PATH_TO_ROOT );
 		$this->twig = new \Twig_Environment( $loader, array(
-			'cache'               => './tmp/',
+//			'cache'               => './tmp/',
 			'debug'               => $this->debug,
 			'base_template_class' => '\WebBuilder\Twig\WebBuilderTemplate'
 		) );

@@ -10,7 +10,7 @@ class PageOverview extends WebBlock
 	public static function requires()
 	{
 		return array(
-			'page' => 'cSimplePage'
+			'page' => 'cWebPage'
 		);
 	}
 }

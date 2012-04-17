@@ -44,6 +44,23 @@ class cWebPage extends aDataObject implements WebPageInterface
 			'type' => 'string',
 		),
 
+		'published' => array(
+			'dbColumn' => 'published',
+			'type' => 'boolean',
+		),
+
+		'validFrom' => array(
+			'dbColumn' => 'valid_from',
+			'type' => 'datetime',
+			'sanitize' => 'nullOnEmpty',
+		),
+
+		'validTo' => array(
+			'dbColumn' => 'valid_to',
+			'type' => 'datetime',
+			'sanitize' => 'nullOnEmpty',
+		),
+
 		'createdOn' => array(
 			'dbColumn' => 'created_on',
 			'type' => 'string',
