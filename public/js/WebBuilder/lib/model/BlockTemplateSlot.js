@@ -1,12 +1,17 @@
 Ext.define( 'WebBuilder.model.BlockTemplateSlot',
 {
-	extend : 'extAdmin.Model',
+	extend : 'Ext.data.Model',
 
 	uses : [
 		'WebBuilder.model.BlockTemplate'
 	],
 
+	idProperty : 'ID',
+
 	fields : [{
+		name : 'ID',
+		type : 'int'
+	},{
 		name : 'templateID',
 		type : 'int'
 	},{

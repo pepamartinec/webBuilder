@@ -7,7 +7,12 @@ Ext.define( 'WebBuilder.model.Block',
 		'WebBuilder.model.BlockTemplate'
 	],
 
+	idProperty : 'ID',
+	
 	fields : [{
+		name : 'ID',
+		type : 'int'
+	},{
 		name : 'categoryID',
 		type : 'int'
 	},{

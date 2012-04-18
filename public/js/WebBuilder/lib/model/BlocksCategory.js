@@ -9,6 +9,9 @@ Ext.define( 'WebBuilder.model.BlocksCategory',
 	idProperty : 'ID',
 
 	fields : [{
+		name : 'ID',
+		type : 'int'
+	},{
 		name : 'title',
 		type : 'string'
 	}],

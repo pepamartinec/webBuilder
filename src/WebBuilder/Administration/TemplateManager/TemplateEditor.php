@@ -301,6 +301,7 @@ class TemplateEditor extends DataEditor
 						'ID'        => $templateID,
 						'blockID'   => $blockID,
 						'filename'  => $template->getFilename(),
+						'content'   => file_get_contents( $template->getFilename() ),
 						'slots' => array(),
 					);
 

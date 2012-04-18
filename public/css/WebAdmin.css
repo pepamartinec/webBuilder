@@ -99,11 +99,23 @@ body {
 	background-color : #fdfdfd;
 }
 
+.x-template-canvas .x-block-variable {
+	color            : #000;
+	background-color : #CAE871;
+	border           : 1px solid #5F7913;
+	border-radius    : 5px;
+	
+	display : inline-block;
+	margin  : 1px 3px;
+	padding : 0px 2px;
+}
+
 /************* BLOCK TITLE *************/
 .x-template-canvas .x-block > .x-title {
 	font-weight      : bold;
 	background-color : #FDFFFF;
 	padding          : 0px 10px;
+	border-radius    : 5px;
 	
 	cursor : pointer;
 }
@@ -164,7 +176,7 @@ body {
 }
 
 /************* SLOT TITLE *************/
-.x-template-canvas .x-block > .x-slot > .x-title {
+.x-template-canvas .x-block .x-slot > .x-title {
     position   : absolute;
     width      : 100%;
     height     : 100%;
@@ -201,3 +213,4 @@ body {
 	margin : 7px auto;
 	border : 1px solid #000;
 }
+

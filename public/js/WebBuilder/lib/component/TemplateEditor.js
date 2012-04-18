@@ -10,7 +10,8 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	requires : [
 		'Ext.layout.container.Border',
 		'WebBuilder.widget.BlocksList',
-		'WebBuilder.widget.TemplateCanvas',
+		'WebBuilder.widget.SimpleCanvas',
+		'WebBuilder.widget.RealCanvas',
 
 		'WebBuilder.EditorStore',
 		'extAdmin.Store',
@@ -65,7 +66,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 			blocksStore : me.blocksStore
 		});
 
-		me.canvas = Ext.create( 'WebBuilder.widget.TemplateCanvas', {
+		me.canvas = Ext.create( 'WebBuilder.widget.RealCanvas', {
 			region : 'center',
 			title  : 'Plátno',
 
@@ -202,7 +203,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	 * Sets a data value into the field and runs the change detection and validation.
 	 *
 	 * @param {Object} value The value to set
-	 * @return {WebBuilder.widget.TemplateCanvas} this
+	 * @return {WebBuilder.component.TemplateEditor} this
 	 */
 	setValue : function( value )
 	{
@@ -244,7 +245,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		// create instance
 		var instance = Ext.create( 'WebBuilder.BlockInstance', value.ID, block ),
 		    template = value.templateID && block.templates().getById( value.templateID );
-		
+
 		instance.setConfig( value.data || {} );
 		instance.setTemplate( template );
 
@@ -257,7 +258,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 
 						instance.addChild( childInstance, id );
 					});
-					
+
 				} else {
 					Ext.Object.each( children, function( position, child ) {
 						var childInstance = me.setValue_createInstance( child );
@@ -265,7 +266,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 						instance.addChild( childInstance, id );
 					});
 				}
-				
+
 
 			});
 		}

@@ -1,4 +1,4 @@
-Ext.define( 'WebBuilder.widget.TemplateCanvas', {
+Ext.define( 'WebBuilder.widget.AbstractTemplateCanvas', {
 	extend : 'Ext.Component',
 
 	requires : [
@@ -158,7 +158,7 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 
         // create insert position pointer instance
         me.insertPtrDom = Ext.DomHelper.createDom( me.insertPtrDom );
-        
+
         // create config popup
         me.configPopup = Ext.create( 'WebBuilder.widget.ConfigPopup', {
         	closeAction : 'hide'
@@ -200,6 +200,14 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 		me.mon( me.instancesStore, 'add', me.handleInstanceAdd, me );
 		me.mon( me.instancesStore, 'remove', me.handleInstanceRemove, me );
 		me.mon( me.instancesStore, 'templatechange', me.handleInstanceTemplateChange, me );
+
+		me.initIframe();
+		var store = me.instancesStore,
+	    root  = store.getRoot();
+
+		if( root ) {
+			me.handleInstanceAdd( store, root );
+		}
 	},
 
 	/**
@@ -209,29 +217,11 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 	 */
 	initIframe : function()
 	{
-		var me  = this;
-
-		var doc = me.iframeEl.dom.contentDocument;
+		var me  = this,
+		    doc = me.iframeEl.dom.contentDocument;
 
 		me.headEl = Ext.get( doc.head );
 		me.bodyEl = Ext.get( doc.body );
-
-		// load stylesheets
-		Ext.DomHelper.append( me.headEl.dom, {
-			tag  : 'link',
-			rel  : 'stylesheet',
-			type : 'text/css',
-			href : 'css/WebAdmin.css'
-		});
-
-		Ext.DomHelper.append( me.headEl.dom, {
-			tag  : 'link',
-			rel  : 'stylesheet',
-			type : 'text/css',
-			href : me.module.getActionUrl( 'loadSimplifiedStylesheet', {
-				stylesheet : 'public/css/style.css'
-			})
-		});
 
 		// mark canvas root
 		me.bodyEl.addCls( me.canvasCls );
@@ -263,13 +253,6 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 			instanceIdRe : me.instanceIdRe,
 			slotIdRe     : me.slotIdRe
 		});
-
-		var store = me.instancesStore,
-		    root  = store.getRoot();
-
-		if( root ) {
-			me.handleInstanceAdd( store, root );
-		}
 	},
 
 	/**
@@ -372,24 +355,43 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 	{
 		var me = this;
 
-		// create block DOM node
-		var blockDom = Ext.DomHelper.createDom( me.createBlockDefinition( instance ) );
-
 		if( parentBlock ) {
-			var slotDom      = me.findSlotDom( parentBlock, parentSlotId ),
+			var instanceTpl  = me.getInstanceTpl( instance ),
+			    slotDom      = me.findSlotDom( parentBlock, parentSlotId ),
 			    insertBefore = slotDom.childNodes[ position ];
 
 			if( insertBefore ) {
-				slotDom.insertBefore( blockDom, insertBefore );
+				instanceTpl.insertBefore( insertBefore, instance );
 
 			} else {
-				slotDom.appendChild( blockDom );
+				instanceTpl.append( slotDom, instance );
 			}
 
 		} else {
-			this.bodyEl.dom.appendChild( blockDom );
+			var iframeDoc = this.iframeEl.dom.contentDocument,
+			    docTpl    = me.getDocumentTpl( instance );
+
+			iframeDoc.open();
+			iframeDoc.write( docTpl.apply( instance ) );
+			iframeDoc.close();
 		}
 	},
+
+	/**
+	 * Returns the template of given block instance
+	 *
+	 * @param {WebBuilder.BlockInstance} instance
+	 * @return {Ext.Template}
+	 */
+	getInstanceTpl : extAdmin.abstractFn,
+
+	/**
+	 * Returns the template of canvas document (including the root HTML node)
+	 *
+	 * @param {WebBuilder.BlockInstance} instance
+	 * @return {Ext.Template}
+	 */
+	getDocumentTpl : extAdmin.abstractFn,
 
 	/**
 	 * Handler for removal of the block instance from store
@@ -471,82 +473,5 @@ Ext.define( 'WebBuilder.widget.TemplateCanvas', {
 	findSlotDom : function( instance, slotId )
 	{
 		return this.iframeEl.dom.contentDocument.getElementById( 'template-block-instance-'+ instance.id +'-slot-'+ slotId );
-	},
-
-	/**
-	 * Create DOM node of given block instance
-	 *
-	 * @param {WebBuilder.BlockInstance} [instance]
-	 * @returns {HTMLElement}
-	 */
-	createBlockDom : function( instance )
-	{
-		return Ext.DomHelper.createDom( this.createBlockDefinition( instance ) );
-	},
-
-	/**
-	 * Creates Ext.dom.Helper definition of block (including its children)
-	 *
-	 * @param {WebBuilder.BlockInstance} [instance]
-	 * @returns {Object}
-	 */
-	createBlockDefinition : function( instance )
-	{
-		var me = this;
-
-		// create block DOM node definition
-		var block    = instance.block,
-		    blockDef = {
-				tag : 'div',
-				id  : 'template-block-instance-'+ instance.id,
-				cls : me.blockCls,
-
-				children : [{
-					tag  : 'div',
-					cls  : [ me.titleCls, me.blockTitleCls ].join(' '),
-
-					children : [{
-						tag  : 'span',
-						html : block.get('title') +' ['+ instance.template.get('title') +']'
-
-					},{
-				    	tag : 'div',
-				    	cls : me.blockToolsCls,
-
-				    	children : [{
-				    		tag : 'div',
-				    		cls : [ me.blockToolCls, me.configToolCls ].join(' ')
-
-				    	},{
-				    		tag : 'div',
-				    		cls : [ me.blockToolCls, me.removeToolCls ].join(' ')
-				    	}]
-				    }]
-				}]
-			};
-
-		// create slots DOM nodes definition
-		if( instance.slots ) {
-			Ext.Object.each( instance.slots, function( id, children ) {
-				var slot        = instance.template.slots().findRecord( 'codeName', id ),
-				    childrenDef = Ext.Array.map( children, me.createBlockDefinition, me );
-
-				childrenDef.unshift({
-					tag  : 'div',
-					cls  : [ me.titleCls, me.slotTitleCls ].join(' '),
-					html : slot.get('codeName')
-				});
-
-				blockDef.children.push({
-					tag : 'div',
-					id  : 'template-block-instance-'+ instance.id +'-slot-'+ id,
-					cls : me.slotCls,
-
-					children : childrenDef
-				});
-			});
-		}
-
-		return blockDef;
 	}
 });

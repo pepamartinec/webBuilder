@@ -1,8 +1,11 @@
 {% container ItemsList %}
 
+<!--[if design]>
+<![else]-->
 {% if items|length == 0 %}
 	prazdno
 {% else %}
+<!--[end]-->
 <table>
 	{% for item in items %}
 		<tr><td>{% slot item with { 'item' : item } %}</td></tr>

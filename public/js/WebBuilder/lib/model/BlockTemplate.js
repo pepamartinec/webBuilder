@@ -7,7 +7,12 @@ Ext.define( 'WebBuilder.model.BlockTemplate',
 		'WebBuilder.model.BlockTemplateSlot'
 	],
 
+	idProperty : 'ID',
+
 	fields : [{
+		name : 'ID',
+		type : 'int'
+	},{
 		name : 'blockID',
 		type : 'int'
 	},{
@@ -17,12 +22,12 @@ Ext.define( 'WebBuilder.model.BlockTemplate',
 		name    : 'title',
 		convert : function( value, record ) {
 			return record.get('filename').split('/').pop();
-		} 
+		}
 	},{
 		name : 'filename',
 		type : 'string'
 	},{
-		name : 'structure',
+		name : 'content',
 		type : 'string'
 	}],
 
