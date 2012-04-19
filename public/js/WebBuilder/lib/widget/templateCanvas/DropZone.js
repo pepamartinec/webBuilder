@@ -181,15 +181,15 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 	},
 
 	/**
-	 * Returns the drop target instance.
+	 * Returns the block instance represented by the DOM node.
 	 *
-	 * @param {HTMLElement} [slotDom]
+	 * @param {HTMLElement} [domNode]
 	 * @returns {WebBuilder.BlockInstance}
 	 */
-	getTargetInstance : function( slotDom )
+	getTargetInstance : function( domNode )
 	{
 		// find parent block
-		var parentDom = Ext.fly( slotDom ).findParent( '.'+ this.blockCls );
+		var parentDom = Ext.fly( domNode ).findParent( '.'+ this.blockCls );
 
 		// pick block id
 		var match      = parentDom.id.match( this.instanceIdRe ),

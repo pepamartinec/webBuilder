@@ -15,27 +15,17 @@ Ext.define( 'WebBuilder.widget.RealCanvas', {
 	initInstanceTpl : function()
 	{
 		var me = this,
-		    tplDef, tpl;
+		    tpl;
 
-		tplDef = [
+		// create the slot renderer
+		tpl = Ext.create( 'Ext.Template',
 			'<div id="template-block-instance-{id}-slot-{slotName}" class="{slotCls}">',
-			'<div class="{titleCls} {slotTitleCls}">{slotName}</div>',
+				'<div class="{titleCls} {slotTitleCls}">{slotName}</div>',
 				'<tpl for="values.slots[\'{slotName}\']">',
-					'<div id="template-block-instance-{[parent.id]}" class="{blockCls}">',
-						'<div class="{titleCls} {blockTitleCls}">',
-							'<span>{blockTitle} [{templateTitle}]</span>',
-							'<div class="{blockToolsCls}">',
-								'<div class="{blockToolCls} {configToolCls}"></div>',
-								'<div class="{blockToolCls} {removeToolCls}"></div>',
-							'</div>',
-						'</div>',
-						'{[ this.getInstanceTpl( values ).apply( values ) ]}',
-					'</div>',
+					'{[ this.getInstanceTpl( values ).apply( values ) ]}',
 				'</tpl>',
 			'</div>'
-		];
-
-		tpl = Ext.create( 'Ext.Template', tplDef );
+		);
 
 		me.slotRendererCode = tpl.apply({
 		    blockCls      : me.blockCls,
@@ -53,6 +43,40 @@ Ext.define( 'WebBuilder.widget.RealCanvas', {
 		    blockTitle    : '{block.data.title}',
 		    templateTitle : '{template.data.title}'
 		});
+
+
+		// create the instance tpl
+		tpl = Ext.create( 'Ext.Template',
+			'<div id="template-block-instance-{id}" class="{blockCls}">',
+				'<div class="{titleCls} {blockTitleCls}">',
+					'<span>{blockTitle} [{templateTitle}]</span>',
+					'<div class="{blockToolsCls}">',
+						'<div class="{blockToolCls} {configToolCls}"></div>',
+						'<div class="{blockToolCls} {removeToolCls}"></div>',
+					'</div>',
+				'</div>'
+
+				// here comes the {content}
+
+			// following is part of the blockFooter
+			// '</div>'
+		);
+
+		me.blockHeader = tpl.apply({
+		    blockCls      : me.blockCls,
+		    titleCls      : me.titleCls,
+		    blockTitleCls : me.blockTitleCls,
+		    blockToolsCls : me.blockToolsCls,
+		    blockToolCls  : me.blockToolCls,
+		    configToolCls : me.configToolCls,
+		    removeToolCls : me.removeToolCls,
+
+		    id            : '{id}',
+		    blockTitle    : '{block.data.title}',
+		    templateTitle : '{template.data.title}'
+		});
+
+		me.blockFooter = '</div>';
 	},
 
 	/**
@@ -98,12 +122,18 @@ Ext.define( 'WebBuilder.widget.RealCanvas', {
 			// setup slot rendering
 			content = content.replace( localSlotRe, me.slotRendererCode );
 
-			var tpl = Ext.create( 'Ext.XTemplate', content, {
-				disableFormats : true,
-				compiled       : true,
+			var tpl = Ext.create( 'Ext.XTemplate',
+					me.blockHeader,
+						content,
+					me.blockFooter,
 
-				getInstanceTpl : Ext.Function.bind( me.getInstanceTpl, me )
-			});
+					{
+						disableFormats : true,
+						compiled       : true,
+
+						getInstanceTpl : Ext.Function.bind( me.getInstanceTpl, me )
+					}
+			);
 
 			me.tplCache[ template.getId() ] = tpl;
 
