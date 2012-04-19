@@ -282,7 +282,7 @@ Ext.define( 'WebBuilder.widget.AbstractTemplateCanvas', {
 
 		// fake event position & relay to DD manager
 		event.innerXY = eventXY;
-		event.xy = [ iframeXY[0] + eventXY[0], iframeXY[1] + eventXY[1] ];
+		event.xy      = [ iframeXY[0] + eventXY[0], iframeXY[1] + eventXY[1] ];
 		Ext.dd.DragDropManager.handleMouseMove( event );
 
 		// styling helpers
@@ -301,6 +301,7 @@ Ext.define( 'WebBuilder.widget.AbstractTemplateCanvas', {
 		}
 
 		// restore original position
+		delete event.innerXY;
 		event.xy = eventXY;
 	},
 
@@ -311,7 +312,7 @@ Ext.define( 'WebBuilder.widget.AbstractTemplateCanvas', {
 
 		// fake event position & relay to DD manager
 		event.innerXY = eventXY;
-		event.xy = [ iframeXY[0] + eventXY[0], iframeXY[1] + eventXY[1] ];
+		event.xy      = [ iframeXY[0] + eventXY[0], iframeXY[1] + eventXY[1] ];
 		Ext.dd.DragDropManager.handleMouseUp( event );
 
 		// restore original position
@@ -358,7 +359,19 @@ Ext.define( 'WebBuilder.widget.AbstractTemplateCanvas', {
 		if( parentBlock ) {
 			var instanceTpl  = me.getInstanceTpl( instance ),
 			    slotDom      = me.findSlotDom( parentBlock, parentSlotId ),
-			    insertBefore = slotDom.childNodes[ position ];
+			    insertBefore = null;
+
+			if( position !== null ) {
+				insertBefore = slotDom.firstChild;
+
+				while( insertBefore && position >= 0 ) {
+					if( Ext.fly( insertBefore ).hasCls( this.blockCls ) ) {
+						--position;
+					}
+
+					insertBefore = insertBefore.nextSibling;
+				}
+			}
 
 			if( insertBefore ) {
 				instanceTpl.insertBefore( insertBefore, instance );

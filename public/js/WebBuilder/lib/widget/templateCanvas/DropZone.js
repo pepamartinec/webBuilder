@@ -63,6 +63,8 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 			tag : 'hr',
 	    	cls : Ext.baseCSSPrefix +'insert-pointer'
 		});
+
+		me.lastDropBefore = null;
 	},
 
 	/**
@@ -74,6 +76,7 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 	getTargetFromEvent : function( e )
 	{
 //		return Ext.fly( e.target ).hasCls( this.slotCls ) ? e.target : null;
+		return e.getTarget( '.'+ this.slotCls );
 
 		var blockCls = '.'+ this.blockCls,
 		    slotCls  = '.'+ this.slotCls,
@@ -135,9 +138,28 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 			}
 		}
 
-		// show drop position pointer
-		var insertPosition = this.findInsertPosition( slotDom, e ),
-		    insertBefore   = insertPosition && slotDom.childNodes[ insertPosition ];
+		// put drop position pointer
+		var insertBefore = slotDom.firstChild,
+		    y = e.innerXY[1]; // use iFrame inner coordinates
+
+		while( insertBefore ) {
+			// skip any non-block child
+			if( Ext.fly( insertBefore ).hasCls( this.blockCls ) ) {
+				var top    = insertBefore.offsetTop,
+				    parent = insertBefore.offsetParent;
+
+				while( parent ) {
+					top   += parent.offsetTop;
+					parent = parent.offsetParent;
+				}
+
+				if( top + ( insertBefore.clientHeight / 2 ) > y ) {
+					break;
+				}
+			}
+
+			insertBefore = insertBefore.nextSibling;
+		}
 
 		if( insertBefore ) {
 			slotDom.insertBefore( this.insertPtrDom, insertBefore );
@@ -145,6 +167,7 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 		} else {
 			slotDom.appendChild( this.insertPtrDom );
 		}
+
 
 		return Ext.dd.DropZone.prototype.dropAllowed;
 	},
@@ -159,43 +182,17 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 	 */
 	onNodeOut : function( slotDom, dragSource, e, data )
 	{
+		var me = this;
+
 		// remove slot highlight
-		Ext.fly( slotDom ).removeCls( this.overCls );
+		Ext.fly( slotDom ).removeCls( me.overCls );
 
 		// remove drop position pointer
-		if( this.insertPtrDom.parentNode == slotDom ) {
-			slotDom.removeChild( this.insertPtrDom );
+		if( me.insertPtrDom.parentNode == slotDom ) {
+			me.lastDropBefore = me.insertPtrDom.nextSibling;
+
+			slotDom.removeChild( me.insertPtrDom );
 		}
-	},
-
-	/**
-	 * Returns the position, where in the slot should be a child
-	 * block dropped.
-	 *
-	 * @param {HTMLElement} [slotDom]
-	 * @param {Event} [e]
-	 * @returns {Number}
-	 */
-	findInsertPosition : function( slotDom, e )
-	{
-		var children = slotDom.children;
-
-		if( children ) {
-			// use iFrame inner coordinates
-			var y = e.innerXY[1];
-
-			for( var i = 0, cl = children.length; i < cl; ++i ) {
-				if( children[i].className != this.blockCls ) {
-					continue;
-				}
-
-				if( children[i].offsetTop > y ) {
-					return i;
-				}
-			};
-		}
-
-		return null;
 	},
 
 	/**
@@ -204,7 +201,7 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 	 * @param {HTMLElement} [domNode]
 	 * @returns {WebBuilder.BlockInstance}
 	 */
-	getTargetInstance : function( domNode )
+	getBlockInstance : function( domNode )
 	{
 		// find parent block
 		var parentDom = Ext.fly( domNode ).findParent( '.'+ this.blockCls );
@@ -244,61 +241,71 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 	 */
 	onNodeDrop : function( slotDom, dragSource, e, data )
 	{
+		// find new parent
+		var targetInstance = this.getBlockInstance( slotDom );
+
+		if( ! targetInstance ) {
+			return false;
+		}
+
+		// find target slot ID
+		var slotId = this.parseSlotId( slotDom );
+
+		if( ! targetInstance.slots[ slotId ] ) {
+			return false;
+		}
+
 		// ugly switch is needed here because we have more kind
 		// of dragSources (blockList, canvas self), but Ext allows
 		// only one DropZone instance per target
+		var droppedInstance = null,
+		    skipNode        = null;
 
 		if( dragSource instanceof WebBuilder.widget.blocksList.DragZone ) {
-			return this.handleBlockListDrop( slotDom, dragSource, e, data );
-		}
+			var block = data.block;
 
-		if( dragSource instanceof WebBuilder.widget.templateCanvas.DragZone ) {
-			return this.handleCanvasDrop( slotDom, dragSource, e, data );
-		}
+			// no block supplied
+			if( block == null ) {
+				return false;
+			}
 
-		Ext.log({
-			msg  : '['+ this.$className +'][onNodeDrop] Invalid drag source',
-			dump : dragSource
-		});
+			droppedInstance = Ext.create( 'WebBuilder.BlockInstance', null, block, block.templates().getAt(0) );
 
-		return false;
-	},
+		} else if( dragSource instanceof WebBuilder.widget.templateCanvas.DragZone ) {
+			droppedInstance = this.getBlockInstance( data.blockDom );
+			skipNode        = data.blockDom;
 
-	handleBlockListDrop : function( slotDom, dragSource, e, data )
-	{
-		var block          = data.block,
-		    targetInstance = this.getTargetInstance( slotDom );
+		} else {
+			Ext.log({
+				msg  : '['+ this.$className +'][onNodeDrop] Invalid drag source',
+				dump : dragSource
+			});
 
-		// no block supplied
-		if( block == null || targetInstance == null ) {
 			return false;
 		}
 
-		var position  = this.findInsertPosition( slotDom, e ),
-		    slotId    = this.parseSlotId( slotDom ),
-		    instance  = Ext.create( 'WebBuilder.BlockInstance', null, block, block.templates().getAt(0) );
+		// find insert position
+		var slotChild = this.lastDropBefore,
+		    position  = null;
 
-		// insert instance
-		targetInstance.addChild( instance, slotId, position );
+		if( slotChild != null ) {
+			position = 0;
 
-		return true;
-	},
+			while( slotChild = slotChild.previousSibling ) {
+				// node to skip, do not increment the position
+				if( slotChild == skipNode ) {
+					continue;
+				}
 
-	handleCanvasDrop : function( slotDom, dragSource, e, data )
-	{
-		var draggedInstance = this.getTargetInstance( data.blockDom );
-			targetInstance  = this.getTargetInstance( slotDom );
+				// block, increment the position
+				if( Ext.fly( slotChild ).hasCls( this.blockCls ) ) {
+					++position;
+				}
 
-		// no instance supplied
-		if( draggedInstance == null || targetInstance == null ) {
-			return false;
+			}
 		}
 
-		var position = this.findInsertPosition( slotDom, e ),
-		    slotId   = this.parseSlotId( slotDom );
-
-		// insert instance
-		targetInstance.addChild( draggedInstance, slotId, position );
+		targetInstance.addChild( droppedInstance, slotId, position );
 
 		return true;
 	}
