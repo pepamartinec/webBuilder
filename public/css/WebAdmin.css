@@ -124,6 +124,17 @@ body {
 	background-color : #F0F2FE;
 }
 
+.x-template-canvas .x-block.x-drag {
+	background-color : #666;
+	opacity          : 1;
+}
+
+.x-template-canvas .x-block.x-drag > .x-title {
+	background-color : #999;
+	color            : #000;
+}
+
+
 /************* BLOCK TITLE TOOLS *************/
 .x-template-canvas .x-block > .x-title > .x-tools {
 	float   : right;
