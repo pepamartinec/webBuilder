@@ -364,7 +364,7 @@ Ext.define( 'WebBuilder.widget.AbstractTemplateCanvas', {
 			if( position !== null ) {
 				insertBefore = slotDom.firstChild;
 
-				while( insertBefore && position >= 0 ) {
+				while( insertBefore && position > 0 ) {
 					if( Ext.fly( insertBefore ).hasCls( this.blockCls ) ) {
 						--position;
 					}
