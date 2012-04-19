@@ -77,13 +77,15 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 
 		var blockCls = '.'+ this.blockCls,
 		    slotCls  = '.'+ this.slotCls,
-		    target = e.target,
-		    limit  = 5;
+		    target = e.target;
 
-		while( target && --limit >= 0 ) {
+		// walk the DOM up and find drop target
+		while( target ) {
+			// drop inside of the slot
 			if( Ext.DomQuery.is( target, slotCls ) ) {
-				return target;
+				break;
 
+			// drop outside of the slot
 			} else if( Ext.DomQuery.is( target, blockCls ) ) {
 				return false;
 			}
@@ -91,7 +93,7 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 			target = target.parentNode;
 		}
 
-		return false;
+		return target || false;
 	},
 
 	/**
@@ -119,6 +121,20 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 	 */
 	onNodeOver : function( slotDom, dragSource, e, data )
 	{
+		// check for the drop inside self
+		if( data.blockDom ) {
+			var blockDom = data.blockDom,
+			    parent   = slotDom.parentNode;
+
+			while( parent ) {
+				if( parent == blockDom ) {
+					return Ext.dd.DropZone.prototype.dropNotAllowed;
+				}
+
+				parent = parent.parentNode;
+			}
+		}
+
 		// show drop position pointer
 		var insertPosition = this.findInsertPosition( slotDom, e ),
 		    insertBefore   = insertPosition && slotDom.childNodes[ insertPosition ];
@@ -147,7 +163,9 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 		Ext.fly( slotDom ).removeCls( this.overCls );
 
 		// remove drop position pointer
-		slotDom.removeChild( this.insertPtrDom );
+		if( this.insertPtrDom.parentNode == slotDom ) {
+			slotDom.removeChild( this.insertPtrDom );
+		}
 	},
 
 	/**
