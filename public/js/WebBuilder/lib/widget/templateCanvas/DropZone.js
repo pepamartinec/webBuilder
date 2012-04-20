@@ -286,7 +286,8 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 				return false;
 			}
 
-			droppedInstance = Ext.create( 'WebBuilder.BlockInstance', null, block, block.templates().getAt(0) );
+			droppedInstance = Ext.create( 'WebBuilder.BlockInstance', null, targetInstance.blockSetId, block );
+			droppedInstance.setTemplate( block.templates().getAt(0) );
 
 		} else if( dragSource instanceof WebBuilder.widget.templateCanvas.DragZone ) {
 			droppedInstance = this.getBlockInstance( data.blockDom );

@@ -1,6 +1,14 @@
 <?php
 namespace WebBuilder\Administration\TemplateManager;
 
+use WebBuilder\DataDependencies\UndefinedData;
+
+use WebBuilder\DataDependencies\ConstantData;
+
+use WebBuilder\DataDependencies\InheritedData;
+
+use WebBuilder\BlockInstance;
+
 use ExtAdmin\Request\AbstractRequest;
 
 use Inspirio\Database\cDatabase;
@@ -105,341 +113,204 @@ class BlockInstancesUpdater
 	 */
 	public function saveBlockInstances( BlockSet $blockSet, array $clientData )
 	{
-		// secure user data
-		$rootInstance = $this->secureClientData( $clientData );
+		$blockSetID = (int)$blockSet->getID();
+		$instances  = BlockInstance::import( $clientData );
 
-		// convert slot && data identificators
-		$this->convertSlotIdentificators( $rootInstance );
-		$this->convertDataIdentificators( $rootInstance );
+		$instances = $this->saveInstances( $blockSetID, $instances );
 
-		// save blocks instances
-		$validInstanceIDs = array();
-		$this->writeBlockInstances( $blockSet->getID(), $rootInstance, $validInstanceIDs );
+		$this->loadMissingData( $instances );
 
-		$sql = "DELETE FROM blocks_instances WHERE block_set_ID = {$blockSet->getID()}";
-		if( sizeof( $validInstanceIDs ) > 0 ) {
-			$sql .= ' AND ID NOT IN ('. implode( ',', $validInstanceIDs ) .')';
+		$this->saveInstancesData( $instances );
+
+		return $instances;
+	}
+
+
+
+
+
+	private function saveInstances( $blockSetID, array $instances )
+	{
+		$savedInstances = array();
+
+		// destroy all parent-child relations for the current blockSet
+		// (including the parent blockSet set, excluding child blockSets links)
+		$sql = "
+			DELETE FROM bis
+			USING blocks_instances_subblocks bis
+			INNER JOIN blocks_instances bi ON ( bi.ID = bis.inserted_instance_ID )
+			WHERE bi.block_set_ID = {$blockSetID}
+		";
+		$this->database->query( $sql );
+
+		// update instances
+		foreach( $instances as $tmpID => $instance ) {
+			$this->saveInstance( $blockSetID, $instance, $savedInstances );
+
+			$savedInstances[ $instance->ID ] = $instance;
+		}
+
+		// remove old instances
+		$sql = "DELETE FROM blocks_instances WHERE block_set_ID = {$blockSetID}";
+		if( sizeof( $savedInstances ) > 0 ) {
+			$sql .= ' AND ID NOT IN ('. implode( ',', array_keys( $savedInstances ) ) .')';
 		}
 		$this->database->query( $sql );
 
-		return $rootInstance;
+		return $savedInstances;
 	}
 
-	/**
-	 * Secures the BlockInstances structure received from the client side
-	 *
-	 * @param array $rawBlock
-	 * @return array
-	 */
-	private function secureClientData( array $rawBlock )
+	private function saveInstance( $blockSetID, BlockInstance $instance, array &$savedInstances )
 	{
-		// FIXME remove AbstractRequest dependency!!!!
-		$instance = array(
-			'ID'         => AbstractRequest::secureData( $rawBlock, 'ID', 'int' ) ?: null,
-			'templateID' => AbstractRequest::secureData( $rawBlock, 'templateID', 'int' ),
-			'data'       => array(),
-			'slots'      => array(),
-		);
-
-		$instances[] = &$instance;
-
-		if( isset( $rawBlock['data'] ) ) {
-			foreach( $rawBlock['data'] as $rawProperty => $rawValue ) {
-				// FIXME handle also inherited data ( object[ $property => $providerID ] )
-				if( ! is_string( $rawValue ) ) {
-					continue;
-				}
-
-				$property = AbstractRequest::secureValue( $rawProperty, 'string' );
-				$value    = AbstractRequest::secureValue( $rawValue, 'string' );
-
-				$instance['data'][ $property ] = $value;
-			}
-		}
-
-		if( isset( $rawBlock['slots'] ) ) {
-			foreach( $rawBlock['slots'] as $rawSlotID => $children ) {
-				$slotID = AbstractRequest::secureValue( $rawSlotID, 'string' );
-
-				$instance['slots'][ $slotID ] = array();
-				$slot = &$instance['slots'][ $slotID ];
-
-				foreach( $children as $rawChild ) {
-					$slot[] = $this->secureClientData( $rawChild );
-				}
-			}
-		}
-
-		return $instance;
-	}
-
-	/**
-	 * Converts codeName slot identificators, used on the client side, to IDs
-	 *
-	 * @param array& $rootInstance
-	 */
-	private function convertSlotIdentificators( array &$rootInstance )
-	{
-		if( $this->slotKey === self::SLOT_KEY_ID ) {
+		// instance from othe block set
+		// do not update
+		if( $instance->blockSetID !== $blockSetID ) {
 			return;
 		}
 
-		// collect used codeNames
-		$slotCodeNames = array();
-		$this->convertSlotIdentificators_collectSlots( $rootInstance, $slotCodeNames );
+		// existing instance
+		if( $instance->ID ) {
+			// TODO handle the template change when some subblock exist
+			// new template may not have the same slots as the original one
+			// so the subblock may not fit int theri positions anymore
+			$sql = "
+				SELECT COUNT(*) `count` FROM blocks_instances bi
+				JOIN blocks_instances_subblocks bis ON ( bi.ID = bis.parent_slot_ID  )
+				WHERE bi.ID = {$instance->ID} AND bi.template_ID != {$instance->templateID}
+			";
 
-		// load slots
-		$filter = array();
-		foreach( $slotCodeNames as $templateID => $codeNames ) {
-			$codeNames = implode( "','", $codeNames );
-
-			$filter[] = "( template_ID = {$templateID} AND code_name IN ('{$codeNames}') )";
-		}
-
-		$filterStr = implode( ' OR ', $filter );
-		$sql = "SELECT * FROM blocks_templates_slots WHERE {$filterStr}";
-		$this->database->query( $sql );
-		$resultSet = $this->database->fetchArray();
-
-		// build codeName -> ID map
-		$slotMap = array();
-		if( $resultSet != null ) {
-			foreach( $resultSet as $resultItem ) {
-				$ID         = (int)$resultItem['ID'];
-				$codeName   = $resultItem['code_name'];
-				$templateID = (int)$resultItem['template_ID'];
-
-				if( ! isset( $slotMap[ $templateID ] ) ) {
-					$slotMap[ $templateID ] = array();
-				}
-
-				$slotMap[ $templateID ][ $codeName ] = $ID;
+			$this->database->query( $sql );
+			$resultSet = $this->database->fetchArray();
+			$result    = reset( $resultSet );
+			if( $result['count'] && $result['count'] > 0 ) {
+				throw new \Exception('Cannot change the template of block with subblock');
 			}
+
+			// update used template file
+			$sql = "UPDATE blocks_instances SET template_ID = {$instance->templateID} WHERE ID = {$instance->ID}";
+			$this->database->query( $sql );
+
+		// new instance
+		} else {
+			// create new instance record
+			$sql = "INSERT INTO blocks_instances ( block_set_ID, template_ID ) VALUES ( {$blockSetID}, {$instance->templateID} )";
+			$this->database->query( $sql );
+
+			$instance->ID = $this->database->getLastInsertedId();
 		}
 
-		// convert identificators
-		$this->convertSlotIdentificators_convert( $rootInstance, $slotMap );
-	}
+		$savedInstances[ $instance->ID ] = $instance;
 
-	private function convertSlotIdentificators_collectSlots( array $instance, array &$slots )
-	{
-		// skip blocks with no slots
-		if( $instance['slots'] == null ) {
-			return;
-		}
+		// save subblocks
+		foreach( $instance->slots as $codeName => $children ) {
+			$codeName = $this->database->escape( $codeName );
 
-		$templateID = $instance['templateID'];
+			foreach( $children as $position => $child ) {
+				// save the child
+				$this->saveInstance( $blockSetID, $child, $savedInstances );
 
-		foreach( $instance['slots'] as $codeName => $children ) {
-			$slots[ $templateID ][] = $codeName;
-
-			foreach( $children as $child ) {
-				$this->convertSlotIdentificators_collectSlots( $child, $slots );
+				// create the parent-child link
+				$sql = "
+					INSERT INTO blocks_instances_subblocks ( parent_instance_ID, parent_slot_ID, position, inserted_instance_ID )
+					SELECT {$instance->ID}, ID, {$position}, {$child->ID} FROM blocks_templates_slots
+					WHERE template_ID = {$instance->templateID} AND code_name = '{$codeName}'
+				";
+				$this->database->query( $sql );
 			}
 		}
 	}
 
-	private function convertSlotIdentificators_convert( array &$instance, array $slotMap )
+	private function loadMissingData( array $instances )
 	{
-		// skip blocks with no slots
-		if( $instance['slots'] == null ) {
+		if( sizeof( $instances ) === 0 ) {
 			return;
 		}
 
-		$templateID = $instance['templateID'];
+		$instanceIDsStr = implode( ',', array_keys( $instances ) );
 
-		if( isset( $slotMap[ $templateID ] ) === false ) {
-			// ERROR
-		}
-
-		$templateSlots = $slotMap[ $templateID ];
-		$slotsByIDs    = array();
-
-		foreach( $instance['slots'] as $codeName => $children ) {
-			if( isset( $templateSlots[ $codeName ] ) === false ) {
-				// ERROR
-				$a = 1;
-			}
-
-			$slotID = $templateSlots[ $codeName ];
-
-			$slotsByIDs[ $slotID ] = array();
-			$newChildren = &$slotsByIDs[ $slotID ];
-
-			foreach( $children as &$child ) {
-				$this->convertSlotIdentificators_convert( $child, $slotMap );
-
-				$newChildren[] = $child;
-			}
-		}
-
-		$instance['slots'] = $slotsByIDs;
-	}
-
-	/**
-	 * Converts codeName data identificators, used on the client side, to IDs
-	 *
-	 * @param array& $rootInstance
-	 */
-	private function convertDataIdentificators( array &$rootInstance )
-	{
-		if( $this->dataKey === self::DATA_KEY_ID ) {
-			return;
-		}
-
-		// collect used codeNames
-		$dataProperties = array();
-		$this->convertDataIdentificators_collectData( $rootInstance, $dataProperties );
-
-		if( sizeof( $dataProperties ) === 0 ) {
-			return;
-		}
-
-		// load property IDs
-		$filter = array();
-		foreach( $dataProperties as $templateID => $properties ) {
-			$propertyStr = implode( "','", array_map( array( $this->database, 'escape' ), $properties ) );
-
-			$filter[] = "( bt.ID = {$templateID} AND bdr.property IN ('{$propertyStr}') )";
-		}
-
-		$filterStr = implode( ' OR ', $filter );
 		$sql = "
 			SELECT
-				bdr.property,
-				bdr.ID,
-				bt.ID template_ID
+				bi.ID       ID,
+				bt.filename template_filename,
+				b.ID        block_ID,
+				b.code_name block_code_name
 
-			FROM blocks_data_requirements bdr
-			JOIN blocks_templates bt ON ( bt.block_ID = bdr.block_ID )
+			FROM blocks_instances bi
+			JOIN blocks_templates bt ON ( bt.ID = bi.template_ID )
+			JOIN blocks b ON ( b.ID = bt.block_ID )
 
-			WHERE {$filterStr}
+			WHERE bi.ID IN ({$instanceIDsStr})
 		";
 		$this->database->query( $sql );
 		$resultSet = $this->database->fetchArray();
 
-		// build property -> ID map
-		$propertyMap = array();
-		if( $resultSet != null ) {
-			foreach( $resultSet as $resultItem ) {
-				$ID         = (int)$resultItem['ID'];
-				$property   = $resultItem['property'];
-				$templateID = (int)$resultItem['template_ID'];
-
-				if( ! isset( $propertyMap[ $templateID ] ) ) {
-					$propertyMap[ $templateID ] = array();
-				}
-
-				$propertyMap[ $templateID ][ $property ] = $ID;
-			}
+		if( sizeof( $resultSet ) !== sizeof( $instances) ) {
+			// TODO better exception
+			throw new \Exception("Instance count does not match");
 		}
 
-		// convert identificators
-		$this->convertDataIdentificators_convert( $rootInstance, $propertyMap );
-	}
+		foreach( $resultSet as $resultItem ) {
+			$instanceID = (int)$resultItem['ID'];
 
-	private function convertDataIdentificators_collectData( array $instance, array &$data )
-	{
-		// skip blocks with no slots
-		if( $instance['data'] != null ) {
-			$templateID = $instance['templateID'];
-
-			if( ! isset( $data[ $templateID ] ) ) {
-				$data[ $templateID ] = array();
+			if( isset( $instances[ $instanceID ] ) === false ) {
+				// TODO better exception
+				throw new \Exception("Loaded data does not match instances");
 			}
 
-			$data[ $templateID ] = array_merge( $data[ $templateID ], array_keys( $instance['data'] ) );
-		}
-
-		if( isset( $instance['slots'] ) ) {
-			foreach( $instance['slots'] as $children ) {
-				foreach( $children as $child ) {
-					$this->convertDataIdentificators_collectData( $child, $data );
-				}
-			}
+			/* @var $instance BlockInstance */
+			$instance = $instances[ $instanceID ];
+			$instance->templateFile = $resultItem['template_filename'];
+			$instance->blockID      = (int)$resultItem['block_ID'];
+			$instance->blockName    = $resultItem['block_code_name'];
 		}
 	}
 
-	private function convertDataIdentificators_convert( array &$instance, array $propertyMap )
+	private function saveInstancesData( array $instances )
 	{
-		if( $instance['data'] != null ) {
-			$templateID = $instance['templateID'];
+		foreach( $instances as $instance ) {
+			/* @var $instance BlockInstance */
 
-			if( ! isset( $propertyMap[ $templateID ] ) ) {
-				// ERROR
-			}
+			foreach( $instance->dataDependencies as $dependency ) {
+				if( $dependency instanceof ConstantData ) {
+					$this->saveInstanceData_constant( $instance, $dependency );
 
-			$templateData = $propertyMap[ $templateID ];
-			$dataByIDs    = array();
+				} elseif( $dependency instanceof InheritedData ) {
+					$this->saveInstanceData_inherited( $instance, $dependency );
 
-			foreach( $instance['data'] as $property => $value ) {
-				if( ! isset( $templateData[ $property ] ) ) {
-					// ERROR
-					continue;
-				}
+				} elseif( $dependency instanceof UndefinedData ) {
+					// do nothing
 
-				$propertyID = $templateData[ $property ];
-
-				$dataByIDs[ $propertyID ] = $value;
-			}
-
-			$instance['data'] = $dataByIDs;
-		}
-
-		if( isset( $instance['slots'] ) ) {
-			foreach( $instance['slots'] as &$children ) {
-				foreach( $children as &$child ) {
-					$this->convertDataIdentificators_convert( $child, $propertyMap );
+				} else {
+					// TODO better exception
+					throw new \Exception("Invalid data dependency");
 				}
 			}
 		}
 	}
 
-	/**
-	 * Saves proccessed BlockInstances
-	 *
-	 * @param int $blockSetID
-	 * @param array& $instance
-	 * @param array& $validInstanceIDs
-	 */
-	private function writeBlockInstances( $blockSetID, array &$instance, array &$validInstanceIDs )
+	private function saveInstanceData_constant( BlockInstance $instance, ConstantData $data )
 	{
-		// save block instance
-		if( $instance['ID'] ) {
-			$sql  = "UPDATE blocks_instances SET template_ID = {$instance['templateID']} WHERE ID = {$instance['ID']}";
-			$this->database->query( $sql );
+		$value    = $this->database->escape( $data->getTargetData() );
+		$property = $this->database->escape( $data->getProperty() );
 
-			$sql = "DELETE FROM blocks_instances_subblocks WHERE parent_instance_ID = {$instance['ID']}";
-			$this->database->query( $sql );
+		$sql = "
+			INSERT INTO blocks_instances_data_constant ( instance_ID, property_ID, value )
+			SELECT {$instance->ID}, ID, '{$value}' FROM blocks_data_requirements
+				WHERE block_ID = {$instance->blockID} AND property = '{$property}'
+		";
+		$this->database->query( $sql );
+	}
 
-			$sql = "DELETE FROM blocks_instances_data_constant WHERE instance_ID = {$instance['ID']}";
-			$this->database->query( $sql );
+	private function saveInstanceData_inherited( BlockInstance $instance, InheritedData $data )
+	{
+		$provider = $data->getProvider();
+		$property = $this->database->escape( $data->getProviderProperty() );
 
-		} else {
-			$sql = "INSERT INTO blocks_instances ( block_set_ID, template_ID ) VALUES ( {$blockSetID}, {$instance['templateID']} )";
-			$this->database->query( $sql );
-
-			$instance['ID'] = $this->database->getLastInsertedId();
-		}
-
-		$validInstanceIDs[] = $instance['ID'];
-
-		// save constant data
-		foreach( $instance['data'] as $propertyID => $value ) {
-			$value = $this->database->escape( $value );
-
-			$sql = "INSERT INTO blocks_instances_data_constant ( instance_ID, property_ID, value ) VALUES ( {$instance['ID']}, {$propertyID}, '{$value}' )";
-			$this->database->query( $sql );
-		}
-
-		// save subblocks
-		foreach( $instance['slots'] as $slotID => $children ) {
-			foreach( $children as $position => &$child ) {
-				$this->writeBlockInstances( $blockSetID, $child, $validInstanceIDs );
-
-				$sql = "INSERT INTO blocks_instances_subblocks ( parent_instance_ID, parent_slot_ID, position, inserted_instance_ID ) VALUES ( {$instance['ID']}, {$slotID}, {$position}, {$child['ID']} )";
-				$this->database->query( $sql );
-			}
-		}
+		$sql = "
+			INSERT INTO blocks_instances_data_inherited ( instance_ID, provider_instance_ID, provider_property_ID )
+			SELECT {$instance->ID}, {$provider->ID}, ID FROM blocks_data_requirements_providers
+				WHERE provider_ID = {$provider->blockID} AND provider_property = '{$property}'
+		";
+		$this->database->query( $sql );
 	}
 }

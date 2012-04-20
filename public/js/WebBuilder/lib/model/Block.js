@@ -4,11 +4,13 @@ Ext.define( 'WebBuilder.model.Block',
 
 	uses : [
 		'WebBuilder.model.BlocksCategory',
-		'WebBuilder.model.BlockTemplate'
+		'WebBuilder.model.BlockTemplate',
+		'WebBuilder.model.DataRequirement',
+		'WebBuilder.model.DataProvider'
 	],
 
 	idProperty : 'ID',
-	
+
 	fields : [{
 		name : 'ID',
 		type : 'int'
@@ -24,10 +26,6 @@ Ext.define( 'WebBuilder.model.Block',
 	},{
 		name : 'codeName',
 		type : 'string'
-	},{
-		name : 'requires'
-	},{
-		name : 'provides'
 	}],
 
 	belongsTo : [{
@@ -42,6 +40,16 @@ Ext.define( 'WebBuilder.model.Block',
 		model      : 'WebBuilder.model.BlockTemplate',
 		name       : 'templates',
 		primaryKey : 'ID',
-		foreignKey : 'templateID'
+		foreignKey : 'blockID'
+	},{
+		model      : 'WebBuilder.model.DataRequirement',
+		name       : 'requires',
+		primaryKey : 'ID',
+		foreignKey : 'blockID'
+	},{
+		model      : 'WebBuilder.model.DataProvider',
+		name       : 'provides',
+		primaryKey : 'ID',
+		foreignKey : 'blockID'
 	}]
 });

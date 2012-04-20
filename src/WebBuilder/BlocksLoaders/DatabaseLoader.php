@@ -44,6 +44,8 @@ class DatabaseLoader implements BlocksLoaderInterface
 	 */
 	public function fetchBlocksInstances( BlockSet $blockSet )
 	{
+		$blockSetID = (int)$blockSet->getID();
+
 		// merge BlockSet with parent
 		if( $blockSet->getParentID() ) {
 			$parentSet = $this->blockSetsFeeder->whereID( $blockSet->getParentID() )->getOne();
@@ -82,7 +84,7 @@ class DatabaseLoader implements BlocksLoaderInterface
 			LEFT JOIN blocks_templates_slots     parent_blocks_slots ON ( parent_blocks_slots.ID = blocks_to_blocks.parent_slot_ID )
 			LEFT JOIN blocks_templates           parent_templates    ON ( parent_templates.ID = parent_blocks_slots.template_ID )
 
-			WHERE instances.block_set_ID = {$blockSet->getID()}
+			WHERE instances.block_set_ID = {$blockSetID}
 			ORDER BY parent_instance_ID ASC, position ASC
 		");
 
@@ -99,6 +101,7 @@ class DatabaseLoader implements BlocksLoaderInterface
 
 			$block = $instances[ $instanceID ];
 
+			$block->blockSetID   = $blockSetID;
 			$block->blockID      = (int)$r['block_ID'];
 			$block->blockName    = $r['block_name'];
 			$block->templateID   = (int)$r['template_ID'];

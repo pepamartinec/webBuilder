@@ -105,13 +105,6 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	{
 		var me = this;
 
-		me.instancesStore = Ext.create( 'WebBuilder.EditorStore', {
-			listeners : {
-				scope  : me,
-				change : me.handleInstancesStoreChange
-			}
-		});
-
 		me.blocksStore = extAdmin.Store.create({
 			env        : me.env,
 			loadAction : [ me.module.name, 'loadBlocks' ],
@@ -124,6 +117,15 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 			listeners : {
 				scope : me,
 				load  : me.onBlocksLoad
+			}
+		});
+
+		me.instancesStore = Ext.create( 'WebBuilder.EditorStore', {
+			blockStore : me.blocksStore,
+
+			listeners : {
+				scope  : me,
+				change : me.handleInstancesStoreChange
 			}
 		});
 	},
@@ -164,39 +166,9 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	handleInstancesStoreChange : function()
 	{
 		var me    = this,
-		    root  = me.instancesStore.getRoot(),
-		    value = me.handleInstancesStoreChange_instance( root );
+		    value = me.instancesStore.getRequestData();
 
 		me.mixins.field.setValue.call( me, value );
-	},
-
-	/**
-	 * @ignore
-	 * @private
-	 */
-	handleInstancesStoreChange_instance : function( instance )
-	{
-		if( instance == null ) {
-			return null;
-		}
-
-		return {
-			ID      : instance.getPersistentId(),
-			blockID : instance.block.getId(),
-			data    : Ext.clone( instance.config ),
-
-			templateID : instance.template && instance.template.getId(),
-			slots      : instance.slots    && Ext.Object.map( instance.slots, this.handleInstancesStoreChange_walkInstanceSlot, this )
-		};
-	},
-
-	/**
-	 * @ignore
-	 * @private
-	 */
-	handleInstancesStoreChange_walkInstanceSlot : function( name, children )
-	{
-		return Ext.Array.map( children, this.handleInstancesStoreChange_instance, this );
 	},
 
 	/**
@@ -215,63 +187,13 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 			return me.mixins.field.setValue.apply( me, arguments );
 		}
 
-		// route the value to the instances store
+		// set the value to the instances store
 		// it updates its internal values and
 		// thru the 'change' event changes the local
 		// inner field value
-		var root = me.setValue_createInstance( value );
-		me.instancesStore.setRoot( root );
+		me.instancesStore.setRequestData( value );
 
 		return this;
-	},
-
-	/**
-	 * @ignore
-	 * @private
-	 */
-	setValue_createInstance : function( value )
-	{
-		if( value == null ) {
-			return null;
-		}
-
-		var me    = this,
-		    block = me.blocksStore.getById( value.blockID );
-
-		if( block == null ) {
-			return null;
-		}
-
-		// create instance
-		var instance = Ext.create( 'WebBuilder.BlockInstance', value.ID, block ),
-		    template = value.templateID && block.templates().getById( value.templateID );
-
-		instance.setConfig( value.data || {} );
-		instance.setTemplate( template );
-
-		// create children
-		if( value.slots ) {
-			Ext.Object.each( value.slots, function( id, children ) {
-				if( Ext.isIterable( children ) ) {
-					Ext.Array.each( children, function( child, position ) {
-						var childInstance = me.setValue_createInstance( child );
-
-						instance.addChild( childInstance, id );
-					});
-
-				} else {
-					Ext.Object.each( children, function( position, child ) {
-						var childInstance = me.setValue_createInstance( child );
-
-						instance.addChild( childInstance, id );
-					});
-				}
-
-
-			});
-		}
-
-		return instance;
 	},
 
 	/**
@@ -283,7 +205,10 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	 */
 	isEqual: function( value1, value2 )
 	{
-		return Ext.JSON.encode( value1 ) === Ext.JSON.encode( value2 );
+		return false;
+
+		// JSON can not be used anymore, because the instance data dependencies can create circylar references
+		// return Ext.JSON.encode( value1 ) === Ext.JSON.encode( value2 );
 	},
 
 	/**

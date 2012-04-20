@@ -1,5 +1,10 @@
 Ext.define( 'WebBuilder.BlockInstance', {
 
+	uses : [
+		'WebBuilder.ConstantData',
+		'WebBuilder.InheritedData'
+	],
+
 	statics : {
 		idCounter : 0,
 
@@ -9,13 +14,14 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		}
 	},
 
-	id        : null,
-	store     : null,
-	parent    : null,
-	block     : null,
-	template  : null,
-	slots     : null,
-	config    : null,
+	id         : null,
+	blockSetId : null,
+	store      : null,
+	parent     : null,
+	block      : null,
+	template   : null,
+	slots      : null,
+	config     : null,
 
 	/**
 	 * Constructor
@@ -23,19 +29,20 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	 * @param {WebBuilder.model.Block} [block]
 	 * @param {WebBuilder.model.BlockTemplate} [template=null]
 	 */
-	constructor : function( ID, block, template )
+	constructor : function( ID, blockSetId, block, template )
 	{
 		var me = this;
 
 		// assign ID & block
-		me.id     = ID || ( 'blockInstance-'+ me.self.genId() );
-		me.block  = block;
+		me.id         = ID || ( 'blockInstance-'+ me.self.genId() );
+		me.blockSetId = blockSetId;
+		me.block      = block;
 
 		// create config
 		me.config = {};
 
-		Ext.Object.each( block.get('requires') || {}, function( property, type ) {
-			me.config[ property ] = null;
+		block.requires().each( function( dataRequirement ) {
+			me.config[ dataRequirement.get('property') ] = null;
 		});
 
 		// assign template
@@ -48,13 +55,81 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	},
 
 	/**
+	 * Returns local instance ID
+	 *
+	 * @return {Number}
+	 */
+	getId : function()
+	{
+		return this.id;
+	},
+
+	/**
 	 * Returns server-side instance ID
 	 *
-	 * @returns {Number/Null}
+	 * @return {Number/Null}
 	 */
 	getPersistentId : function()
 	{
 		return Ext.isNumber( this.id ) ? this.id : null;
+	},
+
+	/**
+	 * Tries to solve block data dependencies
+	 *
+	 */
+	solveDataDependencies : function()
+	{
+		var me     = this,
+		    config = me.getConfig(),
+		    property, value;
+
+		me.block.requires().each( function( requiredProperty ) {
+			property = requiredProperty.get('property');
+			value    = config[ requiredProperty.get('property') ];
+
+			// do not override constant data
+			if( value instanceof WebBuilder.ConstantData ) {
+				console.log( 'constant data - '+ me.block.get('title') +'['+ property + '] <= '+ value.getValue() );
+				return;
+			}
+
+			// find provider
+			config[ property ] = me.findDataProvider( requiredProperty.getId() );
+
+			if( config[ property ] ) {
+				console.log( 'inherited data - '+ me.block.get('title') +'['+ property + '] <= '+ config[property].getProvider().block.get('title') +'::'+ config[property].getProperty() +'('+ config[property].getValue() +')' );
+			} else {
+				console.log( 'undefined data - '+ me.block.get('title') +'['+ property + ']' );
+			}
+		});
+
+		me.setConfig( config );
+	},
+
+	/**
+	 * Finds possible data provider in the instance parents
+	 *
+	 * @protected
+	 * @param {Number} requiredPropertyID
+	 * @return {WebBuilder.BlockInstance/Null}
+	 */
+	findDataProvider : function( requiredPropertyID )
+	{
+		var parent = this.parent,
+		    provider;
+
+		while( parent ) {
+			provider = parent.block.provides().findRecord( 'requiredPropertyID', requiredPropertyID );
+
+			if( provider ) {
+				return Ext.create( 'WebBuilder.InheritedData', parent, provider.get('property') );
+			}
+
+			parent = parent.parent;
+		}
+
+		return null;
 	},
 
 

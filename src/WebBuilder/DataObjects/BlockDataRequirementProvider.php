@@ -4,31 +4,36 @@ namespace WebBuilder\DataObjects;
 use Inspirio\Database\aDataObject;
 
 class BlockDataRequirementProvider extends aDataObject
-{	
+{
 	/**
 	 * DataObject properties configuration
 	 *
 	 * @var array
 	 */
 	protected static $items = array(
+		'ID' => array(
+			'dbColumn' => 'ID',
+			'type'     => 'integer',
+		),
+
 		'requiredPropertyID' => array(
 			'dbColumn' => 'required_property_ID',
-			'type' => 'integer',
+			'type'     => 'integer',
 			'sanitize' => 'foreingKey',
 		),
 
 		'providerID' => array(
 			'dbColumn' => 'provider_ID',
-			'type' => 'integer',
+			'type'     => 'integer',
 			'sanitize' => 'foreingKey',
 		),
 
 		'providerProperty' => array(
 			'dbColumn' => 'provider_property',
-			'type' => 'string',
+			'type'     => 'string',
 		),
 	);
-	
+
 	/**
 	 * DataObject meta info
 	 *

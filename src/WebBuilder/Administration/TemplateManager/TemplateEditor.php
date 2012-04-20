@@ -274,6 +274,12 @@ class TemplateEditor extends DataEditor
 		$slotsFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockTemplateSlot', $this->database );
 		$slots       = $slotsFeeder->groupBy( 'template_ID' )->get();
 
+		$requirementsFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockDataRequirement', $this->database );
+		$requirements       = $requirementsFeeder->groupBy( 'block_ID' )->get();
+
+		$providersFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockDataRequirementProvider' , $this->database );
+		$providers       = $providersFeeder->groupBy( 'provider_ID' )->get();
+
 		$data = array();
 
 		foreach( $blocks as $block ) {
@@ -287,10 +293,37 @@ class TemplateEditor extends DataEditor
 				'categoryID' => $block->getCategoryID(),
 				'title'      => $block->getTitle(),
 				'codeName'   => $block->getCodeName(),
-				'requires'   => $className::requires(),
-				'provides'   => $className::provides(),
+				'requires'   => array(),
+				'provides'   => array(),
 				'templates'  => array(),
 			);
+
+			if( isset( $requirements[ $blockID ] ) ) {
+				foreach( $requirements[ $blockID ] as $requirement ) {
+					/* @var @requirement BlockDataRequirement */
+					$reqData = array(
+						'ID'        => $requirement->getID(),
+						'property'  => $requirement->getProperty(),
+						'dataType'  => $requirement->getDataType(),
+					);
+
+					$blockData['requires'] = $reqData;
+				}
+			}
+
+			if( isset( $providers[ $blockID ] ) ) {
+				foreach( $providers[ $blockID ] as $provider ) {
+					/* @var $provider BlockDataRequirementProvider */
+					$provData = array(
+						'ID'                 => $provider->getID(),
+						'blockID'            => $provider->getProviderID(),
+						'property'           => $provider->getProviderProperty(),
+						'requiredPropertyID' => $provider->getRequiredPropertyID(),
+					);
+
+					$blockData['provides'][] = $provData;
+				}
+			}
 
 			if( isset( $templates[ $blockID ] ) ) {
 				foreach( $templates[ $blockID ] as $template ) {
@@ -450,8 +483,9 @@ class TemplateEditor extends DataEditor
 			// save blockSet
 			$blockSet = $this->saveBlockSet( $blockSetsFeeder, $request );
 
-			// save blocks structure
-			$instance = $this->saveBlockInstances( $blockSetsFeeder, $blockSet, $request );
+			// save block instances
+			$updater   = new BlockInstancesUpdater( $this->database );
+			$instances = $updater->saveBlockInstances( $blockSet, $request->getRawData('template') );
 
 			$this->database->transactionCommit();
 
@@ -460,12 +494,14 @@ class TemplateEditor extends DataEditor
 			throw $e;
 		}
 
+		$rootInstance = reset( $instances );
+
 		$response = new ActionResponse( true );
 		$response->setData( array(
 			'ID'       => $blockSet->getID(),
 			'name'     => $blockSet->getName(),
 			'parentID' => $blockSet->getParentID(),
-			'template' => $instance->export(),
+			'template' => $rootInstance->export(),
 		) );
 
 		return $response;
@@ -490,28 +526,5 @@ class TemplateEditor extends DataEditor
 		$blockSetsFeeder->save( $blockSet );
 
 		return $blockSet;
-	}
-
-	/**
-	 * Saves BlockInstances structure
-	 *
-	 * @param RequestInterface $request
-	 * @return array
-	 */
-	private function saveBlockInstances( cDBFeederBase $blockSetsFeeder, BlockSet $blockSet, RequestInterface $request )
-	{
-		// save client data
-		$updater = new BlockInstancesUpdater( $this->database );
-		$updater->saveBlockInstances( $blockSet, $request->getRawData('template') );
-
-		// reload fresh data
-		$loader    = new DatabaseLoader( $blockSetsFeeder );
-		$instances = $loader->fetchBlocksInstances( $blockSet );
-
-		// solve data dependencies
-		$solver = new Solver( $this->database );
-		$solver->solveMissingDependencies( $instances );
-
-		return reset( $instances );
 	}
 }

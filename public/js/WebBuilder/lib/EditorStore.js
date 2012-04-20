@@ -1,9 +1,22 @@
 Ext.define( 'WebBuilder.EditorStore', {
 	requires : [ 'Ext.util.HashMap' ],
 
+	uses : [
+		'WebBuilder.BlockInstance',
+		'WebBuilder.ConstantData',
+		'WebBuilder.InheritedData'
+	],
+
 	mixins : {
 		observable : 'Ext.util.Observable'
 	},
+
+	/**
+	 * Instance of the block data store
+	 *
+	 * @cfg {Ext.data.Store} blockStore
+	 */
+	blockStore : null,
 
 	/**
 	 * Instances store
@@ -36,6 +49,8 @@ Ext.define( 'WebBuilder.EditorStore', {
 	constructor : function( config )
 	{
 		var me = this;
+
+		me.blockStore = config.blockStore;
 
 		me.mixins.observable.constructor.call( me, config );
 
@@ -99,7 +114,7 @@ Ext.define( 'WebBuilder.EditorStore', {
 		var oldRoot = me.root;
 
 		me.clearInstances();
-		
+
 		if( oldRoot ) {
 			// notify about removal
 			me.fireEvent( 'remove', me, oldRoot, null, null, null );
@@ -119,6 +134,187 @@ Ext.define( 'WebBuilder.EditorStore', {
 		me.commitChange();
 
 		return oldRoot;
+	},
+
+	/**
+	 * Sets data sent from the server
+	 *
+	 * @param {Object} data
+	 */
+	setRequestData : function( data )
+	{
+		var me = this;
+
+		// suspend the change event
+		// so clients do just bulk get 'change' notification
+		me.startChange();
+
+		// create the block instances
+		var instanceMap = {},
+		    root        = me.setRequestData_createInstance( data, instanceMap );
+
+		// setup the instance datas
+		Ext.Object.each( instanceMap, me.setRequestData_setInstanceData, me );
+
+		// save instances
+		me.setRoot( root );
+
+		me.commitChange();
+	},
+
+	/**
+	 * @ignore
+	 * @private
+	 */
+	setRequestData_createInstance : function( value, instanceMap )
+	{
+		if( value == null ) {
+			return null;
+		}
+
+		var me    = this,
+		    block = me.blockStore.getById( value.blockID );
+
+		if( block == null ) {
+			return null;
+		}
+
+		// create instance
+		var instance = Ext.create( 'WebBuilder.BlockInstance', value.ID, value.blockSetID, block );
+
+		// setup template
+		var template = value.templateID && block.templates().getById( value.templateID );
+		instance.setTemplate( template );
+
+		// store data for later processing
+		instanceMap[ instance.getId() ] = {
+			instance : instance,
+			data     : value.data
+		};
+
+		// create children
+		if( value.slots ) {
+			Ext.Object.each( value.slots, function( id, children ) {
+				if( Ext.isIterable( children ) ) {
+					Ext.Array.each( children, function( child, position ) {
+						var childInstance = me.setRequestData_createInstance( child, instanceMap );
+
+						instance.addChild( childInstance, id );
+					});
+
+				} else {
+					Ext.Object.each( children, function( position, child ) {
+						var childInstance = me.setRequestData_createInstance( child, instanceMap );
+
+						instance.addChild( childInstance, id );
+					});
+				}
+			});
+		}
+
+		return instance;
+	},
+
+	/**
+	 * @ignore
+	 * @private
+	 */
+	setRequestData_setInstanceData : function( instanceId, definition, instanceMap )
+	{
+		var instance = definition.instance,
+		    data     = definition.data;
+
+		// no data to setup
+		if( data == null ) {
+			return;
+		}
+
+		var config = Ext.Object.map( data, function( property, value ) {
+			if( Ext.isObject( value ) ) {
+				var provider = instanceMap[ value['providerID'] ];
+
+				if( provider == null ) {
+					Ext.log({
+						level : 'warn',
+						msg   : 'Invalid data provider. Instance "'+ value['providerID'] +'" not found.'
+					});
+
+					return null;
+				}
+
+				return Ext.create( 'WebBuilder.InheritedData', property.instance, value['providerProperty'] );
+
+			} else {
+				return Ext.create( 'WebBuilder.ConstantData', value );
+			}
+		});
+
+		instance.setConfig( config );
+	},
+
+	/**
+	 * Returns the data
+	 *
+	 * @public
+	 */
+	getRequestData : function()
+	{
+	    return this.getRequestData_exportInstance( this.getRoot() );
+	},
+
+	/**
+	 * @ignore
+	 * @private
+	 */
+	getRequestData_exportInstance : function( instance )
+	{
+		if( instance == null ) {
+			return null;
+		}
+
+		return {
+			ID         : instance.getPersistentId(),
+			tmpID      : instance.getId(),
+			blockSetID : instance.blockSetId,
+			blockID    : instance.block.getId(),
+			data       : Ext.Object.map( instance.config, this.getRequestData_exportInstanceData, this ),
+			templateID : instance.template && instance.template.getId(),
+			slots      : instance.slots    && Ext.Object.map( instance.slots, this.getRequestData_exportInstanceSlot, this )
+		};
+	},
+
+	/**
+	 * @ignore
+	 * @private
+	 */
+	getRequestData_exportInstanceData : function( property, data )
+	{
+		if( data instanceof WebBuilder.ConstantData ) {
+			return data.getValue();
+
+		} else if( data instanceof WebBuilder.InheritedData ) {
+			return {
+				providerID       : data.getProvider().getId(),
+				providerProperty : data.getProperty()
+			};
+
+		} else {
+			Ext.log({
+				level : 'warn',
+				msg   : '['+ this.$className +'][getRequestData] Invalid data "'+ data + '" for property "'+ property +'"'
+			});
+
+			return null;
+		}
+	},
+
+	/**
+	 * @ignore
+	 * @private
+	 */
+	getRequestData_exportInstanceSlot : function( name, children )
+	{
+		return Ext.Array.map( children, this.getRequestData_exportInstance, this );
 	},
 
 // ====================== INNER MANIPULATION METHODS ====================== //
@@ -151,6 +347,9 @@ Ext.define( 'WebBuilder.EditorStore', {
 		}
 
 		instance.store = me;
+
+		// solve the child data dependencies
+		instance.solveDataDependencies();
 
 		// add all instance children
 		if( instance.slots != null ) {
