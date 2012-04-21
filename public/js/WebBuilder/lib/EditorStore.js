@@ -58,7 +58,7 @@ Ext.define( 'WebBuilder.EditorStore', {
 			'add',
 			'remove',
 			'templatechange',
-			'configchange',
+			'datachange',
 			'change'
 		);
 
@@ -229,7 +229,7 @@ Ext.define( 'WebBuilder.EditorStore', {
 			return;
 		}
 
-		var config = Ext.Object.map( data, function( property, value ) {
+		var data = Ext.Object.map( data, function( property, value ) {
 			if( Ext.isObject( value ) ) {
 				var provider = instanceMap[ value['providerID'] ];
 
@@ -249,7 +249,7 @@ Ext.define( 'WebBuilder.EditorStore', {
 			}
 		});
 
-		instance.setConfig( config );
+		instance.setData( data );
 	},
 
 	/**
@@ -277,7 +277,7 @@ Ext.define( 'WebBuilder.EditorStore', {
 			tmpID      : instance.getId(),
 			blockSetID : instance.blockSetId,
 			blockID    : instance.block.getId(),
-			data       : Ext.Object.map( instance.config, this.getRequestData_exportInstanceData, this ),
+			data       : Ext.Object.map( instance.data, this.getRequestData_exportInstanceData, this ),
 			templateID : instance.template && instance.template.getId(),
 			slots      : instance.slots    && Ext.Object.map( instance.slots, this.getRequestData_exportInstanceSlot, this )
 		};
@@ -472,8 +472,8 @@ Ext.define( 'WebBuilder.EditorStore', {
 		this.fireEvent( 'templatechange', this, instance, oldTemplate );
 	},
 
-	onConfigChange : function( instance, config )
+	onDataChange : function( instance, data )
 	{
-		this.fireEvent( 'configchange', this, instance, Ext.Object.getKeys( config ) );
+		this.fireEvent( 'datachange', this, instance, Ext.Object.getKeys( data ) );
 	}
 });

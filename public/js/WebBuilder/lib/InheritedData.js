@@ -20,6 +20,6 @@ Ext.define( 'WebBuilder.InheritedData', {
 
 	getValue : function()
 	{
-		return this.provider.getConfig()[ this.property ];
+		return this.provider.getData()[ this.property ];
 	}
 });

@@ -63,14 +63,14 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 
 	setInstance : function( instance )
 	{
-		var me     = this,
-		    config = instance.getConfig();
+		var me   = this,
+		    data = instance.getData();
 
 		// instance already active
 		// just update values
 		if( instance === me.currentInstance ) {
 			Ext.Array.forEach( me.configItems, function( field ) {
-				field.setValue( config[ field.getName() ] );
+				field.setValue( data[ field.getName() ] );
 			});
 
 		// switch current instance
@@ -83,7 +83,7 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 			me.createTemplateConfigItem( instance );
 
 			// create new fields
-			Ext.Object.each( config, me.createConfigItem, me );
+			Ext.Object.each( data, me.createConfigItem, me );
 
 			me.add( me.templateField );
 			me.add( me.configItems );
@@ -149,7 +149,7 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 		// no current instance
 		if( me.currentInstance == null ) {
 			Ext.log({
-				msg : '['+ me.$className +'][applyConfig] Cannot apply the config, no currentInstance is set.'
+				msg : '['+ me.$className +'][applyConfig] Cannot apply the data, no currentInstance is set.'
 			});
 
 		// apply config to the current instance
@@ -157,14 +157,14 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 			// set template
 			me.currentInstance.setTemplate( me.currentInstance.block.templates().getById( me.templateField.getValue() ) );
 
-			// apply config
-			var config = {};
+			// apply data
+			var data = {};
 
 			Ext.Array.forEach( me.configItems, function( field ) {
-				config[ field.getName() ] = field.getValue();
+				data[ field.getName() ] = field.getValue();
 			});
 
-			me.currentInstance.setConfig( config );
+			me.currentInstance.setData( data );
 		}
 
 		me.close();

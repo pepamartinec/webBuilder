@@ -21,7 +21,7 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	block      : null,
 	template   : null,
 	slots      : null,
-	config     : null,
+	data     : null,
 
 	/**
 	 * Constructor
@@ -38,11 +38,11 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		me.blockSetId = blockSetId;
 		me.block      = block;
 
-		// create config
-		me.config = {};
+		// create data
+		me.data = {};
 
 		block.requires().each( function( dataRequirement ) {
-			me.config[ dataRequirement.get('property') ] = null;
+			me.data[ dataRequirement.get('property') ] = null;
 		});
 
 		// assign template
@@ -81,12 +81,12 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	solveDataDependencies : function()
 	{
 		var me     = this,
-		    config = me.getConfig(),
+		    data = me.getData(),
 		    property, value;
 
 		me.block.requires().each( function( requiredProperty ) {
 			property = requiredProperty.get('property');
-			value    = config[ requiredProperty.get('property') ];
+			value    = data[ requiredProperty.get('property') ];
 
 			// do not override constant data
 			if( value instanceof WebBuilder.ConstantData ) {
@@ -95,16 +95,16 @@ Ext.define( 'WebBuilder.BlockInstance', {
 			}
 
 			// find provider
-			config[ property ] = me.findDataProvider( requiredProperty.getId() );
+			data[ property ] = me.findDataProvider( requiredProperty.getId() );
 
-			if( config[ property ] ) {
-				console.log( 'inherited data - '+ me.block.get('title') +'['+ property + '] <= '+ config[property].getProvider().block.get('title') +'::'+ config[property].getProperty() +'('+ config[property].getValue() +')' );
+			if( data[ property ] ) {
+				console.log( 'inherited data - '+ me.block.get('title') +'['+ property + '] <= '+ data[property].getProvider().block.get('title') +'::'+ data[property].getProperty() +'('+ data[property].getValue() +')' );
 			} else {
 				console.log( 'undefined data - '+ me.block.get('title') +'['+ property + ']' );
 			}
 		});
 
-		me.setConfig( config );
+		me.setData( data );
 	},
 
 	/**
@@ -297,33 +297,33 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		return this;
 	},
 
-	setConfig : function( config )
+	setData : function( data )
 	{
 		var me = this;
 
 		me.storeChangeStart();
 
-		var myConfig = me.config;
-		for( var idx in config ) {
-			if( config.hasOwnProperty( idx ) === false ) {
+		var myData = me.data;
+		for( var idx in data ) {
+			if( data.hasOwnProperty( idx ) === false ) {
 				continue;
 			}
 
-			if( myConfig.hasOwnProperty( idx ) === false ) {
+			if( myData.hasOwnProperty( idx ) === false ) {
 				continue;
 			}
 
-			myConfig[ idx ] = config[ idx ];
+			myData[ idx ] = data[ idx ];
 		}
 
 		// notify store
-		me.storeChangeCommit( 'configChange', arguments );
+		me.storeChangeCommit( 'dataChange', arguments );
 
 		return this;
 	},
 
-	getConfig : function()
+	getData : function()
 	{
-		return this.config;
+		return this.data;
 	}
 });
