@@ -19,90 +19,19 @@ use ExtAdmin\RequestInterface;
 
 class BlockInstancesUpdater
 {
-	const SLOT_KEY_ID       = 'id';
-	const SLOT_KEY_CODENAME = 'codeName';
-
-	const DATA_KEY_ID       = 'id';
-	const DATA_KEY_CODENAME = 'codeName';
-
 	/**
 	 * @var \cDatabase
 	 */
 	protected $database;
 
 	/**
-	 * @var string
-	 */
-	protected $slotKey;
-
-	/**
-	 * @var string
-	 */
-	protected $dataKey;
-
-	/**
 	 * Constructor
 	 *
 	 * @param \cDatabase $database
 	 */
-	public function __construct( cDatabase $database, array $config = null )
+	public function __construct( cDatabase $database )
 	{
 		$this->database = $database;
-
-		// apply config
-		if( $config === null ) {
-			$config = array();
-		}
-
-		$config += array(
-			'slotKey' => self::SLOT_KEY_CODENAME,
-			'dataKey' => self::DATA_KEY_CODENAME
-		);
-
-		$this->setSlotKey( $config['slotKey'] );
-		$this->setDataKey( $config['dataKey'] );
-	}
-
-	/**
-	 * Sets the slot key config
-	 *
-	 * @param string $slotKey TemplateUpdater::SLOT_KEY_*
-	 * @return TemplateUpdater
-	 */
-	public function setSlotKey( $slotKey )
-	{
-		// check value
-		$valid = array( self::SLOT_KEY_CODENAME, self::SLOT_KEY_ID );
-
-		if( ! in_array( $slotKey, $valid ) ) {
-			throw new \Exception( "Invalid slot key type '{$slotKey}'" );
-		}
-
-		// setup value
-		$this->slotKey = $slotKey;
-
-		return $this;
-	}
-
-	/**
-	 * Sets the data key config
-	 *
-	 * @param string $dataKey TemplateUpdater::DATA_KEY_*
-	 * @return TemplateUpdater
-	 */
-	public function setDataKey( $dataKey )
-	{
-		// check value
-		$valid = array( self::DATA_KEY_CODENAME, self::DATA_KEY_ID );
-
-		if( ! in_array( $dataKey, $valid ) ) {
-			throw new \Exception( "Invalid data key type '{$dataKey}'" );
-		}
-
-		// setup value
-		$this->dataKey = $dataKey;
-
-		return $this;
 	}
 
 	/**
@@ -113,24 +42,50 @@ class BlockInstancesUpdater
 	 */
 	public function saveBlockInstances( BlockSet $blockSet, array $clientData )
 	{
-		$blockSetID = (int)$blockSet->getID();
-		$instances  = BlockInstance::import( $clientData );
+		$blockSetID   = (int)$blockSet->getID();
+		$tmpInstances = BlockInstance::import( $clientData );
 
-		$instances = $this->saveInstances( $blockSetID, $instances );
+		$this->clearDataDependencies( $blockSetID );
+
+		$localInstances = $this->saveInstances( $blockSetID, $tmpInstances );
+
+		$instances = array();
+		foreach( $tmpInstances as $instance ) {
+			$instances[ $instance->ID ] = $instance;
+		}
 
 		$this->loadMissingData( $instances );
 
-		$this->saveInstancesData( $instances );
+		$this->saveInstancesData( $localInstances );
 
 		return $instances;
 	}
 
+	private function clearDataDependencies( $blockSetID )
+	{
+		$sql = "
+			DELETE FROM dc
+			USING blocks_instances_data_constant dc
+			JOIN blocks_instances bi ON ( bi.ID = dc.instance_ID )
+			WHERE bi.block_set_ID = {$blockSetID}
+		";
+		$this->database->query( $sql );
+
+		$sql = "
+			DELETE FROM di
+			USING blocks_instances_data_inherited di
+			JOIN blocks_instances bi ON ( bi.ID = di.instance_ID )
+			WHERE bi.block_set_ID = {$blockSetID}
+		";
+		$this->database->query( $sql );
+	}
+
 	private function saveInstances( $blockSetID, array $instances )
 	{
-		$savedInstances = array();
+		$localInstances = array();
 
 		// destroy all parent-child relations for the current blockSet
-		// (including the parent blockSet set, excluding child blockSets links)
+		// (including the parent blockSet set links, excluding child blockSets links)
 		$sql = "
 			DELETE FROM bis
 			USING blocks_instances_subblocks bis
@@ -141,35 +96,68 @@ class BlockInstancesUpdater
 
 		// update instances
 		foreach( $instances as $tmpID => $instance ) {
-			$this->saveInstance( $blockSetID, $instance, $savedInstances );
+			// local blockSet instance, save
+			if( $this->isInstanceLocal( $blockSetID, $instance) ) {
+				$this->saveInstance( $blockSetID, $instance );
+
+				$localInstances[ $instance->ID ] = $instance;
+
+			// parent blockSet instance, do nothing
+			} else {
+				if( $instance->ID == null ) {
+					throw new \Exception( "Missing ID of the inherited block instance" );
+				}
+			}
 		}
 
-		// remove old instances
+		// remove orphaned instances
 		$sql = "DELETE FROM blocks_instances WHERE block_set_ID = {$blockSetID}";
-		if( sizeof( $savedInstances ) > 0 ) {
-			$sql .= ' AND ID NOT IN ('. implode( ',', array_keys( $savedInstances ) ) .')';
+		if( sizeof( $localInstances ) > 0 ) {
+			$sql .= ' AND ID NOT IN ('. implode( ',', array_keys( $localInstances ) ) .')';
 		}
 		$this->database->query( $sql );
 
-		return $savedInstances;
-	}
+		// create parent-child links
+		foreach( $instances as $instance ) {
+			foreach( $instance->slots as $codeName => $children ) {
+				$codeName = $this->database->escape( $codeName );
 
-	private function saveInstance( $blockSetID, BlockInstance $instance, array &$savedInstances )
-	{
-		// instance from othe block set
-		// do not update
-		if( $instance->blockSetID != null && $instance->blockSetID !== $blockSetID ) {
-			return;
+				foreach( $children as $position => $child ) {
+					// skip non-local instances
+					if( ! isset( $localInstances[ $child->ID ] ) ) {
+						continue;
+					}
+
+					// create the parent-child link
+					$sql = "
+						INSERT INTO blocks_instances_subblocks ( parent_instance_ID, parent_slot_ID, position, inserted_instance_ID )
+						SELECT {$instance->ID}, ID, {$position}, {$child->ID} FROM blocks_templates_slots
+						WHERE template_ID = {$instance->templateID} AND code_name = '{$codeName}'
+					";
+					$this->database->query( $sql );
+				}
+			}
 		}
 
+		return $localInstances;
+	}
+
+	private function isInstanceLocal( $blockSetID, BlockInstance $instance )
+	{
+		return $instance->blockSetID == null || $instance->blockSetID == $blockSetID;
+	}
+
+	private function saveInstance( $blockSetID, BlockInstance $instance )
+	{
 		// existing instance
 		if( $instance->ID ) {
+
 			// TODO handle the template change when some subblock exist
 			// new template may not have the same slots as the original one
 			// so the subblock may not fit int theri positions anymore
 			$sql = "
 				SELECT COUNT(*) `count` FROM blocks_instances bi
-				JOIN blocks_instances_subblocks bis ON ( bi.ID = bis.parent_slot_ID  )
+				JOIN blocks_instances_subblocks bis ON ( bi.ID = bis.parent_instance_ID  )
 				WHERE bi.ID = {$instance->ID} AND bi.template_ID != {$instance->templateID}
 			";
 
@@ -193,25 +181,7 @@ class BlockInstancesUpdater
 			$instance->ID = $this->database->getLastInsertedId();
 		}
 
-		$savedInstances[ $instance->ID ] = $instance;
-
-		// save subblocks
-		foreach( $instance->slots as $codeName => $children ) {
-			$codeName = $this->database->escape( $codeName );
-
-			foreach( $children as $position => $child ) {
-				// save the child
-				$this->saveInstance( $blockSetID, $child, $savedInstances );
-
-				// create the parent-child link
-				$sql = "
-					INSERT INTO blocks_instances_subblocks ( parent_instance_ID, parent_slot_ID, position, inserted_instance_ID )
-					SELECT {$instance->ID}, ID, {$position}, {$child->ID} FROM blocks_templates_slots
-					WHERE template_ID = {$instance->templateID} AND code_name = '{$codeName}'
-				";
-				$this->database->query( $sql );
-			}
-		}
+		$instance->blockSetID = $blockSetID;
 	}
 
 	private function loadMissingData( array $instances )
@@ -261,15 +231,6 @@ class BlockInstancesUpdater
 
 	private function saveInstancesData( array $instances )
 	{
-		// remove old data
-		$instanceIDsStr = implode( ',', array_keys( $instances ) );
-
-		$sql = "DELETE FROM blocks_instances_data_constant WHERE instance_ID IN ({$instanceIDsStr})";
-		$this->database->query( $sql );
-
-		$sql = "DELETE FROM blocks_instances_data_inherited WHERE instance_ID IN ({$instanceIDsStr})";
-		$this->database->query( $sql );
-
 		// save new data
 		foreach( $instances as $instance ) {
 			/* @var $instance BlockInstance */
@@ -307,13 +268,21 @@ class BlockInstancesUpdater
 
 	private function saveInstanceData_inherited( BlockInstance $instance, InheritedData $data )
 	{
-		$provider = $data->getProvider();
-		$property = $this->database->escape( $data->getProviderProperty() );
+		$provider         = $data->getProvider();
+		$providerProperty = $this->database->escape( $data->getProviderProperty() );
+
+		$target         = $data->getTarget();
+		$targetProperty = $this->database->escape( $data->getProperty() );
 
 		$sql = "
 			INSERT INTO blocks_instances_data_inherited ( instance_ID, provider_instance_ID, provider_property_ID )
-			SELECT {$instance->ID}, {$provider->ID}, ID FROM blocks_data_requirements_providers
-				WHERE provider_ID = {$provider->blockID} AND provider_property = '{$property}'
+			SELECT {$instance->ID}, {$provider->ID}, bdrp.ID
+			FROM blocks_data_requirements_providers bdrp
+			JOIN blocks_data_requirements bdr ON ( bdr.ID = bdrp.required_property_ID )
+				WHERE bdrp.provider_ID = {$provider->blockID}
+				  AND bdrp.provider_property = '{$providerProperty}'
+				  AND bdr.block_ID = {$target->blockID}
+				  AND bdr.property = '{$targetProperty}'
 		";
 		$this->database->query( $sql );
 	}
