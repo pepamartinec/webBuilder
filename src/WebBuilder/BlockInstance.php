@@ -216,7 +216,7 @@ class BlockInstance
 	{
 		// FIXME remove AbstractRequest dependency!!!!
 		$instanceID = AbstractRequest::secureData( $clientData, 'ID', 'int' ) ?: null;
-		$tmpID      = AbstractRequest::secureData( $clientData, 'tmpID', 'int' ) ?: null;
+		$tmpID      = AbstractRequest::secureData( $clientData, 'tmpID', 'string' ) ?: null;
 
 		if( ! isset( $instanceSet[ $tmpID ] ) ) {
 			$instanceSet[ $tmpID ] = new self( null );

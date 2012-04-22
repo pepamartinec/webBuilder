@@ -142,8 +142,6 @@ class BlockInstancesUpdater
 		// update instances
 		foreach( $instances as $tmpID => $instance ) {
 			$this->saveInstance( $blockSetID, $instance, $savedInstances );
-
-			$savedInstances[ $instance->ID ] = $instance;
 		}
 
 		// remove old instances
@@ -160,7 +158,7 @@ class BlockInstancesUpdater
 	{
 		// instance from othe block set
 		// do not update
-		if( $instance->blockSetID !== $blockSetID ) {
+		if( $instance->blockSetID != null && $instance->blockSetID !== $blockSetID ) {
 			return;
 		}
 
