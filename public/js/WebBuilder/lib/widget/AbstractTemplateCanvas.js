@@ -161,6 +161,7 @@ Ext.define( 'WebBuilder.widget.AbstractTemplateCanvas', {
 
         // create config popup
         me.configPopup = Ext.create( 'WebBuilder.widget.ConfigPopup', {
+        	env         : me.module.env,
         	closeAction : 'hide'
         });
 	},
@@ -444,8 +445,8 @@ Ext.define( 'WebBuilder.widget.AbstractTemplateCanvas', {
 		}
 
 		// replace old DOM node with refreshed one
-		var newBlockDom = Ext.DomHelper.createDom( me.createBlockDefinition( instance ) );
-		Ext.fly( newBlockDom ).replace( blockDom );
+		me.getInstanceTpl( instance ).insertBefore( blockDom, instance );
+		blockDom.parentNode.removeChild( blockDom );
 	},
 
 	/**
