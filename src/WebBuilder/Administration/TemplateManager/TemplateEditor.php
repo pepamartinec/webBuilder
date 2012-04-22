@@ -142,11 +142,16 @@ class TemplateEditor extends DataEditor
 		$blocks       = $blocksLoader->fetchBlocksInstances( $blockSet );
 		$rootBlock    = reset( $blocks );
 
+		$template = null;
+		if( $rootBlock ) {
+			$template = $rootBlock->export();
+		}
+
 		return array(
 			'ID'       => $blockSet->getID(),
 			'name'     => $blockSet->getName(),
 			'parentID' => $blockSet->getParentID(),
-			'template' => $rootBlock->export()
+			'template' => $template
 		);
 	}
 
