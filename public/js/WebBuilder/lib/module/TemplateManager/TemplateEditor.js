@@ -71,10 +71,12 @@ Ext.define( 'WebBuilder.module.TemplateManager.TemplateEditor',
 		var me = this;
 
 		data = data || {};
-		
+
 		me.idField.setValue( data.ID );
 		me.parentIdField.setValue( data.parentID );
 		me.nameField.setValue( data.name );
+
+		me.templateEditor.setBlockSetId( data.ID );
 		me.templateEditor.setValue( data.template );
 	},
 

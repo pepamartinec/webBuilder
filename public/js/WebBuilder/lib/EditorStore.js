@@ -19,6 +19,13 @@ Ext.define( 'WebBuilder.EditorStore', {
 	blockStore : null,
 
 	/**
+	 * The blockSet ID
+	 *
+	 * @cfg {Number} blockSetId
+	 */
+	blockSetId : null,
+
+	/**
 	 * Instances store
 	 *
 	 * @protected
@@ -59,10 +66,50 @@ Ext.define( 'WebBuilder.EditorStore', {
 			'remove',
 			'templatechange',
 			'datachange',
+			'lockchange',
+			'blocksetchange',
 			'change'
 		);
 
 		me.store = Ext.create( 'Ext.util.HashMap' );
+	},
+
+	/**
+	 * Sets the blockSet ID
+	 *
+	 * @param {Number} id
+	 * @return {WebBuilder.component.TemplateEditor}
+	 */
+	setBlockSetId : function( id )
+	{
+		var me    = this,
+		    oldId = me.blockSetId;
+
+		me.startChange();
+
+		me.blockSetId = id;
+
+		me.fireEvent( 'blocksetchange', me, oldId, id );
+
+		me.commitChange();
+
+		// TODO implement the block instances 'lock' state change notification
+		Ext.log({
+			level : 'warn',
+			msg   : '['+ me.$className +'][setBlockSetd] BlockSetId change notification is not implemented yet'
+		});
+
+		return me;
+	},
+
+	/**
+	 * Returns the blockSet ID
+	 *
+	 * @returns {Number}
+	 */
+	getBlockSetId : function()
+	{
+		return this.blockSetId;
 	},
 
 	/**
@@ -229,7 +276,7 @@ Ext.define( 'WebBuilder.EditorStore', {
 			return;
 		}
 
-		var data = Ext.Object.map( data, function( property, value ) {
+		data = Ext.Object.map( data, function( property, value ) {
 			if( Ext.isObject( value ) ) {
 				var provider = instanceMap[ value['providerID'] ];
 
@@ -347,6 +394,11 @@ Ext.define( 'WebBuilder.EditorStore', {
 		}
 
 		instance.store = me;
+
+		// setup the instance blockSet
+		if( instance.blockSetId == null ) {
+			instance.blockSetId = me.blockSetId;
+		}
 
 		// solve the child data dependencies
 		instance.solveDataDependencies();

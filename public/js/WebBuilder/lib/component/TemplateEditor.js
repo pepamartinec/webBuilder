@@ -41,6 +41,11 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	blocksLoadAction : null,
 
 	/**
+	 * @cfg {Number} blockSetId
+	 */
+	blockSetId : null,
+
+	/**
 	 * Editor initialization
 	 *
 	 */
@@ -120,14 +125,24 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 			}
 		});
 
+		if( me.blockSetId == null ) {
+			Ext.log({
+				level : 'warn',
+				msg   : '['+ me.$className +'] No blockSetId set.'
+			});
+		}
+
 		me.instancesStore = Ext.create( 'WebBuilder.EditorStore', {
 			blockStore : me.blocksStore,
+			blockSetId : me.blockSetId,
 
 			listeners : {
 				scope  : me,
 				change : me.handleInstancesStoreChange
 			}
 		});
+
+		delete me.blockSetId;
 	},
 
 	/**
@@ -229,4 +244,26 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 
 		return null;
 	},
+
+	/**
+	 * Sets the blockSet ID
+	 *
+	 * @param {Number} id
+	 * @return {WebBuilder.component.TemplateEditor}
+	 */
+	setBlockSetId : function( id )
+	{
+		this.instancesStore.setBlockSetId( id );
+		return this;
+	},
+
+	/**
+	 * Returns the blockSet ID
+	 *
+	 * @returns {Number}
+	 */
+	getBlockSetId : function()
+	{
+		return this.instancesStore.getBlockSetId();
+	}
 });

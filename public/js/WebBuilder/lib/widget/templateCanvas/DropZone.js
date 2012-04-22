@@ -2,6 +2,11 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 	extend : 'Ext.dd.DropZone',
 
 	/**
+	 * @cfg {WebBuilder.EditorStore} instancesStore
+	 */
+	instancesStore : null,
+
+	/**
 	 * ClassName of block nodes
 	 *
 	 * @required
@@ -286,7 +291,7 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 				return false;
 			}
 
-			droppedInstance = Ext.create( 'WebBuilder.BlockInstance', null, targetInstance.blockSetId, block );
+			droppedInstance = Ext.create( 'WebBuilder.BlockInstance', null, this.instancesStore.getBlockSetId(), block );
 			droppedInstance.setTemplate( block.templates().getAt(0) );
 
 		} else if( dragSource instanceof WebBuilder.widget.templateCanvas.DragZone ) {

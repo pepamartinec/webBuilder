@@ -21,20 +21,22 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	block      : null,
 	template   : null,
 	slots      : null,
-	data     : null,
+	data       : null,
 
 	/**
 	 * Constructor
 	 *
+	 * @param {Number} [id]
+	 * @param {Number} [blockSetId]
 	 * @param {WebBuilder.model.Block} [block]
 	 * @param {WebBuilder.model.BlockTemplate} [template=null]
 	 */
-	constructor : function( ID, blockSetId, block, template )
+	constructor : function( id, blockSetId, block, template )
 	{
 		var me = this;
 
 		// assign ID & block
-		me.id         = ID || ( 'blockInstance-'+ me.self.genId() );
+		me.id         = id || ( 'blockInstance-'+ me.self.genId() );
 		me.blockSetId = blockSetId;
 		me.block      = block;
 
@@ -75,6 +77,16 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	},
 
 	/**
+	 * Checks whether the instance is locked
+	 *
+	 * @return {Boolean}
+	 */
+	isLocked : function()
+	{
+		return this.blockSetId !== null && this.store !== null && this.blockSetId != this.store.getBlockSetId();
+	},
+
+	/**
 	 * Tries to solve block data dependencies
 	 *
 	 */
@@ -90,18 +102,11 @@ Ext.define( 'WebBuilder.BlockInstance', {
 
 			// do not override constant data
 			if( value instanceof WebBuilder.ConstantData ) {
-				console.log( 'constant data - '+ me.block.get('title') +'['+ property + '] <= '+ value.getValue() );
 				return;
 			}
 
 			// find provider
 			data[ property ] = me.findDataProvider( requiredProperty.getId() );
-
-			if( data[ property ] ) {
-				console.log( 'inherited data - '+ me.block.get('title') +'['+ property + '] <= '+ data[property].getProvider().block.get('title') +'::'+ data[property].getProperty() +'('+ data[property].getValue() +')' );
-			} else {
-				console.log( 'undefined data - '+ me.block.get('title') +'['+ property + ']' );
-			}
 		});
 
 		me.setData( data );
@@ -132,7 +137,11 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		return null;
 	},
 
-
+	/**
+	 * Start the store change transaction
+	 *
+	 * @protected
+	 */
 	storeChangeStart : function()
 	{
 		if( this.store ) {
@@ -140,10 +149,17 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		}
 	},
 
+	/**
+	 * Commits the store change transaction
+	 *
+	 * @protected
+	 * @param {String} [event]
+	 * @param {Array} [args]
+	 */
 	storeChangeCommit : function( event, args )
 	{
 		if( this.store == null ) {
-			return true;
+			return;
 		}
 
 		args = Array.prototype.slice.call( args, 0 );
@@ -153,6 +169,14 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		this.store.commitChange();
 	},
 
+	/**
+	 * Adds the child instance
+	 *
+	 * @param {WebBuilder.BlockInstance} [instance]
+	 * @param {String} [slotId]
+	 * @param {Number} [position]
+	 * @return {WebBuilder.BlockInstance}
+	 */
 	addChild : function( instance, slotId, position )
 	{
 		var me   = this,
@@ -190,6 +214,12 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		return me;
 	},
 
+	/**
+	 * Removes the child instance
+	 *
+	 * @param {WebBuilder.BlockInstance} [instance]
+	 * @return {WebBuilder.BlockInstance}
+	 */
 	removeChild : function( instance )
 	{
 		var me = this;
@@ -237,6 +267,11 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		return instance;
 	},
 
+	/**
+	 * Removes self from the current parent
+	 *
+	 * @returns {WebBuilder.BlockInstance}
+	 */
 	remove : function()
 	{
 		var me = this;
@@ -249,12 +284,18 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		return me;
 	},
 
+	/**
+	 * Changes the instance template
+	 *
+	 * @param {WebBuilder.model.BlockTemplate} [template]
+	 * @returns {WebBuilder.BlockInstance}
+	 */
 	setTemplate : function( template )
 	{
 		var me = this;
 
 		if( template === me.template ) {
-			return;
+			return me;
 		}
 
 		me.storeChangeStart();
@@ -294,9 +335,15 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		// notify store
 		me.storeChangeCommit( 'templateChange', [ oldTemplate, oldSlots ] );
 
-		return this;
+		return me;
 	},
 
+	/**
+	 * Changes the instance data
+	 *
+	 * @param {Object} data
+	 * @returns {WebBuilder.BlockInstance}
+	 */
 	setData : function( data )
 	{
 		var me = this;
@@ -319,11 +366,16 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		// notify store
 		me.storeChangeCommit( 'dataChange', arguments );
 
-		return this;
+		return me;
 	},
 
+	/**
+	 * Returns the instance data
+	 *
+	 * @returns {Object}
+	 */
 	getData : function()
 	{
-		return this.data;
+		return Ext.Object.merge( {}, this.data );
 	}
 });
