@@ -103,7 +103,7 @@ class PageList extends TreeList
 		$webPages      = $webPageFeeder->groupBy( 'parent_ID' )->orderBy( 'parent_ID', 'asc' )->get();
 
 		if( $webPages === null ) {
-			$webPages = array();
+			return new DataBrowserResponse( true, array(), 0 );
 		}
 
 		$extractor = function( cWebPage $webPage ) use( &$extractor, $webPages ) {
