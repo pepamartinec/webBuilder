@@ -26,6 +26,8 @@ Ext.define( 'WebBuilder.model.Block',
 	},{
 		name : 'codeName',
 		type : 'string'
+	},{
+		name : 'config'
 	}],
 
 	belongsTo : [{

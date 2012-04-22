@@ -43,7 +43,7 @@ Ext.define( 'WebBuilder.module.BlockManager.BlocksList',
 		me.updateActionsStates();
 	},
 	
-	getActiveRecords : function()
+	getSelection : function()
 	{
 		return this.getSelectionModel().getSelection();
 	},

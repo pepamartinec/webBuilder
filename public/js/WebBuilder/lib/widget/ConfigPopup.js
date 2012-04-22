@@ -12,6 +12,12 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 	cancelBtnTitle : 'Storno',
 
 	/**
+	 * @required
+	 * @cfg {extAdmin.Environment} env
+	 */
+	env : null,
+
+	/**
 	 * Component initialization
 	 *
 	 */
@@ -33,9 +39,9 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 
 		/**
 		 * @protected
-		 * @property {Array} configItems
+		 * @property {Object} dataFields
 		 */
-		me.configItems = [];
+		me.dataFields = {};
 
 		me.formPanel = Ext.create( 'Ext.form.Panel', {
 
@@ -63,39 +69,39 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 
 	setInstance : function( instance )
 	{
-		var me   = this,
-		    data = instance.getData();
+		var me     = this,
+		    block  = instance.block,
+		    config = block.get('config'),
+		    data   = instance.getData();
 
-		// instance already active
-		// just update values
-		if( instance === me.currentInstance ) {
-			Ext.Array.forEach( me.configItems, function( field ) {
-				field.setValue( data[ field.getName() ] );
-			});
+		// update the config fields
+		if( instance !== me.currentInstance ) {
 
-		// switch current instance
-		} else {
 			// remove old fields
 			me.removeAll( true );
-			me.configItems = [];
 
-			// create template config field
-			me.createTemplateConfigItem( instance );
-
-			// create new fields
-			Ext.Object.each( data, me.createConfigItem, me );
-
+			// create the template field
+			me.templateField = me.createTemplateConfigItem( instance );
 			me.add( me.templateField );
-			me.add( me.configItems );
+
+			// create config fields
+			me.dataFields = Ext.Object.map( config || {}, me.createConfigItem, me );
+			me.add( Ext.Object.getValues( me.dataFields ) );
+
 			me.currentInstance = instance;
 		}
+
+		// update the filed values
+		Ext.Object.each( me.dataFields, function( name, field ) {
+			field.setValue( data[ name ] );
+		});
 	},
 
 	createTemplateConfigItem : function( instance )
 	{
 		var templates = instance.block.templates();
 
-		this.templateField = Ext.create( 'Ext.form.field.ComboBox', {
+		return Ext.create( 'Ext.form.field.ComboBox', {
 			name       : 'template',
 			fieldLabel : 'Šablona',
 			value      : instance.template.getId(),
@@ -108,10 +114,25 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 		});
 	},
 
-	createConfigItem : function( name, value )
+	createConfigItem : function( name, definition )
 	{
+		var me = this;
+
+		if( ! Ext.isObject( definition ) || ! definition['type'] ) {
+			return;
+		}
+
+		itemCfg = Ext.Object.merge( {
+			env        : me.env,
+			fieldLabel : name
+		}, definition );
+
+		delete itemCfg['type'];
+
+		return Ext.create( definition['type'], itemCfg );
+
 		var me   = this,
-		    item = null;
+	        item = null;
 
 		// constant data
 		if( value instanceof WebBuilder.ConstantData ) {
@@ -160,8 +181,8 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 			// apply data
 			var data = {};
 
-			Ext.Array.forEach( me.configItems, function( field ) {
-				data[ field.getName() ] = field.getValue();
+			Ext.Object.each( me.dataFields, function( name, field ) {
+				data[ name ] = Ext.create( 'WebBuilder.ConstantData', field.getValue() );
 			});
 
 			me.currentInstance.setData( data );
