@@ -125,10 +125,6 @@ class BlockInstancesUpdater
 		return $instances;
 	}
 
-
-
-
-
 	private function saveInstances( $blockSetID, array $instances )
 	{
 		$savedInstances = array();
@@ -267,6 +263,16 @@ class BlockInstancesUpdater
 
 	private function saveInstancesData( array $instances )
 	{
+		// remove old data
+		$instanceIDsStr = implode( ',', array_keys( $instances ) );
+
+		$sql = "DELETE FROM blocks_instances_data_constant WHERE instance_ID IN ({$instanceIDsStr})";
+		$this->database->query( $sql );
+
+		$sql = "DELETE FROM blocks_instances_data_inherited WHERE instance_ID IN ({$instanceIDsStr})";
+		$this->database->query( $sql );
+
+		// save new data
 		foreach( $instances as $instance ) {
 			/* @var $instance BlockInstance */
 
