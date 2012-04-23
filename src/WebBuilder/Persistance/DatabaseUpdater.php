@@ -1,23 +1,14 @@
 <?php
-namespace WebBuilder\Administration\TemplateManager;
+namespace WebBuilder\Persistance;
 
 use WebBuilder\DataDependencies\UndefinedData;
-
-use WebBuilder\DataDependencies\ConstantData;
-
 use WebBuilder\DataDependencies\InheritedData;
-
+use WebBuilder\DataDependencies\ConstantData;
 use WebBuilder\BlockInstance;
-
-use ExtAdmin\Request\AbstractRequest;
-
-use Inspirio\Database\cDatabase;
-use WebBuilder\BlocksLoaders\DatabaseLoader;
 use WebBuilder\DataObjects\BlockSet;
+use Inspirio\Database\cDatabase;
 
-use ExtAdmin\RequestInterface;
-
-class BlockInstancesUpdater
+class DatabaseUpdater
 {
 	/**
 	 * @var \cDatabase

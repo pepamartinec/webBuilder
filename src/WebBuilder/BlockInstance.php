@@ -1,6 +1,11 @@
 <?php
 namespace WebBuilder;
 
+use WebBuilder\DataDependencies\InheritedData;
+use WebBuilder\DataDependencies\ConstantData;
+use ExtAdmin\Request\AbstractRequest;
+use WebBuilder\DataDependencies\UndefinedData;
+
 /**
  * Web block instance meta data
  *
@@ -9,14 +14,6 @@ namespace WebBuilder;
  *
  * @author Josef Martinec
  */
-use WebBuilder\DataDependencies\InheritedData;
-
-use WebBuilder\DataDependencies\ConstantData;
-
-use ExtAdmin\Request\AbstractRequest;
-
-use WebBuilder\DataDependencies\UndefinedData;
-
 class BlockInstance
 {
 	/**

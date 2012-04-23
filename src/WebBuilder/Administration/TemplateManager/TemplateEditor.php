@@ -1,12 +1,10 @@
 <?php
 namespace WebBuilder\Administration\TemplateManager;
 
+use WebBuilder\Persistance\DatabaseUpdater;
 use WebBuilder\DataDependencies\Solver;
-
 use ExtAdmin\Request\AbstractRequest;
-
-use WebBuilder\BlocksLoaders\DatabaseLoader;
-
+use WebBuilder\Persistance\DatabaseLoader;
 use WebBuilder\DataObjects\BlockSet;
 use WebBuilder\BlockInstance;
 use ExtAdmin\Request\Request;
@@ -138,7 +136,7 @@ class TemplateEditor extends DataEditor
 		}
 
 		// load template blocks
-		$blocksLoader = new \WebBuilder\BlocksLoaders\DatabaseLoader( $blockSetsFeeder );
+		$blocksLoader = new \WebBuilder\Persistance\DatabaseLoader( $blockSetsFeeder );
 		$blocks       = $blocksLoader->fetchBlocksInstances( $blockSet );
 		$rootBlock    = reset( $blocks );
 
@@ -490,7 +488,7 @@ class TemplateEditor extends DataEditor
 			$blockSet = $this->saveBlockSet( $blockSetsFeeder, $request );
 
 			// save block instances
-			$updater   = new BlockInstancesUpdater( $this->database );
+			$updater   = new DatabaseUpdater( $this->database );
 			$instances = $updater->saveBlockInstances( $blockSet, $request->getRawData('template') );
 
 			$this->database->transactionCommit();

@@ -133,11 +133,11 @@ class WebBuilder implements WebBuilderInterface
 			throw new InvalidBlockException( 'Invalid BlockSet requested' );
 		}
 
-		$blocksLoader = new BlocksLoaders\DatabaseLoader( $this->blockSetsFeeder );
+		$blocksLoader = new Persistance\DatabaseLoader( $this->blockSetsFeeder );
 
 		// TODO disable this permanently for now
 		if( $this->debug === false && false ) {
-			$blocksLoader = new BlocksLoaders\SerializedCacheProxy( $this->blockSetsFeeder, $blocksLoader );
+			$blocksLoader = new Persistance\SerializedCacheProxy( $this->blockSetsFeeder, $blocksLoader );
 //			$blocksLoader->forceRegeneration( $forceRegeneration );
 		}
 

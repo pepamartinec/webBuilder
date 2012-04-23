@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\BlocksLoaders;
+namespace WebBuilder\Persistance;
 
 use WebBuilder\BlocksLoaderException;
 

@@ -4,7 +4,7 @@ namespace WebBuilder\DataDependencies;
 use Inspirio\Database\cDatabase;
 
 use Inspirio\Database\cDBFeederBase;
-use WebBuilder\BlocksLoaders;
+use WebBuilder\Persistance;
 use WebBuilder\BlockInstance;
 use WebBuilder\DataDependencyInterface;
 
