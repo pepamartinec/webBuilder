@@ -1,0 +1,9 @@
+{% container Breadcrumbs %}
+<ul class="breadcrumb">
+{% for webPage in pagesPath %}
+	<li class="{% if loop.first %}root{% endif %}{% if loop.last %}active{% endif %}">
+		<a href="{{ BASE_HREF }}{{ webPage.urlName }}" title="{{ webPage.title }}"><span>{{ webPage.title }}</span></a>
+		{% if not loop.last %} <span class="divider">/</span>{% endif %}
+	</li>
+{% endfor %}
+</ul>
