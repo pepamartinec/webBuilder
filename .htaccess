@@ -1,10 +1,4 @@
 RewriteEngine on
-RewriteBase /webBuilder/
 
-RewriteCond %{REQUEST_URI} ^/webBuilder/public/
-RewriteRule .* $0 [L,QSA]
-
-RewriteCond %{REQUEST_URI} /webBuilder/extAdminEndpoint.php
-RewriteRule .* $0 [L,QSA]
-
+RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^.*$ index.php?url=$0 [L,QSA]
