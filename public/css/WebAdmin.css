@@ -225,3 +225,59 @@ body {
 	border : 1px solid #f00;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/******************************* DISCUSSION *******************************/
+.x-discussion-posts {
+    clear : both;
+}
+
+.x-discussion-posts .x-dataview-item {
+    border-top : 1px solid #bbb;
+    padding : 5px 10px;
+    margin : 5px 0px;
+}
+
+.x-discussion-posts .x-dataview-item:first-child {
+    border-top : none;
+}
+
+.x-discussion-posts .x-dataview-item .x-authorName {
+    float: left;
+}
+
+.x-discussion-posts .x-dataview-item .x-date {
+    float: right;
+}
+
+.x-discussion-posts .x-dataview-item .x-controls {
+    float: right;
+}
+
+.x-discussion-posts .x-dataview-item .x-controls .x-tool {
+    width  : 16px;
+    height : 16px;
+    margin : 0px 3px;
+    cursor : pointer;
+}
+
+.x-discussion-posts .x-dataview-item .x-controls .x-tool.x-remove {
+	background-image: url('../images/icons/delete.png');
+}
+
+.x-discussion-posts .x-dataview-item .x-content {
+    clear      : both;
+    margin-top : 20px;
+}

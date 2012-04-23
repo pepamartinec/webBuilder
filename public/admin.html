@@ -47,10 +47,15 @@
 		Ext.require([
 		 	'extAdmin.ErrorHandler',
 			'extAdmin.Environment',
-			'extAdmin.Desktop'
+			'extAdmin.Desktop',
+			
+			'Ext.Date'
 		]);
 		
 		Ext.onReady( function() {
+			
+			Ext.Date.defaultFormat = 'd.m.Y';
+			
 			// setup error handling
 			extAdmin.ErrorHandler.setDebug( true );
 			

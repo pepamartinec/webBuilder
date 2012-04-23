@@ -39,8 +39,18 @@ class PageList extends TreeList
 		return array(
 			'loadListData' => true,
 
-			'create' => array(
-				'title'  => 'Vytvořit',
+			'createMenuItem' => array(
+				'title'  => 'Položku menu',
+				'type'   => 'create',
+				'dataDep' => true,
+				'params' => array(
+					'editor'      => 'MenuItemEditor',
+					'loadDefault' => 'loadData_new',
+				),
+			),
+
+			'createPage' => array(
+				'title'  => 'Stránku',
 				'type'   => 'create',
 				'dataDep' => true,
 				'params' => array(
@@ -73,7 +83,15 @@ class PageList extends TreeList
 	public function viewConfiguration()
 	{
 		return array(
-			'barActions' => array( 'create', 'edit', 'delete' ),
+			'barActions' => array(
+				array(
+					'type'  => 'splitButton',
+					'title' => 'Založit nový',
+					'items' => array( 'createMenuItem', 'createPage' )
+				),
+				'edit',
+				'delete'
+			),
 
 			'fields' => array(
 				'title' => array(

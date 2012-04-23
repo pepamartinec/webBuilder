@@ -3,6 +3,7 @@
 use Inspirio\Database\cDBFeederBase;
 
 include_once 'common.php';
+session_start();
 
 $database = new Inspirio\Database\cDatabase( DATABASE, HOST, USER, PASSWORD );
 

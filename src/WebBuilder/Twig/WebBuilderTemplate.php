@@ -67,7 +67,7 @@ abstract class WebBuilderTemplate extends \Twig_Template
 
 		ob_start();
 		foreach( $this->block->slots[ $slotName ] as $innerBlock ) {
-			/* @var $innerBlock \WebBuilder\BlockInstance */
+			/* @var $innerBlock BlockInstance */
 			$this->builder->buildBlock( $innerBlock, $hasRuntimeData );
 
 			$template = $this->env->loadTemplate( $innerBlock->templateFile );

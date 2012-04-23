@@ -56,3 +56,9 @@ function findCommonPrefix( array $strings )
 
 	return $minLen;
 }
+
+function redirect( $location )
+{
+	header( 'Location: '.$location );
+	exit;
+}
