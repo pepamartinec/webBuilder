@@ -92,6 +92,11 @@ Ext.define( 'WebBuilder.module.TemplateManager.TemplateEditor',
 		};
 	},
 
+	getRecordId : function()
+	{
+		return this.getData()['ID'];
+	},
+
 	isDirty : function()
 	{
 		return true;

@@ -59,6 +59,11 @@ Ext.define( 'Inspirio.module.WebEditor.MenuItemEditor',
 		return this.form.getValues();
 	},
 
+	getRecordId : function()
+	{
+		return this.getData()['ID'];
+	},
+
 	isDirty : function()
 	{
 		return this.form.isDirty();

@@ -59,6 +59,11 @@ Ext.define( 'Inspirio.module.TextBlockManager.TextBlockEditor',
 		return this.form.getValues();
 	},
 
+	getRecordId : function()
+	{
+		return this.getData()['ID'];
+	},
+
 	isDirty : function()
 	{
 		return false;
