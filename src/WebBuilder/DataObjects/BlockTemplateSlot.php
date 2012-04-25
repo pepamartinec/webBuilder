@@ -15,23 +15,28 @@ class BlockTemplateSlot extends aDataObject
 			'dbColumn' => 'ID',
 			'type' => 'integer',
 		),
-		
+
 		'templateID' => array(
 			'dbColumn' => 'template_ID',
 			'type' => 'integer',
 			'sanitize' => 'foreingKey',
 		),
-	
+
 		'codeName' => array(
 			'dbColumn' => 'code_name',
 			'type' => 'string',
 		),
-		
+
+		'title' => array(
+			'dbColumn' => 'title',
+			'type'     => 'string',
+		),
+
 		'template' => array(
 			'type' => 'dBlockTemplate',
 		),
 	);
-	
+
 	/**
 	 * DataObject meta info
 	 *

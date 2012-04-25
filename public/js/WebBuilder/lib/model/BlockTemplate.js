@@ -21,7 +21,7 @@ Ext.define( 'WebBuilder.model.BlockTemplate',
 	},{
 		name    : 'title',
 		convert : function( value, record ) {
-			return record.get('filename').split('/').pop();
+			return value || record.get('filename').split('/').pop();
 		}
 	},{
 		name : 'filename',

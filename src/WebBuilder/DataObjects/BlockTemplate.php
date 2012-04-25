@@ -4,7 +4,7 @@ namespace WebBuilder\DataObjects;
 use Inspirio\Database\aDataObject;
 
 class BlockTemplate extends aDataObject
-{	
+{
 	/**
 	 * DataObject properties configuration
 	 *
@@ -32,6 +32,11 @@ class BlockTemplate extends aDataObject
 			'type'     => 'string',
 		),
 
+		'title' => array(
+			'dbColumn' => 'title',
+			'type'     => 'string',
+		),
+
 		'slots' => array(
 			'type' => 'array[ BlockTemplateSlot ]',
 		),
@@ -40,7 +45,7 @@ class BlockTemplate extends aDataObject
 			'type' => 'dBlock',
 		),
 	);
-	
+
 	/**
 	 * DataObject meta info
 	 *

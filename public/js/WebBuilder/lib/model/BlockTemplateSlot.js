@@ -17,6 +17,11 @@ Ext.define( 'WebBuilder.model.BlockTemplateSlot',
 	},{
 		name : 'codeName',
 		type : 'string'
+	},{
+		name    : 'title',
+		convert : function( value, record ) {
+			return value || record.get('codeName');
+		}
 	}],
 
 	belongsTo : [{

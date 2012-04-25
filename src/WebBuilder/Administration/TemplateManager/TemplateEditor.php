@@ -338,7 +338,8 @@ class TemplateEditor extends DataEditor
 						'ID'        => $templateID,
 						'blockID'   => $blockID,
 						'filename'  => $template->getFilename(),
-						'content'   => file_get_contents( $template->getFilename() ),
+						'title'     => $template->getTitle(),
+						'content'   => file_get_contents( $template->getFilename() ), // FIXME this should be propably cached somehow
 						'slots' => array(),
 					);
 
@@ -351,6 +352,7 @@ class TemplateEditor extends DataEditor
 								'ID'         => $slotID,
 								'templateID' => $templateID,
 								'codeName'   => $slot->getCodeName(),
+								'title'      => $slot->getTitle(),
 							);
 
 							$templateData['slots'][] = $slotData;
