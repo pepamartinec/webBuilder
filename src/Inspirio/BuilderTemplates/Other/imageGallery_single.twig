@@ -1,0 +1,16 @@
+{% container ImageGallery %}
+
+<ul class="imageGallery-single">
+{% for image in images %}
+	{% set dim = attribute( dimensions, image.ID ) %}
+	<li>
+		<img src="{{ image.filenameFull }}" title="{{ image.title }}" />
+	</li>
+{% endfor %}
+</ul>
+
+<link href="public/js/pikachoose/pikachoose.css" rel="stylesheet">
+<script type="text/javascript" src="public/js/pikachoose/jquery.pikachoose.js"></script>
+<script type="text/javascript">
+	$('.imageGallery-single').PikaChoose();
+</script>

@@ -1,0 +1,20 @@
+{% container ImageGallery %}
+
+<ul class="imageGallery-plain">
+{% for image in images %}
+	{% set dim = attribute( dimensions, image.ID ) %}
+	<li>
+		<a href="{{ image.filenameFull }}">
+			<img src="{{ image.filenameThumb }}" title="{{ image.title }}" width="{{ dim.thumb.width }}" height="{{ dim.thumb.height }}" />
+		</a>
+	</li>
+{% endfor %}
+</ul>
+
+<link href="public/js/colorbox/colorbox.css" rel="stylesheet">
+<script type="text/javascript" src="public/js/colorbox/jquery.colorbox-min.js"></script>
+<script type="text/javascript">
+	$('.imageGallery-plain > li > a').colorbox({
+		rel : 'colorbox_{{ webPage.ID }}'
+	});
+</script>

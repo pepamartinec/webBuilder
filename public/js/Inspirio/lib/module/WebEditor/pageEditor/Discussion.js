@@ -41,7 +41,7 @@ Ext.define( 'Inspirio.module.WebEditor.pageEditor.Discussion',
 
 	setData : function( data )
 	{
-		this.store.loadData( data.discussion );
+		this.store.loadData( data.discussion || [] );
 
 		return this;
 	}

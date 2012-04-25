@@ -9,7 +9,7 @@ namespace Inspirio\Database;
  * @version 2.3
  */
 class cDBFeederBase
-{	
+{
 	const LOCK_NONE       = null;
 	const LOCK_FOR_READ   = 1;		// MySQL SELECT ... LOCK IN SHARE MODE
 	const LOCK_FOR_UPDATE = 2;		// MySQL SELECT ... LOCK FOR UPDATE
@@ -79,7 +79,7 @@ class cDBFeederBase
 	public function __construct( $className, cDatabase $database )
 	{
 		$this->_database  = $database;
-		
+
 		$this->_className = $className;
 		$this->_tableName = $className::dbGetTableName();
 	}
@@ -124,10 +124,10 @@ class cDBFeederBase
 	 * @return cDBFeederBase
 	 */
 	public function where( $filter )
-	{		
+	{
 		if( $filter == null ) {
 			$this->_filters = array();
-			
+
 		} else {
 			$this->_filters[] = $filter;
 		}
@@ -150,7 +150,7 @@ class cDBFeederBase
 		} else {
 			if( $count === null ) {
 				$this->_limit = $from;
-				
+
 			} else {
 				$this->_limit = $from.','.$count;
 			}
@@ -171,12 +171,12 @@ class cDBFeederBase
 		if( strtolower( $direction ) !== 'asc' ) {
 			$direction = 'desc';
 		}
-		
+
 		if( $column == null ) {
 			$this->_orders = array();
 		} else {
 			$column = $this->resolveFullColumnName( $column );
-			
+
 			$this->_orders[] = "$column $direction";
 		}
 
@@ -248,14 +248,14 @@ class cDBFeederBase
 	public function getRaw( array $columns = null, $lockType = self::LOCK_NONE )
 	{
 		$className = $this->_className;
-		
+
 		if( $columns === null || $columns === '*' ) {
 			$columns = '*';
 
 		} else {
 			foreach( $columns as $alias => &$column ) {
 				$column = $this->resolveFullColumnName( $column );
-				
+
 				if( is_int( $alias ) === false ) {
 					$column = "{$column} AS {$alias}";
 				}
@@ -270,21 +270,21 @@ class cDBFeederBase
 			case self::LOCK_FOR_UPDATE:
 				$sql .= ' LOCK IN SHARED MODE';
 				break;
-				
+
 			case self::LOCK_FOR_UPDATE:
 				$sql .= ' LOCK FOR UPDATE';
 				break;
-			
+
 			case self::LOCK_NONE:
 			default:
 				// nothing
 				break;
 		}
-		
+
 		// fetch data
 		$this->_database->query( $sql );
 		$result = $this->_database->fetchArray();
-		
+
 		return sizeof( $result ) > 0 ? $result : null;
 	}
 
@@ -348,7 +348,7 @@ class cDBFeederBase
 	public function getValues( $column )
 	{
 		$column = $this->resolveFullColumnName( $column );
-		
+
 		$result = $this->getRaw( array( 'value' => "DISTINCT {$column}" ) );
 
 		if( $result == null ) {
@@ -374,7 +374,7 @@ class cDBFeederBase
 	public function getValuesRange( $column )
 	{
 		$column = $this->resolveFullColumnName( $column );
-		
+
 		$result = $this->getRaw( array(
 			'min' => "MIN( {$column} )",
 			'max' => "MAX( {$column} )"
@@ -401,27 +401,27 @@ class cDBFeederBase
 		if( sizeof( $this->_filters ) < 1 ) {
 			throw new xExecException( 'Using DELETE with no filters is forbidden.' );
 		}
-		
+
 		$sql = $this->buildSQL( "DELETE FROM {$this->_tableName}" );
 		$this->_database->query( $sql );
-		
+
 		return $this->_database->getNumRows();
 	}
-	
+
 	/**
 	 * Saves object into database
 	 *
 	 * @param  mixed      $object
 	 * @param  array|null $properties
-	 * 
+	 *
 	 * @throws xDatabaseException
 	 */
 	public function save( $object, array $properties = null )
-	{		
+	{
 		$query = $this->buildSaveQuery( $object, $properties );
-		
+
 		$this->_database->query( $query, true, true );
-		
+
 		// when adding a new record, update it with its newly assigned ID
 		if( $object->getID() == null ) {
 			$object->setID( $this->_database->getLastInsertedID() );
@@ -442,10 +442,10 @@ class cDBFeederBase
 		if( $column[0] > 'z' || strpos( $column, '(' ) || strpos( $column, ' ' ) ) {
 			return $column;
 		}
-		
+
 		return "`{$this->_tableName}`.`{$column}`";
 	}
-	
+
 	/**
 	 * Adds limitation on column value
 	 * SQL: WHERE $column = '$value'
@@ -459,7 +459,7 @@ class cDBFeederBase
 	{
 		return $this->whereColumnEq( $column, $value );
 	}
-	
+
 	/**
 	 * Adds limitation on column value
 	 * SQL: WHERE $column = '$value'
@@ -474,22 +474,22 @@ class cDBFeederBase
 	public function whereColumnEq( $column, $value, $equals = true )
 	{
 		$column = $this->resolveFullColumnName( $column );
-		
+
 		if( $value === null ) {
 			$filter = "{$column} IS NULL";
-			
+
 		} else {
 			$value = $this->_database->escape( $value );
 			$filter = "{$column} = '{$value}'";
 		}
-		
+
 		if( $equals === false ) {
 			$filter = "NOT {$filter}";
 		}
-		
+
 		return $this->where( $filter );
 	}
-	
+
 	/**
 	 * Adds limitation on column value using given binary operator
 	 * SQL: WHERE $column $operator '$value'
@@ -504,14 +504,14 @@ class cDBFeederBase
 	{
 		$column = $this->resolveFullColumnName( $column );
 		$filter = "{$column} {$operator} '{$value}'";
-	
+
 		if( $equals === false ) {
 			$filter = "NOT {$filter}";
 		}
-	
+
 		return $this->where( $filter );
 	}
-	
+
 	/**
 	 * Adds limitation on column value
 	 * SQL: WHERE $column < '$value'
@@ -543,7 +543,7 @@ class cDBFeederBase
 	{
 		return $this->whereBinOperator( $column, $value, '>', $equals );
 	}
-	
+
 	/**
 	 * Adds limitation on column value
 	 * SQL: WHERE $column <= '$value'
@@ -559,7 +559,7 @@ class cDBFeederBase
 	{
 		return $this->whereBinOperator( $column, $value, '<=', $equals );
 	}
-	
+
 	/**
 	 * Adds limitation on column value
 	 * SQL: WHERE $column >= '$value'
@@ -575,7 +575,7 @@ class cDBFeederBase
 	{
 		return $this->whereBinOperator( $column, $value, '>=', $equals );
 	}
-	
+
 	/**
 	 * Adds limitation on column value
 	 * SQL: WHERE $column LIKE '$value'
@@ -592,14 +592,14 @@ class cDBFeederBase
 		$column = $this->resolveFullColumnName( $column );
 		$value  = $this->_database->escape( $value );
 		$filter = "{$column} LIKE '{$value}'";
-		
+
 		if( $equals !== true ) {
 			$filter = "NOT {$filter}";
 		}
-		
+
 		return $this->where( $filter );
 	}
-	
+
 	/**
 	 * Adds limitation on column value in array
 	 * SQL: WHERE column IN ( '$values' )
@@ -613,9 +613,9 @@ class cDBFeederBase
 	{
 		if( is_string( $values ) ) {
 			$filter = $values;
-			
+
 		} elseif( is_array( $values ) ) {
-			
+
 			/**
 			 * TODO pokud nejsou zadane zadne hodnoty, opravdu preskakovat podminku?
 			 * z hlediska psani podminek by odpovidalo 'pokud zaznam nema dany sloupec', cili asi neco jako 'column IS NULL'
@@ -623,29 +623,29 @@ class cDBFeederBase
 			 *  - pouziva se k omezeni dat podle treba nejakych filtru -> nejsou filtry = vynechat podminku (vybrat vse)
 			 *  - pouziva se k vyberu dat v navaznosti jen na nektera predchozi data -> nejsou zadna predchozi data = nevybirat nic
 			 */
-	
+
 			// no values given, skip conditions
 			if( $values === null || sizeof( $values ) === 0 ) {
 				return $this;
 			}
-			
+
 			$filter = '';
 			foreach( $values as $value ) {
 				$value = $this->_database->escape( $value );
-					
+
 				$filter .= "'{$value}', ";
 			}
-			
+
 			$filter = substr( $filter, 0, -2 );
 		}
-		
+
 		$column = $this->resolveFullColumnName( $column );
 		$filter = "{$column} IN ( {$filter} )";
-		
+
 		if( $equals !== true ) {
 			$filter = "NOT {$filter}";
 		}
-		
+
 		return $this->where( $filter );
 	}
 
@@ -664,13 +664,13 @@ class cDBFeederBase
 		$column     = $this->resolveFullColumnName( $column );
 		$lowerBound = $this->_database->escape( $lowerBound );
 		$upperBound = $this->_database->escape( $upperBound );
-		
+
 		$filter = "{$column} BETWEEN '{$lowerBound}' AND '{$upperBound}'";
-		
+
 		if( $equals !== true ) {
 			$filter = "NOT {$filter}";
 		}
-		
+
 		return $this->where( $filter );
 	}
 
@@ -737,28 +737,28 @@ class cDBFeederBase
 
 		return $sql;
 	}
-	
+
 	/**
 	 * Builds SQL query for save object
 	 *
 	 * @param  mixed      $object
 	 * @param  array|null $properties
 	 * @return string
-	 * 
+	 *
 	 * @throws xExecException
 	 */
 	public function buildSaveQuery( aDataObject $object, array $properties = null )
 	{
-		if( $object->getID() ) {			
+		if( $object->getID() ) {
 			$query = $this->buildUpdateQuery( $object, $properties );
-			
-		} else {			
+
+		} else {
 			$query = $this->buildInsertQuery( $object, $properties );
 		}
-	
+
 		return $query;
 	}
-	
+
 	/**
 	 * Builds UPDATE query for given data object
 	 *
@@ -768,49 +768,53 @@ class cDBFeederBase
 	 */
 	public function buildUpdateQuery( iDataObject $object, array $properties = null )
 	{
+		if( $object->hasProperty( 'editedOn' ) ) {
+			$object->set( 'editedOn', date('Y-m-d H:i:s') );
+		}
+
 		$config = $object->getConfiguration();
 		$data   = $object->getInnerValues();
-		
+
 		$query = "UPDATE `{$this->_tableName}` SET ";
-		
+
 		if( $properties === null ) {
 			$properties = array_keys( $data );
 		}
-		
+
 		foreach( $properties as $propertyName ) {
 			$property = $config[ $propertyName ];
-		
+
 			if( isset( $property['dbColumn'] ) === false ) {
 				continue;
 			}
-			
+
 			if( $propertyName === 'ID' ) {
 				continue;
 			}
-		
+
 			if( isset( $data[ $propertyName ] ) ) {
 				$value = $data[ $propertyName ];
 			} else {
 				$value = null;
 			}
-		
+
 			if( $value === null ) {
 				$value = 'NULL';
 			} else {
 				$value = "'{$this->_database->escape( $value )}'";
 			}
-			
+
 			$columnName = $property['dbColumn'];
-		
+
 			$query .= "`{$columnName}`={$value}, ";
 		}
-		
+
 		$query  = substr( $query, 0, -2 );
 		$query .= " WHERE `ID` = {$object->get('ID')};";
-	
+
 		return $query;
 	}
-	
+
 	/**
 	 * Builds INSERT query for given data object
 	 *
@@ -820,41 +824,45 @@ class cDBFeederBase
 	 */
 	public function buildInsertQuery( iDataObject $object, array $properties = null )
 	{
+		if( $object->hasProperty( 'createdOn' ) ) {
+			$object->set( 'createdOn', date('Y-m-d H:i:s') );
+		}
+
 		$config = $object->getConfiguration();
 		$data   = $object->getInnerValues();
-			
+
 		$query = "INSERT INTO `{$this->_tableName}` SET ";
-			
+
 		if( $properties === null ) {
 			$properties = array_keys( $data );
 		}
-			
+
 		foreach( $properties as $propertyName ) {
 			$property = $config[ $propertyName ];
-				
+
 			if( isset( $property['dbColumn'] ) === false ) {
 				continue;
 			}
-				
+
 			if( isset( $data[ $propertyName ] ) ) {
 				$value = $data[ $propertyName ];
 			} else {
 				$value = null;
 			}
-				
+
 			if( $value === null ) {
 				$value = 'NULL';
 			} else {
 				$value = "'{$this->_database->escape( $value )}'";
 			}
-	
+
 			$columnName = $property['dbColumn'];
-				
+
 			$query .= "`{$columnName}`={$value}, ";
 		}
-			
+
 		$query = substr( $query, 0, -2 );
-			
+
 		return $query;
 	}
 
@@ -941,7 +949,7 @@ class cDBFeederBase
 
 		return $dObjects;
 	}
-	
+
 	/**
 	 * Creates data object from given database data
 	 *
@@ -954,7 +962,7 @@ class cDBFeederBase
 
 		return $dObject;
 	}
-	
+
 	/**
 	 * Returns escaped value of given object property
 	 *

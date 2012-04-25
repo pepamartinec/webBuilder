@@ -10,6 +10,7 @@ body {
 .x-templates-list > .x-item { display : inline-block; margin: 10px; padding: 5px; text-align: center; }
 .x-templates-list > .x-item > .name { padding: 3px; }
 
+.i-add { background-image: url('../images/icons/add.png'); }
 .i-application-form { background-image: url('../images/icons/application_form.png'); }
 .i-application-form-add { background-image: url('../images/icons/application_form_add.png'); }
 .i-application-form-edit { background-image: url('../images/icons/application_form_edit.png'); }
@@ -36,12 +37,14 @@ body {
 .i-folder { background-image: url('../images/icons/folder.png'); }
 .i-folder-explore { background-image: url('../images/icons/folder_explore.png'); }
 .i-help { background-image: url('../images/icons/help.png'); }
+.i-image-add { background-image: url('../images/icons/image_add.png'); }
 .i-lorry-add { background-image: url('../images/icons/lorry_add.png'); }
 .i-lorry-go { background-image: url('../images/icons/lorry_go.png'); }
 .i-money { background-image: url('../images/icons/money.png'); }
 .i-money-go { background-image: url('../images/icons/money_go.png'); }
 .i-money-magnify { background-image: url('../images/icons/money_magnify.png'); }
 .i-monitor { background-image: url('../images/icons/monitor.png'); }
+.i-ok { background-image: url('../images/icons/ok_green.png'); }
 .i-package-go { background-image: url('../images/icons/package_go.png'); }
 .i-page-white-acrobat { background-image: url('../images/icons/page_white_acrobat.png'); }
 .i-page-white-excel { background-image: url('../images/icons/page_white_excel.png'); }
@@ -225,20 +228,6 @@ body {
 	border : 1px solid #f00;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /******************************* DISCUSSION *******************************/
 .x-discussion-posts {
     clear : both;
@@ -280,4 +269,49 @@ body {
 .x-discussion-posts .x-dataview-item .x-content {
     clear      : both;
     margin-top : 20px;
+}
+
+/******************************* IMAGE LIST *******************************/
+.x-web-page-images .x-dataview-item {
+    display    : block;
+    float      : left;
+    width      : 180px;
+    height     : 180px;
+    margin     : 5px;
+    padding    : 5px;
+    text-align : center;
+    
+    background-color : #f8f8ff;
+	border           : 1px solid #abf;
+	
+	position : relative;
+}
+
+.x-web-page-images .x-dataview-item:hover {
+    background-color : #dfe8f6;
+}
+
+.x-web-page-images .x-dataview-item .x-controls {
+    position : absolute;
+    top      : 0px;
+    right    : 0px;
+}
+
+.x-web-page-images .x-dataview-item .x-controls .x-tool {
+    float  : left;
+    width  : 16px;
+    height : 16px;
+    margin : 2px;
+}
+
+.x-web-page-images .x-dataview-item .x-controls .x-tool.x-edit {
+    background-image: url('../images/icons/edit.png');
+}
+
+.x-web-page-images .x-dataview-item .x-controls .x-tool.x-remove {
+    background-image: url('../images/icons/delete.png');
+}
+
+.x-web-page-images .x-dataview-item:hover .x-controls {
+
 }

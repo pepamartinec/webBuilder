@@ -53,12 +53,15 @@ form textarea {
     float: right;
 }
 
+/****************** DISCUSSION ******************/
+.imageGallery-plain {
+	list-style: none;
+}
 
-
-
-
-
-
+.imageGallery-plain li {
+	float: left;
+	margin: 5px;
+}
 
 
 

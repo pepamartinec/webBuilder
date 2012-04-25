@@ -13,6 +13,8 @@ Ext.define( 'Inspirio.module.WebEditor.pageEditor.General',
 		align : 'stretch'
 	},
 
+	bodyPadding : 5,
+
 	items : [{
 		xtype : 'hiddenfield',
 		name  : 'ID'
@@ -46,6 +48,11 @@ Ext.define( 'Inspirio.module.WebEditor.pageEditor.General',
 				fieldLabel : 'URL',
 				name       : 'urlName'
 			}]
+
+		},{
+			xtype : 'tbspacer',
+			width : 5
+
 		},{
 			xtype  : 'container',
 			layout : {

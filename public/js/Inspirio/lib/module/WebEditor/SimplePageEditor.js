@@ -11,6 +11,7 @@ Ext.define( 'Inspirio.module.WebEditor.SimplePageEditor',
 		'Inspirio.module.WebEditor.pageEditor.General',
 		'Inspirio.module.WebEditor.pageEditor.Content',
 		'Inspirio.module.WebEditor.pageEditor.Discussion',
+		'Inspirio.module.WebEditor.pageEditor.Images',
 		'Inspirio.module.WebEditor.pageEditor.Template'
 	],
 
@@ -25,16 +26,21 @@ Ext.define( 'Inspirio.module.WebEditor.SimplePageEditor',
 	{
 		var me = this;
 
-		me.generalTab   = Ext.create( 'Inspirio.module.WebEditor.pageEditor.General' ),
-		me.contentTab   = Ext.create( 'Inspirio.module.WebEditor.pageEditor.Content' ),
-		me.dicussionTab = Ext.create( 'Inspirio.module.WebEditor.pageEditor.Discussion' ),
+		me.generalTab   = Ext.create( 'Inspirio.module.WebEditor.pageEditor.General' );
+		me.contentTab   = Ext.create( 'Inspirio.module.WebEditor.pageEditor.Content' );
+		me.imagesTab    = Ext.create( 'Inspirio.module.WebEditor.pageEditor.Images', {
+			env    : me.env,
+			editor : me,
+			border : false
+		});
+		me.dicussionTab = Ext.create( 'Inspirio.module.WebEditor.pageEditor.Discussion' );
 		me.templateTab  = Ext.create( 'Inspirio.module.WebEditor.pageEditor.Template', {
 			env : me.env
 		});
 
 
 		me.border = false;
-		me.items  = [ me.generalTab, me.contentTab, me.dicussionTab, me.templateTab ];
+		me.items  = [ me.generalTab, me.contentTab, me.imagesTab, me.dicussionTab, me.templateTab ];
 
 
 		me.title   = 'Úprava stránky';
@@ -50,6 +56,7 @@ Ext.define( 'Inspirio.module.WebEditor.SimplePageEditor',
 	{
 		this.generalTab.setData( data );
 		this.contentTab.setData( data );
+		this.imagesTab.setData( data );
 		this.dicussionTab.setData( data );
 		this.templateTab.setData( data );
 
@@ -63,10 +70,16 @@ Ext.define( 'Inspirio.module.WebEditor.SimplePageEditor',
 
 		Ext.apply( data, me.generalTab.getData() );
 		Ext.apply( data, me.contentTab.getData() );
+		Ext.apply( data, me.imagesTab.getData() );
 		Ext.apply( data, me.dicussionTab.getData() );
 		Ext.apply( data, me.templateTab.getData() );
 
 		return data;
+	},
+
+	getRecordId : function()
+	{
+		return this.getData()['ID'];
 	},
 
 	isDirty : function()

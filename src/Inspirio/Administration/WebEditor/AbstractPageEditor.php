@@ -163,7 +163,6 @@ abstract class AbstractPageEditor extends DataEditor
 					'authorName'  => $post->getAuthorName(),
 					'authorEmail' => $post->getAuthorEmail(),
 					'content'     => $post->getContent(),
-					'createdOn'   => $post->getCreatedOn(),
 				);
 			}
 		}

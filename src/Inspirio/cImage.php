@@ -21,31 +21,19 @@ class cImage extends aDataObject
 			'type'     => 'string',
 		),
 
-		'filename' => array(
-			'dbColumn' => 'filename',
+		'filenameFull' => array(
+			'dbColumn' => 'filename_full',
+			'type'     => 'string',
+		),
+
+		'filenameThumb' => array(
+			'dbColumn' => 'filename_thumb',
 			'type'     => 'string',
 		),
 
 		'createdOn' => array(
 			'dbColumn' => 'created_on',
 			'type'     => 'datetime',
-		),
-
-		'createdBy' => array(
-			'dbColumn' => 'created_by',
-			'type'     => 'int',
-			'sanitize' => 'foreingKey',
-		),
-
-		'editedOn' => array(
-			'dbColumn' => 'edited_on',
-			'type'     => 'datetime',
-		),
-
-		'editedBy' => array(
-			'dbColumn' => 'edited_by',
-			'type'     => 'int',
-			'sanitize' => 'foreingKey',
 		),
 	);
 

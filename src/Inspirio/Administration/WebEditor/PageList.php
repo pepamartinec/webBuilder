@@ -99,6 +99,17 @@ class PageList extends TreeList
 					'type'  => 'treecolumn'
 				),
 
+				'urlName' => array(
+					'title' => 'URL',
+					'width' => 250,
+				),
+
+				'editedOn' => array(
+					'title' => 'Poslední úprava',
+					'type'  => 'datecolumn',
+					'width' => 200,
+				),
+
 				'actions' => array(
 					'type'  => 'actioncolumn',
 					'items' => array( 'edit', 'delete' )
@@ -134,10 +145,12 @@ class PageList extends TreeList
 			}
 
 			return array(
-				'ID'      => $webPage->getID(),
-				'title'   => $webPage->getTitle(),
-				'actions' => array( 'create', 'edit', 'delete' ),
-				'data'    => array_map( $extractor, $children ),
+				'ID'       => $webPage->getID(),
+				'title'    => $webPage->getTitle(),
+				'urlName'  => $webPage->getUrlName(),
+				'editedOn' => $webPage->getEditedOn() ?: $webPage->getCreatedOn(),
+				'actions'  => array( 'create', 'edit', 'delete' ),
+				'data'     => array_map( $extractor, $children ),
 			);
 		};
 
