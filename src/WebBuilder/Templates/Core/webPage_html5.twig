@@ -8,13 +8,14 @@
 	<title>{% block pageTitle %}WebBuilder | {{ webPage.title }}{% endblock %}</title>
 	<meta name="author" content="Josef Martinec <joker806@gmail.com>">
 	<meta name="description" content="webBuilder test site">
+	<base href="{{ BASE_HREF }}" />
 
     <!--[if design]>
-	    <link href="css/bootstrap.css" rel="stylesheet">
-	    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+	    <link href="public/css/bootstrap.css" rel="stylesheet">
+	    <link href="public/css/bootstrap-responsive.css" rel="stylesheet">
 
-	    <link rel="stylesheet" href="css/style.css">
-	    <link rel="stylesheet" href="css/WebAdmin.css">
+	    <link rel="stylesheet" href="public/css/style.css">
+	    <link rel="stylesheet" href="public/css/WebAdmin.css">
 
     <![else]-->
 	    <link href="public/css/bootstrap.css" rel="stylesheet">

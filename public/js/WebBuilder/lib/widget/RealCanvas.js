@@ -19,7 +19,7 @@ Ext.define( 'WebBuilder.widget.RealCanvas', {
 
 		// create the slot renderer
 		tpl = Ext.create( 'Ext.Template',
-			'<div id="template-block-instance-{id}-slot-{slotName}" class="{slotCls}">',
+			'<div id="template-block-instance-{id}-slot-{slotName}" class="{slotCls}{% if( values.isRoot() ) { %} x-root{% } %}">',
 				'<div class="{titleCls} {slotTitleCls}">{[ values.template.slots().findRecord("codeName","{slotName}").get("title") ]}</div>',
 				'<tpl for="values.slots[\'{slotName}\']">',
 					'{[ this.getInstanceTpl( values ).apply( values ) ]}',
@@ -47,7 +47,7 @@ Ext.define( 'WebBuilder.widget.RealCanvas', {
 
 		// create the instance tpl
 		tpl = Ext.create( 'Ext.Template',
-			'<div id="template-block-instance-{id}" class="{blockCls}">',
+			'<div id="template-block-instance-{id}" class="{blockCls}{% if( values.isRoot() ) { %} x-root{% } %}">',
 				'<div class="{titleCls} {blockTitleCls}">',
 					'<span>',
 						'{blockTitle}',
@@ -113,6 +113,11 @@ Ext.define( 'WebBuilder.widget.RealCanvas', {
 
 			content = content.replace( twigSlotRe, '#!&_slot_$1_&!#' );
 
+			// replace base tag
+			var baseRe = /<base[\s\S]+?>/gi;
+
+			content = content.replace( baseRe, '<base href="'+ me.module.env.baseHref +'">' );
+
 			// remove unwanted Twig stuff
 			var macroRe = /{%\s*macro[\s\S]*?%}[\s\S]*?{%\s*endmacro\s*%}/g;
 			content = content.replace( macroRe, '' );
@@ -121,18 +126,20 @@ Ext.define( 'WebBuilder.widget.RealCanvas', {
 			content = content.replace( controlRe, '' );
 
 			// replace Twig variables
-			var htmlTagRe = /<[\s\S]+?>/g,
-			    varRe     = /{{\s*([\w\.]+).*?\s*}}/g;
+			var htmlTagRe  = /<[\s\S]+?>/g,
+			    varRe      = /{{\s*([\w\.]+).*?\s*}}/g;
+			    textareaRe = /(<textarea[^>]*>)[\s\S]+?(<\/textarea>)/gi;
 			content = content.replace( htmlTagRe, function( tag ) { return tag.replace( varRe, '' ); }); // variables in the HTML tags
 			content = content.replace( varRe, ' <span class="x-block-variable">[$1]</span>' );           // variables in the text nodes
+			content = content.replace( textareaRe, '$1$2' );
 
 			// setup slot rendering
 			content = content.replace( localSlotRe, me.slotRendererCode );
 
 			var tpl = Ext.create( 'Ext.XTemplate',
-					me.blockHeader,
+					instance.isRoot() ? '' : me.blockHeader,
 						content,
-					me.blockFooter,
+					instance.isRoot() ? '' : me.blockFooter,
 
 					{
 						disableFormats : true,

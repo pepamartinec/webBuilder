@@ -1,6 +1,8 @@
 <?php
 namespace Inspirio\Administration\WebEditor;
 
+use ExtAdmin\Request\AbstractRequest;
+
 use Inspirio\cWebPage;
 use Inspirio\Database\cDBFeederBase;
 use Inspirio\Database\cDatabase;
@@ -169,5 +171,42 @@ class MenuItemEditor extends DataEditor
 		) );
 
 		return $response;
+	}
+
+	/**
+	 * Deletes the records
+	 *
+	 * @param RequestInterface $request
+	 * @return ActionResponse
+	 */
+	public function deleteData( RequestInterface $request )
+	{
+		$recordIDs = array();
+		$records   = $request->getRawData( 'records' );
+
+		if( is_array( $records ) ) {
+			foreach( $records as $record ) {
+				$recordID = AbstractRequest::secureData( $record, 'ID', 'int' );
+
+				if( $recordID ) {
+					$recordIDs[] = $recordID;
+				}
+			}
+		}
+
+		try {
+			$this->database->transactionStart();
+
+			$webPageFeeder = new cDBFeederBase( '\\Inspirio\\cWebPage', $this->database );
+			$webPages      = $webPageFeeder->whereColumnIn( 'ID', $recordIDs )->remove();
+
+			$this->database->transactionCommit();
+
+		} catch( Exception $e ) {
+			$this->database->transactionRollback();
+			throw $e;
+		}
+
+		return new ActionResponse( true );
 	}
 }

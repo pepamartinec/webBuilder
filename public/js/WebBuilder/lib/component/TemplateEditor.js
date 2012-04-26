@@ -161,9 +161,12 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 
 		// fill some default content
 		if( value == null ) {
+			var block    = blocksStore.findRecord( 'codeName', '\\WebBuilder\\Blocks\\Core\\WebPage' ),
+			    template = block.templates().first();
+
 			value = {
-				blockID    : 2,
-				templateID : 3
+				blockID    : block.getId(),
+				templateID : template.getId()
 			};
 		}
 

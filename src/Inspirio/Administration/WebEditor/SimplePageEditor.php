@@ -60,4 +60,9 @@ class SimplePageEditor extends AbstractPageEditor
 		return $response;
 	}
 
+	protected function deleteAssociatedData( RequestInterface $request, array $webPages )
+	{
+		return new ActionResponse( true );
+	}
+
 }

@@ -228,6 +228,10 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 		// find parent block
 		var parentDom = Ext.fly( domNode ).findParent( '.'+ this.blockCls );
 
+		if( ! parentDom ) {
+			return null;
+		}
+
 		// pick block id
 		var match      = parentDom.id.match( this.instanceIdRe ),
 		    instanceId = match && match[1];
@@ -265,6 +269,10 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 	{
 		// find new parent
 		var targetInstance = this.getBlockInstance( slotDom );
+
+		if( ! targetInstance ) {
+			targetInstance = this.instancesStore.getRoot();
+		}
 
 		if( ! targetInstance ) {
 			return false;

@@ -1,6 +1,8 @@
 <?php
 namespace Inspirio\Administration\WebEditor;
 
+use Inspirio\cImageHandler;
+
 use ExtAdmin\Request\AbstractRequest;
 
 use WebBuilder\Persistance\DatabaseUpdater;
@@ -180,7 +182,11 @@ abstract class AbstractPageEditor extends DataEditor
 			$instances    = $loader->fetchBlocksInstances( $blockSet );
 			$rootInstance = reset( $instances );
 
-			$data['template'] = $rootInstance->export();
+			if( $blockSet ) {
+				$data['parentBlockSetID'] = $blockSet->getParentID();
+			}
+
+			$data['template']         = $rootInstance->export();
 		}
 
 		// load associated data
@@ -216,8 +222,9 @@ abstract class AbstractPageEditor extends DataEditor
 
 			// save template
 			$blockSet = new BlockSet( array(
-				'ID'   => $request->getData( 'blockSetID', 'int' ),
-				'name' => "[{$title}]",
+				'ID'       => $request->getData( 'blockSetID', 'int' ),
+				'parentID' => $request->getData( 'parentBlockSetID', 'int' ),
+				'name'     => "[{$title}]",
 			), true );
 
 			$blockSetFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockSet', $this->database );
@@ -270,10 +277,10 @@ abstract class AbstractPageEditor extends DataEditor
 			if( $posts != null ) {
 				foreach( $posts as $post ) {
 					$postsData[] = array(
-							'ID'          => $post->getID(),
-							'authorName'  => $post->getAuthorName(),
-							'authorEmail' => $post->getAuthorEmail(),
-							'content'     => $post->getContent()
+						'ID'          => $post->getID(),
+						'authorName'  => $post->getAuthorName(),
+						'authorEmail' => $post->getAuthorEmail(),
+						'content'     => $post->getContent()
 					);
 				}
 			}
@@ -307,6 +314,87 @@ abstract class AbstractPageEditor extends DataEditor
 			'template'   => $rootInstance->export(),
 			'discussion' => $postsData,
 		) + $response->getData() );
+
+		return $response;
+	}
+
+	/**
+	 * Deletes the associated data
+	 *
+	 * @param RequestInterface $request
+	 * @param cWebPage $webPage
+	 * @return ActionResponse
+	 */
+	protected abstract function deleteAssociatedData( RequestInterface $request, array $webPages );
+
+	/**
+	 * Deletes the records
+	 *
+	 * @param RequestInterface $request
+	 * @return ActionResponse
+	 */
+	public function deleteData( RequestInterface $request )
+	{
+		$recordIDs = array();
+		$records   = $request->getRawData( 'records' );
+
+		if( is_array( $records ) ) {
+			foreach( $records as $record ) {
+				$recordID = AbstractRequest::secureData( $record, 'ID', 'int' );
+
+				if( $recordID ) {
+					$recordIDs[] = $recordID;
+				}
+			}
+		}
+
+		// load the web pages that should be deleted
+		$webPageFeeder = new cDBFeederBase( '\\Inspirio\\cWebPage', $this->database );
+		$webPages      = $webPageFeeder->whereColumnIn( 'ID', $recordIDs )->get();
+
+		// extract some data used later
+		$webPageIDs  = array();
+		$blockSetIDs = array();
+		foreach( $webPages as $webPage ) {
+			$webPageID  = $webPage->getID();
+			$blockSetID = $webPage->getBlockSetID();
+
+			$webPageIDs[] = $webPageID;
+
+			if( $blockSetID ) {
+				$blockSetIDs[] = $blockSetID;
+			}
+		}
+
+		try {
+			$this->database->transactionStart();
+
+			// delete associated data
+			$response = $this->deleteAssociatedData( $request, $webPages );
+
+			if( $response->getSuccess() ) {
+				// delete images
+				$imageHandler = new cImageHandler( $this->database );
+				$images       = $imageHandler->getImageFeeder()->whereColumnIn( 'web_page_ID', $webPageIDs )->get();
+				$imageHandler->deleteImages( $images );
+
+				// delete webPages
+				$webPageFeeder->whereColumnIn( 'ID', $webPageIDs )->remove();
+
+				// delete templates
+				$blockSetFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockSet', $this->database );
+				$blockSetFeeder->whereColumnIn( 'ID', $blockSetIDs)->remove();
+
+				$this->database->transactionCommit();
+
+			} else {
+				$this->database->transactionRollback();
+			}
+
+		} catch( Exception $e ) {
+			$this->database->transactionRollback();
+			throw $e;
+		}
 
 		return $response;
 	}

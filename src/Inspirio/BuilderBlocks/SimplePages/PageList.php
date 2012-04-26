@@ -16,7 +16,8 @@ class PageList extends WebBlock
 	public static function provides()
 	{
 		return array(
-			'pages' => 'array[ cWebPage ]'
+			'pages' => 'array[ cWebPage ]',
+			'page'  => '{pages}'
 		);
 	}
 

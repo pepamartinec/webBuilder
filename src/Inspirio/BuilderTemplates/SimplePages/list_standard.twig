@@ -1,0 +1,13 @@
+{% container PageList %}
+<div class="page-list">
+{% for page in pages %}
+	<div class="title">
+		<div class="left">
+			<a href="{{ BASE_HREF ~ page.urlName }}">{{ page.title }}</a>
+		</div>
+	</div>
+	<div class="content">
+		{{ page.perex }}
+	</div>
+{% endfor %}
+</div>

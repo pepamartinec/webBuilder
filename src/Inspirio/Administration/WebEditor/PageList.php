@@ -1,6 +1,8 @@
 <?php
 namespace Inspirio\Administration\WebEditor;
 
+use ExtAdmin\Response\ActionResponse;
+
 use ExtAdmin\Response\DataBrowserResponse;
 use Inspirio\Database\cDBFeederBase;
 use ExtAdmin\Request\DataRequestDecorator;
@@ -17,6 +19,11 @@ class PageList extends TreeList
 	protected $database;
 
 	/**
+	 * @var \SimpleXmlElement
+	 */
+	protected $labels;
+
+	/**
 	 * Module constructor
 	 *
 	 * @param cDatabase $database
@@ -25,6 +32,7 @@ class PageList extends TreeList
 	public function __construct( cDatabase $database, \SimpleXMLElement $labels )
 	{
 		$this->database = $database;
+		$this->labels   = $labels;
 	}
 
 	/**
@@ -49,6 +57,20 @@ class PageList extends TreeList
 				),
 			),
 
+			'editMenuItem' => array(
+				'title'  => 'Upravit',
+				'type'   => 'edit',
+				'params' => array(
+					'editor'      => 'MenuItemEditor',
+					'loadDefault' => 'loadData_record',
+				),
+			),
+
+ 			'deleteMenuItem' => array(
+				'title'   => 'Smazat',
+ 				'type'    => 'delete',
+ 			),
+
 			'createPage' => array(
 				'title'  => 'Stránku',
 				'type'   => 'create',
@@ -59,7 +81,7 @@ class PageList extends TreeList
 				),
 			),
 
-			'edit' => array(
+			'editPage' => array(
 				'title'  => 'Upravit',
 				'type'   => 'edit',
 				'params' => array(
@@ -68,7 +90,7 @@ class PageList extends TreeList
 				),
 			),
 
- 			'delete' => array(
+ 			'deletePage' => array(
 				'title'   => 'Smazat',
  				'type'    => 'delete',
  			),
@@ -89,8 +111,6 @@ class PageList extends TreeList
 					'title' => 'Založit nový',
 					'items' => array( 'createMenuItem', 'createPage' )
 				),
-				'edit',
-				'delete'
 			),
 
 			'fields' => array(
@@ -112,7 +132,7 @@ class PageList extends TreeList
 
 				'actions' => array(
 					'type'  => 'actioncolumn',
-					'items' => array( 'edit', 'delete' )
+					'items' => array( 'editPage', 'deletePage', 'editMenuItem', 'deleteMenuItem' )
 				)
 			),
 		);
@@ -132,7 +152,7 @@ class PageList extends TreeList
 		$webPages      = $webPageFeeder->groupBy( 'parent_ID' )->orderBy( 'parent_ID', 'asc' )->get();
 
 		if( $webPages === null ) {
-			return new DataBrowserResponse( true, array(), 0 );
+			return new ActionResponse( true );
 		}
 
 		$extractor = function( cWebPage $webPage ) use( &$extractor, $webPages ) {
@@ -144,27 +164,60 @@ class PageList extends TreeList
 				$children = array();
 			}
 
+			// FIXME ugly solution
+			$actions = array( 'createMenuItem', 'createPage' );
+			switch( $webPage->getType() ) {
+				case 'simplePage': $actions[] = 'editPage'; break;
+				case 'menuItem'  : $actions[] = 'editMenuItem'; break;
+			}
+
+			if( $webPage->getParentID() ) {
+				switch( $webPage->getType() ) {
+					case 'simplePage': $actions[] = 'deletePage'; break;
+					case 'menuItem'  : $actions[] = 'deleteMenuItem'; break;
+				}
+			}
+
+
 			return array(
 				'ID'       => $webPage->getID(),
 				'title'    => $webPage->getTitle(),
 				'urlName'  => $webPage->getUrlName(),
 				'editedOn' => $webPage->getEditedOn() ?: $webPage->getCreatedOn(),
-				'actions'  => array( 'create', 'edit', 'delete' ),
+				'actions'  => $actions,
 				'data'     => array_map( $extractor, $children ),
 			);
 		};
 
-		return new DataBrowserResponse( true, $webPages[''], 0, $extractor );
+		$response = new ActionResponse( true );
+		$response->setData( array_map( $extractor, $webPages[''] ) );
+
+		return $response;
 	}
 
 	/**
-	 * Deletes selected items
+	 * Deletes menuItems
 	 *
 	 * @param  RequestInterface $request
 	 * @return Response
 	 */
-	public function delete( RequestInterface $request )
+	public function deleteMenuItem( RequestInterface $request )
 	{
+		$editor = new MenuItemEditor( $this->database, $this->labels );
 
+		return $editor->deleteData( $request );
+	}
+
+	/**
+	 * Deletes webPage
+	 *
+	 * @param  RequestInterface $request
+	 * @return Response
+	 */
+	public function deletePage( RequestInterface $request )
+	{
+		$editor = new SimplePageEditor( $this->database, $this->labels );
+
+		return $editor->deleteData( $request );
 	}
 }

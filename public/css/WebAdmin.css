@@ -80,8 +80,7 @@ body {
 
 
 /************* CANVAS *************/
-.x-template-canvas {
-	padding     : 0px;
+.x-template-canvas .x-title {
 	font-family : Calibri, Verdana, Arial, sans-serif;
 	font-size   : 15px;
 }
@@ -91,15 +90,24 @@ body {
 	margin  : 7px;
 	padding : 0px;
 	
-	color         : #aaa;
 	border        : 2px solid #aaa;
 	border-radius : 7px;
 }
 
+.x-template-canvas .x-block.x-root {
+	margin : 0px;
+	width  : 100%;
+	height : 100%;
+	border : none;
+}
+
 .x-template-canvas .x-block.x-over {
-	color            : #000;
-	border           : 2px solid #000;
-	background-color : #fdfdfd;
+	border-color : #f00;
+}
+
+.x-template-canvas .x-block.x-drag {
+	background-color : #666;
+	opacity          : 1;
 }
 
 .x-template-canvas .x-block-variable {
@@ -123,13 +131,12 @@ body {
 	cursor : pointer;
 }
 
-.x-template-canvas .x-block.x-over > .x-title {
-	background-color : #F0F2FE;
+.x-template-canvas .x-block.x-root > .x-title {
+    display : none;
 }
 
-.x-template-canvas .x-block.x-drag {
-	background-color : #666;
-	opacity          : 1;
+.x-template-canvas .x-block.x-over > .x-title {
+	background-color : #F0F2FE;
 }
 
 .x-template-canvas .x-block.x-drag > .x-title {
@@ -166,14 +173,7 @@ body {
 }
 
 /************* SLOT *************/
-.x-template-canvas > .x-slot {
-	margin : auto;
-	width  : 95%;
-	height : 95%;
-}
-
 .x-template-canvas .x-slot {
-	clear         : both;
 	border        : 1px solid #bbb;
 	border-radius : 7px;
 	margin        : 10px 5px;
@@ -183,10 +183,18 @@ body {
 	
 	position   : relative;
 	min-height : 16px;
+	min-width  : 32px;
 }
 
-.x-template-canvas .x-block.x-over > .x-slot {
-	border : 1px solid #666;
+.x-template-canvas .x-slot.x-root {
+	margin : auto;
+	width  : 100%;
+	height : 100%;
+	border : none;
+}
+
+.x-template-canvas .x-block.x-over .x-slot {
+/*	border-color : #666;*/
 }
 
 /************* SLOT TITLE *************/
@@ -206,19 +214,21 @@ body {
    	font-weight      : bold;
 }
 
-.x-template-canvas .x-block.x-over > .x-slot > .x-title {
+.x-template-canvas .x-block.x-over .x-slot > .x-title {
 	z-index : 2;
 	opacity : .85;
 	color   : #000;
 }
 
-.x-template-canvas .x-block.x-over > .x-slot:hover > .x-title {
+.x-template-canvas .x-block.x-over .x-slot:hover > .x-title,
+.x-template-canvas .x-block.x-over .x-slot .x-block .x-slot > .x-title {
 	z-index : -1;	
 }
 
 	
 .x-template-canvas .x-slot.x-over {
 	border-style: solid;
+	border-color : #0f0;
 }
 
 .x-template-canvas .x-insert-pointer {

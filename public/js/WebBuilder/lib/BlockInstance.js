@@ -87,6 +87,16 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	},
 
 	/**
+	 * Checks whether the instance is root
+	 *
+	 * @return {Boolean}
+	 */
+	isRoot : function()
+	{
+		return this.parent == null;
+	},
+
+	/**
 	 * Tries to solve block data dependencies
 	 *
 	 */

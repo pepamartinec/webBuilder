@@ -1,12 +1,12 @@
 Ext.define( 'Inspirio.component.TemplateSelectorPopup',
 {
 	extend : 'Ext.window.Window',
-	
+
 	title : 'Výběr šablony',
-	
+
 	okBtnTitle     : 'Použít',
 	cancelBtnTitle : 'Storno',
-	
+
 	/**
 	 * @required
 	 * @cfg {extAdmin.Environment} env
@@ -32,23 +32,23 @@ Ext.define( 'Inspirio.component.TemplateSelectorPopup',
 		var me = this;
 
 		me.module = me.env.getModule( me.module );
-		
+
 		me.list = Ext.create( 'Ext.grid.Panel', {
 			forceFit : true,
-			
+
 			store : me.module.createStore({
 				loadAction : me.loadAction,
 				autoLoad   : true,
-				
+
 				model : extAdmin.component.Model.create({
-					name : { type : 'string' }
+					title : { type : 'string' }
 				}),
 				implicitModel : true
 			}),
-			
+
 			columns : [{
 				dataIndex : 'name',
-				header    : 'Název'				
+				header    : 'Název'
 			}]
 		});
 
@@ -56,7 +56,7 @@ Ext.define( 'Inspirio.component.TemplateSelectorPopup',
 			layout : 'fit',
 			width  : 400,
 			height : 200,
-			
+
 			items   : [ me.list ],
 			buttons : [{
 				text    : me.okBtnTitle,
@@ -73,12 +73,12 @@ Ext.define( 'Inspirio.component.TemplateSelectorPopup',
 
 		me.callParent();
 	},
-	
+
 	onSelect : function()
 	{
 		var me      = this,
 		    records = me.list.getSelectionModel().getSelection();
-		
+
 		me.close();
 		Ext.callback( me.handler, me.scope, [ records ] );
 	}

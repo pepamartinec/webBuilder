@@ -1,6 +1,10 @@
 <?php
 namespace WebBuilder\Administration\TemplateManager;
 
+use ExtAdmin\Request\AbstractRequest;
+
+use ExtAdmin\Response\ActionResponse;
+
 use ExtAdmin\Module\DataBrowser\GridList;
 use WebBuilder\DataObjects\BlockSet;
 use ExtAdmin\Request\DataRequestDecorator;
@@ -106,7 +110,7 @@ class TemplateList extends GridList
 			),
 
 			'fields' => array(
-				'name' => array(
+				'title' => array(
 					'title' => 'Název'
 				),
 
@@ -128,7 +132,10 @@ class TemplateList extends GridList
 	{
 		$request = new DataRequestDecorator( $request );
 
-		$dataFeeder = new cDBFeederBase( 'WebBuilder\\DataObjects\\BlockSet', $this->database );
+		$dataFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockSet', $this->database );
+// 		$data       = $dataFeeder->where( 'ID NOT IN ( SELECT block_set_ID FROM web_pages )' )->get();
+// 		$count      = $dataFeeder->where( 'ID NOT IN ( SELECT block_set_ID FROM web_pages )' )->getCount();
+
 		$data       = $dataFeeder->get();
 		$count      = $dataFeeder->getCount();
 
@@ -139,24 +146,46 @@ class TemplateList extends GridList
 		return new DataBrowserResponse( true, $data, $count, function( BlockSet $record ) {
 			return array(
 				'ID'    => $record->getID(),
-				'name'  => $record->getName(),
+				'title' => $record->getName(),
 				'image' => 'images/templateThumb.png',
 			);
 		} );
 	}
 
 	/**
-	 * Removes selected items
+	 * Deletes the records
 	 *
-	 * @param  RequestInterface $request
-	 * @return Response
+	 * @param RequestInterface $request
+	 * @return ActionResponse
 	 */
 	public function delete( RequestInterface $request )
 	{
-		var_dump( $request->getParameter( 'recordID', 'int' ) );
-exit;
-// 		$dataFeeder = new cDBFeederBase( 'WebBuilder\\DataObjects\\BlockSet', $this->database );
-// 		$data       = $dataFeeder->get();
-// 		$count      = $dataFeeder->getCount();
+		$recordIDs = array();
+		$records   = $request->getRawData( 'records' );
+
+		if( is_array( $records ) ) {
+			foreach( $records as $record ) {
+				$recordID = AbstractRequest::secureData( $record, 'ID', 'int' );
+
+				if( $recordID ) {
+					$recordIDs[] = $recordID;
+				}
+			}
+		}
+
+		try {
+			$this->database->transactionStart();
+
+			$webPageFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockSet', $this->database );
+			$webPageFeeder->whereColumnIn( 'ID', $recordIDs )->remove();
+
+			$this->database->transactionCommit();
+
+		} catch( Exception $e ) {
+			$this->database->transactionRollback();
+			throw $e;
+		}
+
+		return new ActionResponse( true );
 	}
 }

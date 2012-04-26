@@ -124,16 +124,16 @@ Ext.define( 'Inspirio.module.WebEditor.pageEditor.Template',
 	getData : function()
 	{
 		return {
-			blockSetID : this.blockSetIdField.getValue(),
-			parentID   : this.parentIdField.getValue(),
-			template   : this.templateEditor.getValue()
+			blockSetID       : this.blockSetIdField.getValue(),
+			parentBlockSetID : this.parentIdField.getValue(),
+			template         : this.templateEditor.getValue()
 		};
 	},
 
 	setData : function( data )
 	{
 		this.blockSetIdField.setValue( data.blockSetID );
-		this.parentIdField.setValue( data.parentID );
+		this.parentIdField.setValue( data.parentBlockSetID );
 
 		this.templateEditor.setBlockSetId( data.blockSetID );
 		this.templateEditor.setValue( data.template );
