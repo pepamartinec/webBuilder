@@ -248,6 +248,13 @@ abstract class AbstractPageEditor extends DataEditor
 				'validTo'    => $request->getData( 'validTo',   'string' ),
 			), true );
 
+			$urlName = $webPage->getUrlName();
+			if( $urlName && $urlName[0] !== '/' ) {
+				$urlName = '/'.$urlName;
+
+				$webPage->setUrlName( $urlName );
+			}
+
 			$webPageFeeder = new cDBFeederBase( '\\Inspirio\\cWebPage', $this->database );
 			$webPageFeeder->save( $webPage );
 

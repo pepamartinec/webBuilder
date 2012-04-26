@@ -15,84 +15,96 @@ Ext.define( 'Inspirio.module.WebEditor.pageEditor.General',
 
 	bodyPadding : 5,
 
-	items : [{
-		xtype : 'hiddenfield',
-		name  : 'ID'
+	initComponent : function()
+	{
+		var me = this;
 
-	},{
-		xtype : 'hiddenfield',
-		name  : 'parentID'
+		var titleField = Ext.create( 'Ext.form.field.Text', {
+			fieldLabel : 'Titulek',
+			name       : 'title'
+		});
 
-	},{
-		xtype : 'container',
-		layout : {
-			type  : 'hbox',
-			align : 'stretchMax'
-		},
+		var urlField = Ext.create( 'extAdmin.widget.form.UrlName', {
+			fieldLabel  : 'URL',
+			name        : 'urlName',
+			sourceField : titleField
+		});
 
-		items : [{
-			xtype  : 'container',
-			layout : {
-				type  : 'vbox',
-				align : 'stretch'
-			},
-
-			flex : 1,
-
+		Ext.apply( me, {
 			items : [{
-				xtype      : 'textfield',
-				fieldLabel : 'Titulek',
-				name       : 'title',
+				xtype : 'hiddenfield',
+				name  : 'ID'
+
 			},{
-				xtype      : 'textfield',
-				fieldLabel : 'URL',
-				name       : 'urlName'
-			}]
+				xtype : 'hiddenfield',
+				name  : 'parentID'
 
-		},{
-			xtype : 'tbspacer',
-			width : 5
-
-		},{
-			xtype  : 'container',
-			layout : {
-				type  : 'vbox',
-				align : 'stretch'
-			},
-
-			flex : 1,
-
-			items : [{
-				xtype      : 'fieldcontainer',
-				fieldLabel : 'Platnost',
+			},{
+				xtype : 'container',
+				layout : {
+					type  : 'hbox',
+					align : 'stretchMax'
+				},
 
 				items : [{
-					xtype : 'component',
-					html  : 'od'
-				},{
-					xtype : 'datefield',
-					name  : 'validFrom'
-				},{
-					xtype : 'component',
-					html  : 'do'
-				},{
-					xtype : 'datefield',
-					name  : 'validTo'
-				}]
-			},{
-				xtype      : 'checkboxfield',
-				fieldLabel : 'Publikovat',
-				name       : 'published'
-			}]
-		}]
+					xtype  : 'container',
+					layout : {
+						type  : 'vbox',
+						align : 'stretch'
+					},
 
-	},{
-		xtype      : 'htmleditor',
-		fieldLabel : 'Perex',
-		name       : 'perex',
-		labelAlign : 'top',
-		flex       : 1
-	}],
+					flex : 1,
+
+					items : [ titleField, urlField ]
+
+				},{
+					xtype : 'tbspacer',
+					width : 5
+
+				},{
+					xtype  : 'container',
+					layout : {
+						type  : 'vbox',
+						align : 'stretch'
+					},
+
+					flex : 1,
+
+					items : [{
+						xtype      : 'fieldcontainer',
+						fieldLabel : 'Platnost',
+
+						items : [{
+							xtype : 'component',
+							html  : 'od'
+						},{
+							xtype : 'datefield',
+							name  : 'validFrom'
+						},{
+							xtype : 'component',
+							html  : 'do'
+						},{
+							xtype : 'datefield',
+							name  : 'validTo'
+						}]
+					},{
+						xtype      : 'checkboxfield',
+						fieldLabel : 'Publikovat',
+						name       : 'published'
+					}]
+				}]
+
+			},{
+				xtype      : 'htmleditor',
+				fieldLabel : 'Perex',
+				name       : 'perex',
+				labelAlign : 'top',
+				flex       : 1
+			}]
+		});
+
+		me.callParent();
+	},
 
 	getData : function() {
 		return this.form.getValues();
