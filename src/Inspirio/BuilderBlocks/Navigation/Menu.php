@@ -30,6 +30,7 @@ class Menu extends WebBlock
 		$webPages      = $webPageFeeder->whereColumnEq( 'published', true )
 		                               ->where( 'valid_from IS NULL OR valid_from <= NOW()' )
 		                               ->where( 'valid_to IS NULL   OR valid_to   >= NOW()' )
+		                               ->orderBy( 'position', 'asc' )
 		                               ->indexBy( 'ID' )
 		                               ->get();
 
