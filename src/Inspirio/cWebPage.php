@@ -23,6 +23,11 @@ class cWebPage extends aDataObject implements WebPageInterface
 			'sanitize' => 'foreingKey',
 		),
 
+		'position' => array(
+			'dbColumn' => 'position',
+			'type' => 'integer',
+		),
+
 		'blockSetID' => array(
 			'dbColumn' => 'block_set_ID',
 			'type' => 'integer',

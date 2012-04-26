@@ -46,6 +46,7 @@ class PageList extends TreeList
 	{
 		return array(
 			'loadListData' => true,
+			'moveItem'     => true,
 
 			'createMenuItem' => array(
 				'title'  => 'Položku menu',
@@ -113,6 +114,8 @@ class PageList extends TreeList
 				),
 			),
 
+			'moveAction' => 'moveItem',
+
 			'fields' => array(
 				'title' => array(
 					'title' => 'Název',
@@ -149,7 +152,10 @@ class PageList extends TreeList
 		$request = new DataRequestDecorator( $request );
 
 		$webPageFeeder = new cDBFeederBase( '\\Inspirio\\cWebPage', $this->database );
-		$webPages      = $webPageFeeder->groupBy( 'parent_ID' )->orderBy( 'parent_ID', 'asc' )->get();
+		$webPages      = $webPageFeeder->groupBy( 'parent_ID' )
+		                               ->orderBy( 'parent_ID', 'asc' )
+		                               ->orderBy( 'position', 'asc' )
+		                               ->get();
 
 		if( $webPages === null ) {
 			return new ActionResponse( true );
@@ -193,6 +199,44 @@ class PageList extends TreeList
 		$response->setData( array_map( $extractor, $webPages[''] ) );
 
 		return $response;
+	}
+
+	/**
+	 * Changes position of the item within the tree
+	 *
+	 * @param RequestInterface $request
+	 * @return ActionResponse
+	 */
+	public function moveItem( RequestInterface $request )
+	{
+		$itemID   = $request->getData( 'itemID', 'int' );
+		$parentID = $request->getData( 'parentID', 'int' );
+		$position = $request->getData( 'position', 'int' );
+
+		if( $itemID == null || $parentID == null || $itemID == $parentID ) {
+			return new ActionResponse( false );
+		}
+
+		$webPageFeeder = new cDBFeederBase( '\\Inspirio\\cWebPage', $this->database );
+		$webPages      = $webPageFeeder->whereColumnIn( 'ID', array( $itemID, $parentID ) )->indexBy( 'ID' )->get();
+
+		if( ! isset( $webPages[ $itemID ], $webPages[ $parentID ] ) ) {
+			return new ActionResponse( false );
+		}
+
+		$item = $webPages[ $itemID ];
+
+		if( $position < $item->getPosition() ) {
+			++$position;
+		}
+
+
+		$item->setParentID( $parentID );
+		$item->setPosition( $position );
+
+		$webPageFeeder->save( $item );
+
+		return new ActionResponse( true );
 	}
 
 	/**

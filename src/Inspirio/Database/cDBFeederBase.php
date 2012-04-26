@@ -426,6 +426,37 @@ class cDBFeederBase
 		if( $object->getID() == null ) {
 			$object->setID( $this->_database->getLastInsertedID() );
 		}
+
+		// when record is part of a tree, update positions
+		if( $object->hasProperty( 'parentID' ) && $object->hasProperty( 'position' ) ) {
+			$this->updatePositions( $object );
+		}
+	}
+
+	private function updatePositions( $object )
+	{
+		$siblings = $this->whereColumnEq( 'parent_ID', $object->getParentID() )
+		                 ->whereColumnEq( 'ID', $object->getID(), false )
+		                 ->orderBy( 'position', 'asc' )
+		                 ->get();
+
+		if( $siblings != null ) {
+			$position       = 1;
+			$targetPosition = $object->getPosition();
+			$sibling        = reset( $siblings );
+
+			while( $sibling ) {
+				if( $position == $targetPosition ) {
+					++$position;
+				}
+
+				$sibling->setPosition( $position++ );
+				$query = $this->buildSaveQuery( $sibling );
+				$this->_database->query( $query, true, true );
+
+				$sibling = next( $siblings );
+			}
+		}
 	}
 
 // ========== EXTENDED MODIFICATORS ==========
