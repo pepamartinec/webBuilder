@@ -1,5 +1,11 @@
 <?php
 
+use WebBuilder\WebBuilder;
+
+use WebBuilder\WebBlocksFactory;
+
+use WebBuilder\Persistance\DatabaseLoader;
+
 use Inspirio\Database\cDBFeederBase;
 
 include_once 'common.php';
@@ -19,15 +25,21 @@ if( $webPage == null ) {
 	exit;
 }
 
+// load the webPage
 $simplePageFeeder = new cDBFeederBase( '\\DemoCMS\\cSimplePage', $database );
 $simplePage       = $simplePageFeeder->whereColumnEq( 'web_page_ID', $webPage->getID() )->getOne();
 
 $webPage->setContentItem( $simplePage );
 $simplePage->setWebPage( $webPage );
 
-$builder = new WebBuilder\WebBuilder( $database, array( 'debug' => false ));
+// create the builder
+$blockLoader = new \WebBuilder\Persistance\DatabaseLoader( $database, $webPage->getBlockSetID() );
+$blockFactory = new \WebBuilder\WebBlocksFactory( $database );
+
+$builder = new \WebBuilder\WebBuilder( $blockLoader, $blockFactory );
 
 $twig = $builder->getTwig();
 $twig->addGlobal( 'BASE_HREF', BASE_HREF );
 
+// render the webPage
 echo $builder->render( $webPage );

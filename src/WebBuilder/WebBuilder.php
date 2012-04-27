@@ -10,9 +10,14 @@ use Inspirio\Database\cDatabase;
 class WebBuilder implements WebBuilderInterface
 {
 	/**
-	 * @var Inspirio\Database\cDatabase
+	 * @var BlocksLoaderInterface
 	 */
-	protected $database;
+	protected $blockLoader;
+
+	/**
+	 * @var WebBlocksFactoryInterface
+	 */
+	protected $blockFactory;
 
 	/**
 	 * @var bool
@@ -34,9 +39,12 @@ class WebBuilder implements WebBuilderInterface
 	 *
 	 * @param \Database $database
 	 */
-	public function __construct( cDatabase $database, array $config = null )
+	public function __construct( BlocksLoaderInterface $blockLoader, WebBlocksFactoryInterface $blockFactory, array $config = null )
 	{
-		$this->database = $database;
+		$this->blockLoader  = $blockLoader;
+		$this->blockFactory = $blockFactory;
+
+		// TODO dependency injection of the Twig
 
 		if( $config === null ) {
 			$config = array();
@@ -47,8 +55,6 @@ class WebBuilder implements WebBuilderInterface
 		);
 
 		$this->debug = $config['debug'];
-
-		$this->blockSetsFeeder = new cDBFeederBase( '\WebBuilder\DataObjects\BlockSet', $this->database );
 
 		// init Twig
 		$loader     = new \Twig_Loader_Filesystem( PATH_TO_ROOT );
@@ -81,17 +87,16 @@ class WebBuilder implements WebBuilderInterface
 	 */
 	public function render( WebPageInterface $webPage )
 	{
-		// load blocks set for given web structure item
-		$blockSet = $this->getBlockSet( $webPage, true );
+		// load the block instances
+		$instances = $this->blockLoader->loadBlockInstances();
 
 		// create blocks builder
-		$blocksFactory   = new WebBlocksFactory( $this->database );
-		$buildersFactory = new BlocksBuildersFactory( $blocksFactory, $this->twig );
-		$blocksBuilder   = $buildersFactory->getBlocksBuilder( $blockSet, true );
+		$builderFactory = new BlocksBuildersFactory( $this->blockFactory );
+		$blockBuilder   = $builderFactory->getBlocksBuilder( 'CrossDependenciesBuilder', $instances, true );
 
-		$rootBlock = $blockSet->getRootBlock();
+		$rootBlock = $this->pickRootBlock( $instances );
 		if( $rootBlock === null ) {
-			throw new BlockSetIntegrityException( "Blocks set {$blockSet->getName()}[{$blockSet->getID()}] has no root block defined" );
+			throw new BlockSetIntegrityException( "No root block found" );
 		}
 
 		// setup root block data
@@ -109,42 +114,29 @@ class WebBuilder implements WebBuilderInterface
 		}
 
 		// build and render blocks
-		$blocksBuilder->buildBlock( $rootBlock );
+		$blockBuilder->buildBlock( $rootBlock );
 
 		$template = $this->twig->loadTemplate( $rootBlock->templateFile );
-		$template->setBuilder( $blocksBuilder );
+		$template->setBuilder( $blockBuilder );
 		$template->setBlock( $rootBlock );
 
 		return $template->render( $rootBlock->data );
 	}
 
 	/**
-	 * Loads BlockSet belongig to given WebPage and fills underlying blocks definitions
+	 * Returns root block of set
 	 *
-	 * @param  WebPageInterface $wePage
-	 * @param  bool $forceRegenreration
-	 * @return \WebBuilder\DataObjects\BlockSet
+	 * @return \inspirio\webBuilder\cBlockInstance
 	 */
-	protected function getBlockSet( WebPageInterface $wePage, $forceRegeneration = false )
+	protected function pickRootBlock( array $instances )
 	{
-		$blockSet = $this->blockSetsFeeder->whereID( $wePage->getBlockSetID() )->getOne();
-
-		if( $blockSet === null ) {
-			throw new InvalidBlockException( 'Invalid BlockSet requested' );
+		foreach( $instances as $instance ) {
+			/* @var $instance BlockInstance */
+			if( $instance->parent === null ) {
+				return $instance;
+			}
 		}
 
-		$blocksLoader = new Persistance\DatabaseLoader( $this->blockSetsFeeder );
-
-		// TODO disable this permanently for now
-		if( $this->debug === false && false ) {
-			$blocksLoader = new Persistance\SerializedCacheProxy( $this->blockSetsFeeder, $blocksLoader );
-//			$blocksLoader->forceRegeneration( $forceRegeneration );
-		}
-
-		$blocks = $blocksLoader->fetchBlocksInstances( $blockSet );
-
-		$blockSet->setBlocks( $blocks );
-
-		return $blockSet;
+		return null;
 	}
 }

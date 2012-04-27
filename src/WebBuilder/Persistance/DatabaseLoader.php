@@ -1,6 +1,8 @@
 <?php
 namespace WebBuilder\Persistance;
 
+use Inspirio\Database\cDatabase;
+
 use Inspirio\Database\cDBFeederBase;
 
 use WebBuilder\DataDependencies\UndefinedData;
@@ -13,53 +15,75 @@ use WebBuilder\BlocksLoaderInterface;
 class DatabaseLoader implements BlocksLoaderInterface
 {
 	/**
-	 * @var \Inspirio\Database\cDatabase
+	 * @var cDatabase
 	 */
 	protected $database;
 
 	/**
-	 * @var \Inspirio\Database\cDBFeederBase
+	 * @var int
 	 */
-	protected $blockSetsFeeder;
+	protected $blockSetID;
+
+	/**
+	 * @var BlockSet
+	 */
+	protected $blockSet;
 
 	/**
 	 * Constructs
 	 *
 	 * @param \Database $blockSetsFeeder
 	 */
-	public function __construct( cDBFeederBase $blockSetsFeeder )
+	public function __construct( cDatabase $database, $blockSetID )
 	{
-		$this->database         = $blockSetsFeeder->database();
-		$this->blockSetsFeeder = $blockSetsFeeder;
+		$this->database   = $database;
+		$this->blockSetID = $blockSetID;
+		$this->blockSet   = null;
 	}
 
 	/**
-	 * Loads and initializes blocks instances used in given BlockSet
+	 * Loads the block instances
 	 *
-	 * @param  BlockSet $blockSet blocks set
-	 * @return array                 array( BlockInstance )
+	 * @return array
 	 *
 	 * @throws InvalidBlockSetException
-	 * @throws \DatabaseException
 	 */
-	public function fetchBlocksInstances( BlockSet $blockSet )
+	public function loadBlockInstances()
 	{
-		$blockSetID = (int)$blockSet->getID();
+		return $this->fetchBlockInstances( $this->blockSetID );
+	}
 
-		// merge BlockSet with parent
-		if( $blockSet->getParentID() ) {
-			$parentSet = $this->blockSetsFeeder->whereID( $blockSet->getParentID() )->getOne();
+	/**
+	 * Loads the block instances of the blockSet
+	 *
+	 * @param int $blockSetID
+	 * @return array
+	 *
+	 * @throws InvalidBlockSetException
+	 */
+	protected function fetchBlockInstances( $blockSetID )
+	{
+		$blockSetID = (int)$blockSetID;
 
-			if( $parentSet === null ) {
-				throw new InvalidBlockSetException("BlockSet '{$blockSet->getID()}' has invalid parent '{$blockSet->getParentID()}'");
-			}
+		// load the parent first
+		$sql = "SELECT parent_ID FROM block_sets WHERE ID = {$blockSetID}";
+		$this->database->query( $sql );
+		$resultSet = $this->database->fetchArray();
 
-			$instances = $this->fetchBlocksInstances( $parentSet );
+		if( $resultSet == null ) {
+			throw new InvalidBlockSetException();
+		}
+
+		$result = $resultSet[0];
+
+		if( $result['parent_ID'] ) {
+			$instances = $this->fetchBlockInstances( $result['parent_ID'] );
 
 		} else {
 			$instances = array();
 		}
 
+		// load block instances
 		$this->database->query("
 			SELECT
 				instances.ID       instance_ID,
