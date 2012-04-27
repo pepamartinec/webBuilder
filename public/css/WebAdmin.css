@@ -290,6 +290,7 @@ body {
     margin     : 5px;
     padding    : 5px;
     text-align : center;
+    overflow   : hidden;
     
     background-color : #f8f8ff;
 	border           : 1px solid #abf;
@@ -297,7 +298,8 @@ body {
 	position : relative;
 }
 
-.x-web-page-images .x-dataview-item:hover {
+.x-web-page-images .x-dataview-item:hover,
+.x-web-page-images .x-dataview-item.x-item-selected {
     background-color : #dfe8f6;
 }
 

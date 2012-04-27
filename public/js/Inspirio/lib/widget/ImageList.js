@@ -7,20 +7,28 @@ Ext.define( 'Inspirio.widget.ImageList',
 	],
 
 	/**
+	 * @required
 	 * @cfg {extAdmin.Module} module
 	 */
 	module : null,
 
+	/**
+	 * @property {String} componentCls
+	 */
 	componentCls : Ext.baseCSSPrefix +'web-page-images',
 
+	/**
+	 * @property {Array} itemTpl
+	 */
 	itemTpl : [
 		'<div class="x-controls">',
-//			'<div class="x-tool x-edit"></div>',
 			'<div class="x-tool x-remove"></div>',
 		'</div>',
 		'<img src="{filenameThumb}" />',
 		'<div class="x-title">{title}</div>'
 	],
+
+	autoScroll : true,
 
 	/**
 	 * Component initialization
@@ -37,6 +45,33 @@ Ext.define( 'Inspirio.widget.ImageList',
 		});
 
 		me.callParent();
+
+		me.webPageId = null;
+	},
+
+	/**
+	 * Reloads the data
+	 *
+	 * @param {Number} webPageId
+	 * @param {Function} cb
+	 * @param {Object} scope
+	 * @return {Inspirio.widget.ImageList}
+	 */
+	loadData : function( webPageId, cb, scope )
+	{
+		this.webPageId = webPageId;
+
+		this.store.load({
+			filters : [{
+				property : 'webPageID',
+				value    : webPageId
+			}],
+
+			callback : cb,
+			scope    : scope
+		});
+
+		return this;
 	},
 
 	/**
@@ -69,7 +104,7 @@ Ext.define( 'Inspirio.widget.ImageList',
 						},
 
 						complete : function() {
-							me.store.load();
+							me.loadData( me.webPageId );
 						}
 					});
 				}

@@ -1,6 +1,10 @@
 <?php
 namespace Inspirio\Administration\WebEditor;
 
+use ExtAdmin\Response\FileResponse;
+
+use Inspirio\cImageHandler;
+
 use ExtAdmin\Response\DataBrowserResponse;
 
 use ExtAdmin\Request\AbstractRequest;
@@ -46,6 +50,7 @@ class ImageList extends ModuleBase
 			'updateImages' => true,
 			'deleteImages' => true,
 			'uploadImages' => true,
+			'serveImage'   => true,
 		);
 	}
 
@@ -122,7 +127,7 @@ class ImageList extends ModuleBase
 			$imageFeeder = new cDBFeederBase( '\\Inspirio\\cImage', $this->database );
 			$images      = $imageFeeder->whereColumnIn( 'ID', $imageIDs )->get();
 
-			$pathPrefix = PATH_TO_WEBSERVER_ROOT . PATH_FROM_ROOT_TO_BASE . 'public/';
+			$pathPrefix = PATH_TO_WEBSERVER_ROOT . PATH_FROM_ROOT_TO_BASE;
 
 			foreach( $images as $image ) {
 				@unlink( $pathPrefix . $image->getFilenameFull() );
@@ -317,5 +322,36 @@ class ImageList extends ModuleBase
 		}
 
 		return $transformed;
+	}
+
+	/**
+	 * Action - ServeImage
+	 *
+	 * @param array $parameters
+	 */
+	public function serveImage( RequestInterface $request )
+	{
+		$imageID = $request->getParameter( 'imageID', 'int' );
+		$variant = $request->getParameter( 'variant', 'type' );
+
+		if( $imageID == null || ! in_array( $variant, array( 'full', 'thumb' ) ) ) {
+			return new FileResponse( null );
+		}
+
+		$imageHandler = new cImageHandler( $this->database );
+		$imageFeeder  = $imageHandler->getImageFeeder();
+		$image        = $imageFeeder->whereID( $imageID )->getOne();
+
+		if( $image == null ) {
+			return new FileResponse( null );
+		}
+
+		switch( $variant ) {
+			case 'thumb': $property = 'filenameThumb'; break;
+			default     : // no break
+			case 'full' : $property = 'filenameFull'; break;
+		}
+
+		return new FileResponse( $image->get( $property ) );
 	}
 }

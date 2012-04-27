@@ -26,12 +26,16 @@ Ext.define( 'Inspirio.module.WebEditor.SimplePageEditor',
 	{
 		var me = this;
 
-		me.generalTab   = Ext.create( 'Inspirio.module.WebEditor.pageEditor.General' );
+		me.generalTab   = Ext.create( 'Inspirio.module.WebEditor.pageEditor.General', {
+			env    : me.env,
+			editor : me
+		});
 		me.contentTab   = Ext.create( 'Inspirio.module.WebEditor.pageEditor.Content' );
 		me.imagesTab    = Ext.create( 'Inspirio.module.WebEditor.pageEditor.Images', {
 			env    : me.env,
 			editor : me,
-			border : false
+			border : false,
+			title  : 'Obrázky'
 		});
 		me.dicussionTab = Ext.create( 'Inspirio.module.WebEditor.pageEditor.Discussion' );
 		me.templateTab  = Ext.create( 'Inspirio.module.WebEditor.pageEditor.Template', {

@@ -2,6 +2,14 @@ Ext.define( 'Inspirio.module.WebEditor.pageEditor.General',
 {
 	extend : 'Ext.form.Panel',
 
+	requires : [
+		'Ext.form.field.Text',
+		'extAdmin.widget.form.UrlName',
+		'Ext.form.field.Checkbox',
+		'Inspirio.widget.TitleImage',
+		'Ext.form.field.Hidden'
+	],
+
 	title : 'Obecné',
 
 	defaults : {
@@ -19,15 +27,30 @@ Ext.define( 'Inspirio.module.WebEditor.pageEditor.General',
 	{
 		var me = this;
 
-		var titleField = Ext.create( 'Ext.form.field.Text', {
+		me.titleField = Ext.create( 'Ext.form.field.Text', {
 			fieldLabel : 'Titulek',
 			name       : 'title'
 		});
 
-		var urlField = Ext.create( 'extAdmin.widget.form.UrlName', {
+		me.urlField = Ext.create( 'extAdmin.widget.form.UrlName', {
 			fieldLabel  : 'URL',
 			name        : 'urlName',
-			sourceField : titleField
+			sourceField : me.titleField
+		});
+
+		me.publishField = Ext.create( 'Ext.form.field.Checkbox', {
+			fieldLabel : 'Publikovat',
+			name       : 'published',
+		});
+
+		me.titleImageField = Ext.create( 'Inspirio.widget.TitleImage', {
+			fieldLabel : 'Titulní obrázek',
+			labelAlign : 'top',
+			name       : 'titleImageID',
+			env    : me.env,
+			editor : me.editor,
+
+			flex : 1
 		});
 
 		Ext.apply( me, {
@@ -55,46 +78,16 @@ Ext.define( 'Inspirio.module.WebEditor.pageEditor.General',
 
 					flex : 1,
 
-					items : [ titleField, urlField ]
+					items : [ me.titleField, me.urlField, me.publishField ]
 
 				},{
 					xtype : 'tbspacer',
 					width : 5
 
-				},{
-					xtype  : 'container',
-					layout : {
-						type  : 'vbox',
-						align : 'stretch'
-					},
-
-					flex : 1,
-
-					items : [{
-						xtype      : 'fieldcontainer',
-						fieldLabel : 'Platnost',
-
-						items : [{
-							xtype : 'component',
-							html  : 'od'
-						},{
-							xtype : 'datefield',
-							name  : 'validFrom'
-						},{
-							xtype : 'component',
-							html  : 'do'
-						},{
-							xtype : 'datefield',
-							name  : 'validTo'
-						}]
-					},{
-						xtype      : 'checkboxfield',
-						fieldLabel : 'Publikovat',
-						name       : 'published'
-					}]
-				}]
+				}, me.titleImageField ]
 
 			},{
+
 				xtype      : 'htmleditor',
 				fieldLabel : 'Perex',
 				name       : 'perex',
@@ -112,6 +105,8 @@ Ext.define( 'Inspirio.module.WebEditor.pageEditor.General',
 
 	setData : function( data )
 	{
+		this.titleImageField.parentId = data.ID;
+
 		return this.form.setValues( data );
 	}
 });
