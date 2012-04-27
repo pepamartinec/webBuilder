@@ -13,6 +13,7 @@ body {
 .i-add { background-image: url('../images/icons/add.png'); }
 .i-application-form { background-image: url('../images/icons/application_form.png'); }
 .i-application-form-add { background-image: url('../images/icons/application_form_add.png'); }
+.i-application-form-delete { background-image: url('../images/icons/application_form_delete.png'); }
 .i-application-form-edit { background-image: url('../images/icons/application_form_edit.png'); }
 .i-application-go { background-image: url('../images/icons/application_go.png'); }
 .i-application-osx-terminal { background-image: url('../images/icons/application_osx_terminal.png'); }

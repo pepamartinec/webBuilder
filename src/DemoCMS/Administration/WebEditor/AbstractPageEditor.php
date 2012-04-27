@@ -186,7 +186,7 @@ abstract class AbstractPageEditor extends DataEditor
 				$data['parentBlockSetID'] = $blockSet->getParentID();
 			}
 
-			$data['template']         = $rootInstance->export();
+			$data['template'] = $rootInstance->export();
 		}
 
 		// load associated data

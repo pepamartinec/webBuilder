@@ -36,13 +36,6 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Template',
 				xtype : 'toolbar',
 
 				items : [{
-					xtype   : 'button',
-					text    : 'Náhled',
-					iconCls : 'i-monitor',
-
-					handler : me.preview,
-					scope   : me
-				},{
 					xtype : 'button',
 					text  : 'Načíst předdefinovanou',
 					iconCls : 'i-folder',
@@ -51,26 +44,16 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Template',
 					scope   : me
 				},{
 					xtype   : 'button',
-					text    : 'Uložit mezi předdefinované',
-					iconCls : 'i-disk',
+					text    : 'Vymazat obsah',
+					iconCls : 'i-application-form-delete',
 
-					handler : me.saveAsPredefined,
+					handler : me.reset,
 					scope   : me
-				},{
-					xtype : 'tbfill'
-				},{
-					xtype   : 'button',
-					iconCls : 'i-arrow-out'
 				}]
 			}]
 		});
 
 		me.callParent();
-	},
-
-	preview : function()
-	{
-
 	},
 
 	loadPredefined : function()
@@ -116,9 +99,24 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Template',
 		}
 	},
 
-	saveAsPredefined : function()
+	reset : function()
 	{
+		var me = this;
 
+		Ext.MessageBox.show({
+			title    : 'Vymazat obsah šablony?',
+			msg      : 'Opravdu chcete vymazat obsah této šablony?',
+			buttons  : Ext.MessageBox.YESNO,
+			icon     : Ext.MessageBox.QUESTION,
+			closable : false,
+			fn       : function( buttonId ) {
+				if( buttonId !== 'yes' ) {
+					return;
+				}
+
+				me.templateEditor.clear();
+			}
+		});
 	},
 
 	getData : function()

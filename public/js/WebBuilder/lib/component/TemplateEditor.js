@@ -159,21 +159,16 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 		var me    = this,
 		    value = me.getValue();
 
-		// fill some default content
-		if( value == null ) {
-			var block    = blocksStore.findRecord( 'codeName', '\\WebBuilder\\Blocks\\Core\\WebPage' ),
-			    template = block.templates().first();
-
-			value = {
-				blockID    : block.getId(),
-				templateID : template.getId()
-			};
-		}
-
 		// init real field value
 		// this must be done after block load
 		// so we have all data for instances creation
-		me.setValue( value );
+
+		if( value == null ) {
+			me.clear();
+
+		} else {
+			me.setValue( value );
+		}
 	},
 
 	/**
@@ -268,5 +263,22 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	getBlockSetId : function()
 	{
 		return this.instancesStore.getBlockSetId();
+	},
+
+	/**
+	 * Clear current template content
+	 *
+	 * @return {WebBuilder.component.TemplateEditor}
+	 */
+	clear : function()
+	{
+		var me       = this,
+		    block    = me.blocksStore.findRecord( 'codeName', '\\WebBuilder\\Blocks\\Core\\WebPage' ),
+		    template = block.templates().first();
+
+		me.setValue({
+			blockID    : block.getId(),
+			templateID : template.getId()
+		});
 	}
 });
