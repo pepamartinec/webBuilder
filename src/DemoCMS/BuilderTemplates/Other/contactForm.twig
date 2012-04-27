@@ -2,7 +2,8 @@
 <h3>Napište nám</h3>
 
 <form class="form-vertical" action="" method="post">
-<!--[if design]><![else]-->
+<!--[if design]>
+<![else]-->
 {% if formData.errorMessage %}<div class="alert alert-error">{{ formData.errorMessage }}</div>{% endif %}
 {% if formData.successMessage %}<div class="alert alert-success">{{ formData.successMessage }}</div>{% endif %}
 <!--[end]-->

@@ -1,5 +1,5 @@
 <?php
-namespace DemoCMS\BuilderBlocks\Other;
+namespace DemoCMS\BuilderBlocks\SimplePages;
 
 use Inspirio\Database\cDBFeederBase;
 
@@ -28,6 +28,19 @@ class Image extends WebBlock
 
 		return array(
 			'image' => $image,
+		);
+	}
+
+	public static function config()
+	{
+		return array(
+			'textBlockID' => array(
+				'required' => true,
+				'type'     => 'WebBuilder.widget.config.ForeignDataField',
+
+				'module'       => '\\DemoCMS\\Administration\\TextBlockManager\\ImageList',
+				'displayField' => 'title'
+			)
 		);
 	}
 }

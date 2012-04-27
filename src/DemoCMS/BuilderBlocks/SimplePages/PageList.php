@@ -1,6 +1,9 @@
 <?php
 namespace DemoCMS\BuilderBlocks\SimplePages;
 
+use DemoCMS\cImageHandler;
+
+use DemoCMS\cWebPage;
 use Inspirio\Database\cDBFeederBase;
 use WebBuilder\WebBlock;
 
@@ -9,7 +12,7 @@ class PageList extends WebBlock
 	public static function requires()
 	{
 		return array(
-			'parentID' => 'int'
+			'parent' => 'cWebPage'
 		);
 	}
 
@@ -21,23 +24,46 @@ class PageList extends WebBlock
 		);
 	}
 
-	public function setupData( $parentID )
+	public function setupData( cWebPage $webPage )
 	{
-		$simplePages = null;
-
 		$webPageFeeder = new cDBFeederBase( '\\DemoCMS\\cWebPage', $this->database );
-		$webPages      = $webPageFeeder->whereColumnEq( 'parent_ID', $parentID )->indexBy( 'ID' )->get();
+		$webPages      = $webPageFeeder->whereColumnEq( 'parent_ID', $webPage->getID() )->indexBy( 'ID' )->get();
 
 		if( $webPages ) {
+			// load title images
+			$titleImageIDs = array();
+			foreach( $webPages as $webPage ) {
+				$titleImageID = $webPage->getTitleImageID();
+
+				if( $titleImageID ) {
+					$titleImageIDs[] = $titleImageID;
+				}
+			}
+
+			if( sizeof( $titleImageIDs ) > 0 ) {
+				$imageHandler = new cImageHandler( $this->database );
+				$imageFeeder  = $imageHandler->getImageFeeder();
+				$titleImages  = $imageFeeder->whereColumnIn( 'ID', $titleImageIDs )->get();
+
+			} else {
+				$titleImages = null;
+			}
+
+			// load content pages
 			$simplePageFeeder = new cDBFeederBase( '\\DemoCMS\\cSimplePage', $this->database );
-			$simplePages      = $simplePageFeeder->whereColumnIn( 'web_page_ID', array_keys( $webPages ) )->get();
+			$simplePages      = $simplePageFeeder->whereColumnIn( 'web_page_ID', array_keys( $webPages ) )->indexBy( 'web_page_ID' )->get();
 
-			if( $simplePages ) {
-				foreach( $simplePages as $simplePage ) {
-					$webPage = $webPages[ $simplePage->getWebPageID() ];
+			// attach to the webb pages
+			foreach( $webPages as $webPageID => $webPage ) {
+				if( isset( $simplePages[ $webPageID ] ) ) {
+					$simplePages[ $webPageID ]->setWebPage( $webPage );
+					$webPage->setContentItem( $simplePages[ $webPageID ] );
+				}
 
-					$simplePage->setWebPage( $webPage );
-					$webPage->setContentItem( $simplePage );
+				$titleImageID = $webPage->getTitleImageID();
+
+				if( $titleImageID && isset( $titleImages[ $titleImageID ] ) ) {
+					$webPage->setTitleImage( $titleImages[ $titleImageID ] );
 				}
 			}
 		}

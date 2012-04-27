@@ -1,9 +1,9 @@
 <?php
-namespace DemoCMS\BuilderBlocks\Other;
+namespace DemoCMS\BuilderBlocks\SimplePages;
 
 use DemoCMS\cDiscussionPost;
-use Inspirio\Database\cDBFeederBase;
 use DemoCMS\cWebPage;
+use Inspirio\Database\cDBFeederBase;
 use WebBuilder\WebBlock;
 
 class Discussion extends WebBlock

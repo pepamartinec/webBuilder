@@ -1,5 +1,5 @@
 <?php
-namespace DemoCMS\BuilderBlocks\SimplePages;
+namespace DemoCMS\BuilderBlocks\Other;
 
 use Inspirio\Database\cDBFeederBase;
 use WebBuilder\WebBlock;

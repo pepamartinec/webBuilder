@@ -6,13 +6,6 @@
 			<a href="{{ BASE_HREF ~ page.urlName }}">{{ page.title }}</a>
 		</div>
 	</div>
-	{% if page.titleImage %}
-		<div class="titleImage">
-			<a href="{{ BASE_HREF ~ page.urlName }}">
-				<img src="{{ page.titleImage.filenameThumb }}" alt="{{ page.title }}" title="{{ page.title }}" />
-			</a>
-		</div>
-	{% endif %}
 	<div class="content">
 		{{ page.perex }}
 	</div>

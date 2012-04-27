@@ -1,0 +1,39 @@
+{% container Discussion %}
+
+<div class="discussion">
+	<h3>Diskuze</h3>
+
+	<div class="posts">
+		{% for post in posts %}
+			<div class="post">
+				<div class="author">Od: <strong>{{ post.authorName|default("Neznámý autor") }}</strong></div>
+				<div class="date">Datum: <strong>{{ post.createdOn|date("j.n.Y H:i") }}</strong></div>
+				<div class="content">{{ post.content|nl2br }}</div>
+			</div>
+		{% else %}
+			<p class="noPosts">Zatím nebyl vložen žádný příspěvek. Mužete být první!</p>
+		{% endfor %}
+	</div>
+
+	<div class="form">
+		<h4>Přidat příspěvek</h4>
+		<form class="form-horizontal" action="" method="post">
+		{% if formData.errorMessage %}<div class="alert alert-error">{{ formData.errorMessage }}</div>{% endif %}
+		{% if formData.successMessage %}<div class="alert alert-success">{{ formData.successMessage }}</div>{% endif %}
+
+		<div class="authorName">
+			<label>Vaše jméno: <input type="text" name="name" value="{{ formData.name }}" /></label>
+		</div>
+
+		<div class="authorEmail">
+			<label>Kontaktní e-mail: <input type="email" name="email" value="{{ formData.email }}" /></label>
+		</div>
+
+		<div class="content">
+			<label>* Zpráva: <textarea name="content" cols="160" rows="15">{{ formData.content }}</textarea></label>
+		</div>
+
+			<button type="submit" class="btn btn-success" name="sendDiscussionPost"><i class="icon-share-alt icon-white"></i> Odeslat</button>
+		</form>
+	</div>
+</div>
