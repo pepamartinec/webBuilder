@@ -9,7 +9,7 @@ $database = new Inspirio\Database\cDatabase( DATABASE, HOST, USER, PASSWORD );
 
 $url = '/'. $_GET['url'];
 
-$webPageFeeder = new Inspirio\Database\cDBFeederBase( '\\Inspirio\\cWebPage', $database );
+$webPageFeeder = new Inspirio\Database\cDBFeederBase( '\\DemoCMS\\cWebPage', $database );
 $webPage       = $webPageFeeder->whereColumnEq( 'url_name', $url )->getOne();
 
 // 404
@@ -19,7 +19,7 @@ if( $webPage == null ) {
 	exit;
 }
 
-$simplePageFeeder = new cDBFeederBase( '\\Inspirio\\cSimplePage', $database );
+$simplePageFeeder = new cDBFeederBase( '\\DemoCMS\\cSimplePage', $database );
 $simplePage       = $simplePageFeeder->whereColumnEq( 'web_page_ID', $webPage->getID() )->getOne();
 
 $webPage->setContentItem( $simplePage );

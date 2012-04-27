@@ -7,12 +7,12 @@ include_once 'common.php';
 
 $extAdmin = new \ExtAdmin\ExtAdmin();
 
-// register Inspirio modules factory
+// register DemoCMS modules factory
 $database = new \Inspirio\Database\cDatabase( DATABASE, HOST, USER, PASSWORD );
 $labels   = new \SimpleXMLElement('<root></root>');
-$factory  = new \Inspirio\Administration\cModuleFactory( $database, $labels );
+$factory  = new \DemoCMS\Administration\cModuleFactory( $database, $labels );
 
-$extAdmin->registerModuleFactory( '\\Inspirio', $factory );
+$extAdmin->registerModuleFactory( '\\DemoCMS', $factory );
 
 // register WebBuilder modules factory
 $factory  = new \WebBuilder\Administration\ModuleFactory( $database, $labels );

@@ -1,0 +1,33 @@
+{% container Menu %}
+
+{% macro list( item, currentPage ) %}
+{% spaceless %}
+	{% if item.children %}
+    	<li class="dropdown{% if item.ID == currentPage.ID %} active{% endif %}">
+	    	<a href="{{ BASE_HREF }}{{ item.urlName }}" title="{{ item.title }}" class="dropdown-toggle" data-toggle="dropdown">{{ item.title }} <b class="caret"></b></a>
+	        <ul class="dropdown-menu">
+		        {% for child in item.children %}
+		            {{ _self.list( child, currentPage ) }}
+		        {% endfor %}
+	        </ul>
+		</li>
+	{% else %}
+		<li {% if item.ID == currentPage.ID %}class="active"{% endif %}><a href="{{ BASE_HREF }}{{ item.urlName }}" title="{{ item.title }}">{{ item.title }}</a></li>
+	{% endif %}
+{% endspaceless %}
+{% endmacro %}
+
+<div class="navbar">
+	<div class="navbar-inner">
+		<div class="container">
+			<a class="brand" href="{{ BASE_HREF }}">DemoCMS s.r.o.</a>
+			<div class="nav-collapse">
+				<ul class="nav">
+					{% for item in menuItems %}
+						{{ _self.list( item, webPage ) }}
+					{% endfor %}
+				</ul>
+			</div><!--/.nav-collapse -->
+		</div>
+	</div>
+</div>

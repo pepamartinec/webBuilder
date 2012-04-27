@@ -15,7 +15,7 @@ try {
 	// register blocks
 	$dirs = array(
 		__DIR__.'/src/WebBuilder/Blocks/',
-		__DIR__.'/src/Inspirio/BuilderBlocks/'
+		__DIR__.'/src/DemoCMS/BuilderBlocks/'
 	);
 
 	$generator->registerBlocks( $dirs );
@@ -30,9 +30,9 @@ try {
 		),
 
 		array(
-			'namespace' => '\\Inspirio\\BuilderBlocks',
+			'namespace' => '\\DemoCMS\\BuilderBlocks',
 			'baseDir'   => __DIR__,
-			'tplDir'    => 'src/Inspirio/BuilderTemplates/'
+			'tplDir'    => 'src/DemoCMS/BuilderTemplates/'
 		),
 	);
 
