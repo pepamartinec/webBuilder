@@ -1,6 +1,14 @@
 <?php
 namespace DemoCMS\Administration\WebEditor;
 
+use ExtAdmin\Response\HtmlResponse;
+
+use WebBuilder\WebBlocksFactory;
+
+use WebBuilder\BlocksBuildersFactory;
+
+use WebBuilder\Builders\CrossDependenciesBuilder;
+
 use DemoCMS\cImageHandler;
 
 use ExtAdmin\Request\AbstractRequest;
@@ -57,6 +65,7 @@ abstract class AbstractPageEditor extends DataEditor
 		return array(
 			'loadData_new'    => true,
 			'loadData_record' => true,
+			'preview'         => true,
 
 			'saveData' => array(
 				'type' => 'save'
@@ -178,8 +187,8 @@ abstract class AbstractPageEditor extends DataEditor
 			$blockSetFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockSet', $this->database );
 			$blockSet       = $blockSetFeeder->whereID( $webPage->getBlockSetID() )->getOne();
 
-			$loader       = new DatabaseLoader( $blockSetFeeder );
-			$instances    = $loader->fetchBlocksInstances( $blockSet );
+			$loader       = new DatabaseLoader( $this->database, $webPage->getBlockSetID() );
+			$instances    = $loader->loadBlockInstances( $blockSet );
 			$rootInstance = reset( $instances );
 
 			if( $blockSet ) {
@@ -404,5 +413,72 @@ abstract class AbstractPageEditor extends DataEditor
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Adds associated data for page preview
+	 *
+	 * @param RequestInterface $request
+	 * @param cWebPage $webPage
+	 */
+	protected abstract function associatePreviewData( RequestInterface $request, cWebPage $webPage );
+
+	/**
+	 * Returns preview of the page without saving any data
+	 *
+	 * @param RequestInterface $request
+	 * @return ActionResponse
+	 */
+	public function preview( RequestInterface $request )
+	{
+		$title = $request->getData( 'title', 'string' );
+
+		// save template
+		$blockSet = new BlockSet( array(
+			'ID'       => $request->getData( 'blockSetID', 'int' ),
+			'parentID' => $request->getData( 'parentBlockSetID', 'int' ),
+			'name'     => "[{$title}]",
+		), true );
+
+		$updater   = new DatabaseUpdater( $this->database );
+		$instances = $updater->fakeBlockInstances( $blockSet, $request->getRawData('template') );
+
+		$rootInstance = reset( $instances );
+
+		// save webPage
+		$webPage = new cWebPage( array(
+			'ID'         => $request->getData( 'ID', 'int' ),
+			'parentID'   => $request->getData( 'parentID', 'int' ),
+			'blockSetID' => $blockSet->getID(),
+			'type'       => 'simplePage',
+			'title'      => $title,
+			'urlName'    => $request->getData( 'urlName', 'string' ),
+			'published'  => $request->getData( 'published', 'bool' ),
+			'validFrom'  => $request->getData( 'validFrom', 'string' ),
+			'validTo'    => $request->getData( 'validTo',   'string' ),
+		), true );
+
+		$urlName = $webPage->getUrlName();
+		if( $urlName && $urlName[0] !== '/' ) {
+			$urlName = '/'.$urlName;
+
+			$webPage->setUrlName( $urlName );
+		}
+
+		$this->associatePreviewData( $request, $webPage );
+
+		// build and render blocks
+		$blockLoader  = new \WebBuilder\Persistance\FakeLoader( $instances );
+		$blockFactory = new \WebBuilder\WebBlocksFactory( $this->database );
+
+		$builder = new \WebBuilder\WebBuilder( $blockLoader, $blockFactory );
+
+		$twig = $builder->getTwig();
+		$twig->addGlobal( 'BASE_HREF', BASE_HREF );
+
+		// render the webPage
+		$preview = $builder->render( $webPage );
+
+		return new HtmlResponse( $preview );
 	}
 }

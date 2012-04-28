@@ -65,4 +65,23 @@ class SimplePageEditor extends AbstractPageEditor
 		return new ActionResponse( true );
 	}
 
+	/**
+	 * Adds associated data for page preview
+	 *
+	 * @param RequestInterface $request
+	 * @param cWebPage $webPage
+	 */
+	protected function associatePreviewData( RequestInterface $request, cWebPage $webPage )
+	{
+		$simplePage = new cSimplePage( array(
+			'webPageID'    => $webPage->getID(),
+			'perex'        => $request->getData( 'perex', 'string' ),
+			'content'      => $request->getData( 'content', 'string' ),
+			'titleImageID' => $request->getData( 'titleImageID', 'int' ),
+		) );
+
+		$simplePage->setWebPage( $webPage );
+		$webPage->setContentItem( $simplePage );
+	}
+
 }

@@ -28,7 +28,8 @@ class DatabaseUpdater
 	/**
 	 * Saves BlockInstances structure
 	 *
-	 * @param RequestInterface $request
+	 * @param BlockSet $blockSet
+	 * @param array $clientData
 	 * @return array
 	 */
 	public function saveBlockInstances( BlockSet $blockSet, array $clientData )
@@ -48,6 +49,25 @@ class DatabaseUpdater
 		$this->loadMissingData( $instances );
 
 		$this->saveInstancesData( $localInstances );
+
+		return $instances;
+	}
+
+	/**
+	 * Formats the client data same way as the saveBlockInstances method,
+	 * but do not actually save iny data to the database
+	 *
+	 * @param BlockSet $blockSet
+	 * @param array $clientData
+	 * @return array
+	 */
+	public function fakeBlockInstances( BlockSet $blockSet, array $clientData )
+	{
+		$blockSetID = (int)$blockSet->getID();
+		$instances  = BlockInstance::import( $clientData );
+
+		$this->loadMissingData( $instances );
+		$this->loadMissingDataDependencies( $instances );
 
 		return $instances;
 	}
@@ -181,42 +201,119 @@ class DatabaseUpdater
 			return;
 		}
 
-		$instanceIDsStr = implode( ',', array_keys( $instances ) );
+		$templateIDs = array();
+		foreach( $instances as $instance ) {
+			$templateIDs[] = $instance->templateID;
+		}
+
+		$templateIDsStr = implode( ',', $templateIDs );
 
 		$sql = "
 			SELECT
-				bi.ID       ID,
+				bt.ID       template_ID,
 				bt.filename template_filename,
 				b.ID        block_ID,
 				b.code_name block_code_name
 
-			FROM blocks_instances bi
-			JOIN blocks_templates bt ON ( bt.ID = bi.template_ID )
+			FROM blocks_templates bt
 			JOIN blocks b ON ( b.ID = bt.block_ID )
 
-			WHERE bi.ID IN ({$instanceIDsStr})
+			WHERE bt.ID IN ({$templateIDsStr})
 		";
 		$this->database->query( $sql );
 		$resultSet = $this->database->fetchArray();
 
-		if( sizeof( $resultSet ) !== sizeof( $instances) ) {
+		if( sizeof( $resultSet ) !== sizeof( $instances ) ) {
 			// TODO better exception
 			throw new \Exception("Instance count does not match");
 		}
 
+		$templates = array();
 		foreach( $resultSet as $resultItem ) {
-			$instanceID = (int)$resultItem['ID'];
+			$templateID = (int)$resultItem['template_ID'];
 
-			if( isset( $instances[ $instanceID ] ) === false ) {
+			$templates[ $templateID ] = array(
+				'templateFilename' => $resultItem['template_filename'],
+				'blockID'          => (int)$resultItem['block_ID'],
+				'blockCodeName'    => $resultItem['block_code_name'],
+			);
+		}
+
+		foreach( $instances as $instance ) { /* @var $instance BlockInstance */
+			$templateID = $instance->templateID;
+
+			if( isset( $templates[ $templateID ] ) === false ) {
 				// TODO better exception
-				throw new \Exception("Loaded data does not match instances");
+				throw new \Exception("Invalid template ID '{$templateID}'");
 			}
 
-			/* @var $instance BlockInstance */
-			$instance = $instances[ $instanceID ];
-			$instance->templateFile = $resultItem['template_filename'];
-			$instance->blockID      = (int)$resultItem['block_ID'];
-			$instance->blockName    = $resultItem['block_code_name'];
+			$template = $templates[ $templateID ];
+
+			$instance->templateFile = $template['templateFilename'];
+			$instance->blockID      = $template['blockID'];
+			$instance->blockName    = $template['blockCodeName'];
+		}
+	}
+
+	private function loadMissingDataDependencies( array $instances )
+	{
+		if( sizeof( $instances ) === 0 ) {
+			return;
+		}
+
+		$filters = array();
+		foreach( $instances as $instance ) {
+			$filter = "block_ID = {$instance->blockID}";
+
+			if( sizeof( $instance->dataDependencies ) > 0 ) {
+				$properties = array();
+				foreach( $instance->dataDependencies as $propertyName => $dependency ) {
+					$properties[] = $this->database->escape( $propertyName );
+				}
+
+				$filter .= ' AND property NOT IN ("'. implode( '","', $properties ). '")';
+			}
+
+			$filters[] = $filter;
+		}
+
+		$sql = 'SELECT * FROM blocks_data_requirements WHERE ('. implode( ') OR (', $filters ) .')';
+		$this->database->query( $sql );
+		$resultSet = $this->database->fetchArray();
+
+		// no additional data requirements
+		if( $resultSet == null ) {
+			return;
+		}
+
+		// group results by blockID
+		$blockRequirements = array();
+		foreach( $resultSet as $resultItem ) {
+			$blockID = (int)$resultItem['block_ID'];
+
+			if( ! isset( $blockRequirements[ $blockID ] ) ) {
+				$blockRequirements[ $blockID ] = array();
+			}
+
+			$blockRequirements[ $blockID ][ $resultItem['property'] ] = (int)$resultItem['ID'];
+		}
+
+		// add UndefinedData to the instances
+		foreach( $instances as $instance ) {
+			$blockID = $instance->blockID;
+
+			// no additional data requirements
+			if( ! isset( $blockRequirements[ $blockID ] ) ) {
+				continue;
+			}
+
+			foreach( $blockRequirements[ $blockID ] as $property => $propertyID ) {
+				if( isset( $instance->dataDependencies[ $property ] ) ) {
+					continue;
+				}
+
+				$instance->dataDependencies[ $property ] = new UndefinedData( $instance, $propertyID, $property );
+			}
 		}
 	}
 

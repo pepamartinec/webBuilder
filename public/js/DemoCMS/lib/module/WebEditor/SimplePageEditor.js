@@ -39,7 +39,8 @@ Ext.define( 'DemoCMS.module.WebEditor.SimplePageEditor',
 		});
 		me.dicussionTab = Ext.create( 'DemoCMS.module.WebEditor.pageEditor.Discussion' );
 		me.templateTab  = Ext.create( 'DemoCMS.module.WebEditor.pageEditor.Template', {
-			env : me.env
+			env    : me.env,
+			editor : me
 		});
 
 

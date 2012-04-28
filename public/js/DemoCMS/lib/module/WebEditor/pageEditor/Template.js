@@ -14,6 +14,16 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Template',
 	 */
 	env : null,
 
+	/**
+	 * @required
+	 * @cfg {extAdmin.component.editor.DataEditorFeature} editor
+	 */
+	editor : null,
+
+	/**
+	 * Component initialization
+	 *
+	 */
 	initComponent : function()
 	{
 		var me = this;
@@ -36,6 +46,13 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Template',
 				xtype : 'toolbar',
 
 				items : [{
+					xtype : 'button',
+					text  : 'Náhled',
+					iconCls : 'i-display',
+
+					handler : me.showPreview,
+					scope   : me
+				},{
 					xtype : 'button',
 					text  : 'Načíst předdefinovanou',
 					iconCls : 'i-folder',
@@ -117,6 +134,80 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Template',
 				me.templateEditor.clear();
 			}
 		});
+	},
+
+	showPreview : function()
+	{
+		var me = this;
+
+		if( ! me.previewWindow || me.previewWindow.closed ) {
+			// TODO window.closed is not a part of any W3C specification
+			// but is supported by all mayor browsers
+
+			me.previewWindow = window.open( 'about:blank' );
+		}
+
+		var doc = me.previewWindow.document;
+
+		Ext.DomHelper.overwrite( doc.body, {
+			tag  : 'p',
+			html : 'Probáhá zpracování náhledu..'
+		});
+
+		me.editor.module.runRawAction( 'preview', {
+			data : me.editor.getData(),
+
+			success : me.onPreviewLoad,
+			scope   : me
+		});
+	},
+
+	onPreviewLoad : function( content )
+	{
+		var me  = this,
+		    doc = me.previewWindow.document;
+
+		// show preview notification bar
+		var bar = '<div style="position: fixed; background-image: url(data:image/gif;base64,R0lGODlhCgAKALMAAP8AAP8pKQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAACgAKAAAEFTBICWqdwd6pAe6fFlpYRo4eWopoBAA7); color: white; font-weight: bolder; padding: 3px; opacity: 0.8; width: 100%; top:0; left: 0; text-align: center; z-index: 1000">Náhled stránky</div>';
+
+		// write the preview content
+		doc.open();
+		doc.write( content );
+		doc.write( bar );
+		doc.close();
+
+		// modify the title
+		doc.title = '[Náhled] '+ doc.title;
+
+		// prevent user from navigating away from the preview
+		doc.onmousedown = me.previewEventsHandler;
+		doc.onmouseup   = me.previewEventsHandler;
+		doc.onclick     = me.previewEventsHandler;
+		doc.onkeypress  = me.previewEventsHandler;
+		doc.onkeyup     = me.previewEventsHandler;
+
+		// refresh the preview on the F5 key
+		doc.onkeydown = function( e ) { return me.previewKeypressHandler( e ); };
+	},
+
+	previewEventsHandler : function( e )
+	{
+		e.preventDefault();
+		e.stopPropagation();
+	},
+
+	previewKeypressHandler : function( e )
+	{
+		var code = e.keyCode || e.charCode;
+
+		// TODO let Ext handle the hardcoded keyCode
+
+		if( code == 116 ) {
+			this.showPreview();
+		}
+
+		e.preventDefault();
+		e.stopPropagation();
 	},
 
 	getData : function()

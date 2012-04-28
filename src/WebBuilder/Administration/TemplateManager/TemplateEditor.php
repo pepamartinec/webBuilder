@@ -136,8 +136,8 @@ class TemplateEditor extends DataEditor
 		}
 
 		// load template blocks
-		$blocksLoader = new \WebBuilder\Persistance\DatabaseLoader( $blockSetsFeeder );
-		$blocks       = $blocksLoader->fetchBlocksInstances( $blockSet );
+		$blocksLoader = new \WebBuilder\Persistance\DatabaseLoader( $this->database, $blockSet->getID() );
+		$blocks       = $blocksLoader->loadBlockInstances();
 		$rootBlock    = reset( $blocks );
 
 		$template = null;
