@@ -5,6 +5,7 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Template',
 	requires : [
 		'Ext.layout.container.Fit',
 		'WebBuilder.component.TemplateEditor',
+		'WebBuilder.UndoPlugin',
 		'DemoCMS.component.TemplateSelectorPopup'
 	],
 
@@ -31,12 +32,33 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Template',
 		me.blockSetIdField = Ext.create( 'Ext.form.field.Hidden' );
 		me.parentIdField   = Ext.create( 'Ext.form.field.Hidden' );
 
+		var undoPlugin = Ext.create( 'WebBuilder.UndoPlugin' );
+
 		me.templateEditor = Ext.create( 'WebBuilder.component.TemplateEditor', {
+			plugins : [ undoPlugin ],
+
 			env   : me.env
 		});
 
+		me.undoBtn = Ext.create( 'Ext.button.Button', {
+			text    : 'Zpět',
+			iconCls : 'i-arrow-undo',
+
+			handler : me.templateEditor.undo,
+			scope   : me.templateEditor
+		});
+
+		me.redoBtn = Ext.create( 'Ext.button.Button', {
+			text    : 'Vpřed',
+			iconCls : 'i-arrow-redo',
+
+			handler : me.templateEditor.redo,
+			scope   : me.templateEditor
+		});
+
+		undoPlugin.on( 'historychange', me.onTemplateHistoryChange, me );
+
 		Ext.apply( me, {
-			title  : 'Šablona',
 			layout : 'fit',
 
 			items : [ me.templateEditor ],
@@ -46,11 +68,11 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Template',
 				xtype : 'toolbar',
 
 				items : [{
-					xtype : 'button',
-					text  : 'Náhled',
-					iconCls : 'i-display',
+					xtype   : 'button',
+					text    : 'Nová',
+					iconCls : 'i-application-form-delete',
 
-					handler : me.showPreview,
+					handler : me.reset,
 					scope   : me
 				},{
 					xtype : 'button',
@@ -60,11 +82,17 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Template',
 					handler : me.loadPredefined,
 					scope   : me
 				},{
-					xtype   : 'button',
-					text    : 'Vymazat obsah',
-					iconCls : 'i-application-form-delete',
+					xtype : 'tbseparator'
 
-					handler : me.reset,
+				}, me.undoBtn, me.redoBtn, {
+
+					xtype : 'tbseparator'
+				},{
+					xtype : 'button',
+					text  : 'Náhled',
+					iconCls : 'i-monitor',
+
+					handler : me.showPreview,
 					scope   : me
 				}]
 			}]
@@ -134,6 +162,15 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Template',
 				me.templateEditor.clear();
 			}
 		});
+	},
+
+	onTemplateHistoryChange : function()
+	{
+		var me  = this,
+		    tpl = me.templateEditor;
+
+		me.undoBtn.setDisabled( ! tpl.hasPrevState() );
+		me.redoBtn.setDisabled( ! tpl.hasNextState() );
 	},
 
 	showPreview : function()

@@ -18,8 +18,10 @@ body {
 .i-application-go { background-image: url('../images/icons/application_go.png'); }
 .i-application-osx-terminal { background-image: url('../images/icons/application_osx_terminal.png'); }
 .i-arrow-out { background-image: url('../images/icons/arrow_out.png'); }
+.i-arrow-redo { background-image: url('../images/icons/arrow_redo.png'); }
 .i-arrow-refresh { background-image: url('../images/icons/arrow_refresh.png'); }
 .i-arrow-rotate-anticlockwise { background-image: url('../images/icons/arrow_rotate_anticlockwise.png'); }
+.i-arrow-undo { background-image: url('../images/icons/arrow_undo.png'); }
 .i-cancel { background-image: url('../images/icons/cancel.png'); }
 .i-chart-bar-error { background-image: url('../images/icons/chart_bar_error.png'); }
 .i-clock-go { background-image: url('../images/icons/clock_go.png'); }
@@ -81,6 +83,11 @@ body {
 
 
 /************* CANVAS *************/
+html, body {
+        width   : 100%;
+        height  : 100%;
+}
+
 .x-template-canvas .x-title {
 	font-family : Calibri, Verdana, Arial, sans-serif;
 	font-size   : 15px;
@@ -88,89 +95,106 @@ body {
 
 /************* BLOCK *************/
 .x-template-canvas .x-block {
-	margin  : 7px;
-	padding : 0px;
+    margin  : 7px;
+    padding : 0px;
 	
-	border        : 2px solid #aaa;
-	border-radius : 7px;
+    border        : 2px solid #aaa;
+    border-radius : 7px;
+    background-color : #F0FFD1;
 }
 
-.x-template-canvas .x-block.x-root {
-	margin : 0px;
-	width  : 100%;
-	height : 100%;
-	border : none;
+.x-template-canvas .x-root > .x-block {
+    width  : 100%;
+    height : 100%;
+    margin : 0;
+    border     : none;
+    background : none;
+}
+
+.x-template-canvas .x-root > .x-title {
+    display : none;
 }
 
 .x-template-canvas .x-block.x-over {
-	border-color : #f00;
+    border-color : #f00;
 }
 
 .x-template-canvas .x-block.x-drag {
-	background-color : #666;
-	opacity          : 1;
+    background-color : #666;
+    opacity          : 1;
 }
 
 .x-template-canvas .x-block-variable {
-	color            : #000;
-	background-color : #CAE871;
-	border           : 1px solid #5F7913;
-	border-radius    : 5px;
-	
-	display : inline-block;
-	margin  : 1px 3px;
-	padding : 0px 2px;
+    color            : #000;
+    background-color : #CAE871;
+    border           : 1px solid #5F7913;
+    border-radius    : 5px;
+    
+    display : inline-block;
+    margin  : 1px 3px;
+    padding : 0px 2px;
+}
+
+.x-template-canvas .x-block > * {
+    visibility : hidden;
+}
+
+.x-template-canvas .x-block > .x-title,
+.x-template-canvas .x-block .x-slot {
+    visibility : visible;
 }
 
 /************* BLOCK TITLE *************/
 .x-template-canvas .x-block > .x-title {
-	font-weight      : bold;
-	background-color : #FDFFFF;
-	padding          : 0px 10px;
-	border-radius    : 5px;
-	
-	cursor : pointer;
+    font-weight      : bold;
+    background-color : #FDFFFF;
+    padding          : 0px 10px;
+    border-radius    : 5px;
+    cursor           : pointer;
+}
+
+.x-template-canvas .x-block > .x-title > span {
+    float : left;
+}
+
+.x-template-canvas .x-block > .x-title:after {
+    content    : '.';
+    display    : block;
+    height     : 0;
+    clear      : both;
+    visibility : hidden;
 }
 
 .x-template-canvas .x-block.x-root > .x-title {
     display : none;
 }
 
-.x-template-canvas .x-block.x-over > .x-title {
-	background-color : #F0F2FE;
-}
-
 .x-template-canvas .x-block.x-drag > .x-title {
-	background-color : #999;
-	color            : #000;
+    background-color : #999;
+    color            : #000;
 }
 
 
 /************* BLOCK TITLE TOOLS *************/
 .x-template-canvas .x-block > .x-title > .x-tools {
-	float   : right;
-	display : none;
-}
-
-.x-template-canvas .x-block.x-over > .x-title > .x-tools {
-	display : block;
+    float : right;
 }
 
 .x-template-canvas .x-block > .x-title > .x-tools > .x-tool {
-	width      : 16px;
-	height     : 16px;
-	margin     : 2px 3px;
-	float      : left;
-	cursor     : pointer;
-	background : transparent no-repeat center center;
+    width      : 16px;
+    height     : 16px;
+    margin     : 2px 3px;
+    float      : left;
+    cursor     : pointer;
+    background : transparent no-repeat center center;
 }
 
 .x-template-canvas .x-block > .x-title > .x-tools > .x-tool.x-config {
-	background-image: url('../images/icons/cog.png');
+    background-image: url('../images/icons/cog.png');
 }
 
 .x-template-canvas .x-block > .x-title > .x-tools > .x-tool.x-remove {
-	background-image: url('../images/icons/delete.png');
+    background-image: url('../images/icons/delete.png');
 }
 
 /************* SLOT *************/
@@ -194,10 +218,6 @@ body {
 	border : none;
 }
 
-.x-template-canvas .x-block.x-over .x-slot {
-/*	border-color : #666;*/
-}
-
 /************* SLOT TITLE *************/
 .x-template-canvas .x-block .x-slot > .x-title {
     position   : absolute;
@@ -205,38 +225,35 @@ body {
     height     : 100%;
     border-radius : 7px;
     text-align : center;
+
+    z-index : -1;
+    opacity : .85;
     
-    z-index    : -1;
-    opacity    : 0;
-    
-   	background-color : #fafafa;
-   	color            : #888;
-   	text-shadow      : #ccc 1px 1px 1px;
-   	font-weight      : bold;
+    background-color : #fafafa;
+    color            : #000;
+    text-shadow      : #ccc 1px 1px 1px;
+    font-weight      : bold;
 }
 
 .x-template-canvas .x-block.x-over .x-slot > .x-title {
-	z-index : 2;
-	opacity : .85;
-	color   : #000;
+    z-index : 2;
 }
 
 .x-template-canvas .x-block.x-over .x-slot:hover > .x-title,
 .x-template-canvas .x-block.x-over .x-slot .x-block .x-slot > .x-title {
-	z-index : -1;	
+    z-index : -1;	
 }
 
-	
 .x-template-canvas .x-slot.x-over {
-	border-style: solid;
-	border-color : #0f0;
+    border-style: solid;
+    border-color : #0f0;
 }
 
 .x-template-canvas .x-insert-pointer {
-	width  : 95%;
-	height : 0px;
-	margin : 7px auto;
-	border : 1px solid #f00;
+    width  : 95%;
+    height : 0px;
+    margin : 7px auto;
+    border : 1px solid #f00;
 }
 
 /******************************* DISCUSSION *******************************/

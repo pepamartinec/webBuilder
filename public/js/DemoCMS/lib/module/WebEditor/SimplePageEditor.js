@@ -28,19 +28,33 @@ Ext.define( 'DemoCMS.module.WebEditor.SimplePageEditor',
 
 		me.generalTab   = Ext.create( 'DemoCMS.module.WebEditor.pageEditor.General', {
 			env    : me.env,
-			editor : me
+			editor : me,
+			border : false,
+			title  : 'Obecné'
 		});
-		me.contentTab   = Ext.create( 'DemoCMS.module.WebEditor.pageEditor.Content' );
+
+		me.contentTab   = Ext.create( 'DemoCMS.module.WebEditor.pageEditor.Content', {
+			border : false,
+			title  : 'Obsah'
+		});
+
 		me.imagesTab    = Ext.create( 'DemoCMS.module.WebEditor.pageEditor.Images', {
 			env    : me.env,
 			editor : me,
 			border : false,
 			title  : 'Obrázky'
 		});
-		me.dicussionTab = Ext.create( 'DemoCMS.module.WebEditor.pageEditor.Discussion' );
+
+		me.dicussionTab = Ext.create( 'DemoCMS.module.WebEditor.pageEditor.Discussion', {
+			border : false,
+			title  : 'Diskuze'
+		});
+
 		me.templateTab  = Ext.create( 'DemoCMS.module.WebEditor.pageEditor.Template', {
 			env    : me.env,
-			editor : me
+			editor : me,
+			border : false,
+			title  : 'Šablona'
 		});
 
 

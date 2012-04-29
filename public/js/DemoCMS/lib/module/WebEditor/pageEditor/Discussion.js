@@ -6,7 +6,6 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Discussion',
 		'DemoCMS.model.DiscussionPost'
 	],
 
-	title : 'Diskuze',
 	componentCls : Ext.baseCSSPrefix +'discussion-posts',
 
 	itemTpl : [

@@ -10,8 +10,6 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.General',
 		'Ext.form.field.Hidden'
 	],
 
-	title : 'Obecné',
-
 	defaults : {
 		anchor : '100%'
 	},

@@ -73,33 +73,15 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 
 		me.canvas = Ext.create( 'WebBuilder.widget.RealCanvas', {
 			region : 'center',
-			title  : 'Plátno',
 
 			module         : me.module,
 			ddGroup        : ddGroup,
 			instancesStore : me.instancesStore
 		});
 
-//		me.tree = Ext.create( 'WebBuilder.widget.TemplateTree', {
-//			region : 'center',
-//			border : false,
-//			title  : 'Strom',
-//
-//			ddGroup : ddGroup,
-//			store   : me.instancesStore
-//		});
-
 		Ext.apply( me, {
 			layout : 'border',
-			items  : [{
-					xtype  : 'tabpanel',
-					region : 'center',
-					border : false,
-
-					items : [ me.canvas ]
-				},
-
-				me.list ]
+			items  : [ me.canvas, me.list ]
 		});
 
 		me.callParent( arguments );
@@ -220,7 +202,7 @@ Ext.define( 'WebBuilder.component.TemplateEditor',
 	{
 		return false;
 
-		// JSON can not be used anymore, because the instance data dependencies can create circylar references
+		// JSON can not be used anymore, because the instance data dependencies can create circular references
 		// return Ext.JSON.encode( value1 ) === Ext.JSON.encode( value2 );
 	},
 

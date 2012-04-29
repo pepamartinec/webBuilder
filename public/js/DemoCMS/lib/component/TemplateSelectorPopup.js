@@ -47,7 +47,7 @@ Ext.define( 'DemoCMS.component.TemplateSelectorPopup',
 			}),
 
 			columns : [{
-				dataIndex : 'name',
+				dataIndex : 'title',
 				header    : 'Název'
 			}]
 		});
