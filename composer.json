@@ -14,6 +14,16 @@
             }
         }
     },{
+        "type" : "package",
+        "package" : {
+            "name"    : "Sencha/ExtJS",
+            "version" : "4.1.0", 
+            "dist"    : {
+                "url"  : "http://cdn.sencha.io/ext-4.1.0-gpl.zip",
+                "type" : "zip"
+            }
+        }
+    },{
         "type" : "vcs",
         "url"  : "https://joker806@github.com/joker806/extAdmin"
     }],
@@ -21,6 +31,7 @@
     "require" : {
         "php"               : ">=5.3",
         "twig/twig"         : "1.6.*",
+        "Sencha/ExtJS"      : "4.1.*",
         "extAdmin/extAdmin" : "master-dev",
         "imagine/Imagine"   : "0.2.8"
     },
