@@ -10,7 +10,7 @@
 	<!-- STYLESHEETS -->
 	<link rel="stylesheet" type="text/css" href="http://dev-cdn/ExtJS_4.1/resources/css/ext-all-debug.css" />
 	<link rel="stylesheet" type="text/css" href="http://dev-cdn/dumpJS/dump.css" />
-	<link rel="stylesheet" type="text/css" href="http://dev-cdn/extAdmin/resources/css/extAdmin.css" />
+	<link rel="stylesheet" type="text/css" href="vendor/extAdmin/extAdmin/resources/css/extAdmin.css" />
 	
 	<link rel="stylesheet" type="text/css" href="public/css/WebAdmin.css" />
 </head>
@@ -26,7 +26,7 @@
 			enabled        : true,
 			disableCaching : false,
 			paths : {
-				'extAdmin'   : 'http://dev-local/extAdmin/lib',
+				'extAdmin'   : 'vendor/extAdmin/extAdmin/client',
 				'WebBuilder' : 'public/js/WebBuilder/lib',
 				'DemoCMS'   : 'public/js/DemoCMS/lib'
 			}
@@ -34,7 +34,7 @@
 	</script>
 	
 	<script type="text/javascript" src="http://dev-cdn/dumpJS/dump.js"></script>
-	<script type="text/javascript" src="http://dev-local/extAdmin/extAdmin.js"></script>
+	<script type="text/javascript" src="vendor/extAdmin/extAdmin/extAdmin.js"></script>
 	<script type="text/javascript">	
 		// FireBug console emulation
 		if( window.console === undefined ) {

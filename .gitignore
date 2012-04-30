@@ -8,10 +8,6 @@
 /composer.lock
 /vendor
 
-##### NON-COMPOSER LIBS #####
-/src/ExtAdmin
-
-##### JS LIBS #####
 
 *.bak
 /tmp

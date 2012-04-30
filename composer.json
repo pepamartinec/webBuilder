@@ -13,26 +13,23 @@
                 "reference" : "master"
             }
         }
+    },{
+        "type" : "vcs",
+        "url"  : "https://joker806@github.com/joker806/extAdmin"
     }],
     
     "require" : {
-        "php"             : ">=5.3",
-        "twig/twig"       : "1.6.*",
-        "imagine/Imagine" : "0.2.8",
-        
-        "sabberworm/PHP-CSS-Parser" : "1.0.0-dev"
+        "php"               : ">=5.3",
+        "twig/twig"         : "1.6.*",
+        "extAdmin/extAdmin" : "master-dev",
+        "imagine/Imagine"   : "0.2.8"
     },
     
     "autoload" : {
         "psr-0" : {
         	"DemoCMS"    : "src/",
-        	"ExtAdmin"   : "src/",
             "Inspirio"   : "src/",
             "WebBuilder" : "src/"
-        },
-        
-        "classmap" : [
-        	"vendor/sabberworm/PHP-CSS-Parser"
-        ]
+        }
     }
 }
