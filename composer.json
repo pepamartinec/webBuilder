@@ -24,7 +24,7 @@
             }
         }
     },{
-        "type" : "vcs",
+        "type" : "git",
         "url"  : "https://joker806@github.com/joker806/extAdmin"
     }],
     
