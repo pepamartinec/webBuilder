@@ -109,6 +109,13 @@ class TemplateList extends GridList
 				'delete'
 			),
 
+			'filters' => array(
+				'items' => array(
+					'title'         => array( 'fieldLabel' => 'Název', 'xtype' => 'textfield' ),
+					'pageTemplates' => array( 'fieldLabel' => 'Zobrazit šablony stránek', 'xtype' => 'checkbox' ),
+				)
+			),
+
 			'fields' => array(
 				'title' => array(
 					'title' => 'Název'
@@ -123,6 +130,44 @@ class TemplateList extends GridList
 	}
 
 	/**
+	 * Applies filters from the request on the data feeder
+	 *
+	 * @param DataRequestDecorator $request
+	 * @param cDBFeederBase $feeder
+	 * @return cDBFeederBase
+	 */
+	private function applyRequestFilters( DataRequestDecorator $request, cDBFeederBase $feeder )
+	{
+		if( $request->hasFilter( 'title' ) ) {
+			$feeder->whereColumnLike( 'name', '%'. $request->getFilter( 'title', 'string' ) .'%' );
+		}
+
+		if( ! $request->hasFilter( 'pageTemplates') ) {
+			$feeder->where( 'ID NOT IN ( SELECT block_set_ID FROM web_pages )' );
+		}
+
+		return $feeder;
+	}
+
+	/**
+	 * Applies result sorting from the request on the data feeder
+	 *
+	 * @param DataRequestDecorator $request
+	 * @param cDBFeederBase $feeder
+	 * @return cDBFeederBase
+	 */
+	private function applyRequestSorting( DataRequestDecorator $request, cDBFeederBase $feeder )
+	{
+		foreach( $request->getOrdering() as $property => $dir ) {
+			switch( $property ) {
+				case 'title': $feeder->orderBy( 'name', $dir ); break;
+			}
+		}
+
+		return $feeder;
+	}
+
+	/**
 	 * Loads data for dataList
 	 *
 	 * @param  RequestInterface $request
@@ -133,11 +178,12 @@ class TemplateList extends GridList
 		$request = new DataRequestDecorator( $request );
 
 		$dataFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockSet', $this->database );
-// 		$data       = $dataFeeder->where( 'ID NOT IN ( SELECT block_set_ID FROM web_pages )' )->get();
-// 		$count      = $dataFeeder->where( 'ID NOT IN ( SELECT block_set_ID FROM web_pages )' )->getCount();
 
-		$data       = $dataFeeder->get();
-		$count      = $dataFeeder->getCount();
+		$this->applyRequestFilters( $request, $dataFeeder );
+		$this->applyRequestSorting( $request, $dataFeeder );
+		$data = $dataFeeder->get();
+
+		$count = $this->applyRequestFilters( $request, $dataFeeder )->getCount();
 
 		if( $data === null ) {
 			$data = array();
