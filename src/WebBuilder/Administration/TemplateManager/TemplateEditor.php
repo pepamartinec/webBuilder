@@ -230,7 +230,7 @@ class TemplateEditor extends DataEditor
 
 		$templateData['parentID'] = $templateData['ID'];
 		$templateData['ID'] = null;
-		$templateData['name'] += ' (kopie)';
+		$templateData['name'] = 'Rozšířná '. lcfirst( $templateData['name'] );
 
 		$response->setData( $templateData );
 

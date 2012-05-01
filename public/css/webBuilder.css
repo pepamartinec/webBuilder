@@ -50,7 +50,9 @@ body {
 .i-ok { background-image: url('../images/icons/ok_green.png'); }
 .i-package-go { background-image: url('../images/icons/package_go.png'); }
 .i-page-white-acrobat { background-image: url('../images/icons/page_white_acrobat.png'); }
+.i-page-white-copy { background-image: url('../images/icons/page_white_copy.png'); }
 .i-page-white-excel { background-image: url('../images/icons/page_white_excel.png'); }
+.i-page-white-go { background-image: url('../images/icons/page_white_go.png'); }
 .i-server-from { background-image: url('../images/icons/server_from.png'); }
 .i-server-to { background-image: url('../images/icons/server_to.png'); }
 .i-table-add { background-image: url('../images/icons/table_add.png'); }

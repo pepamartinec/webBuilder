@@ -58,6 +58,7 @@ class TemplateList extends GridList
 
 			'createCopy' => array(
 				'title'   => 'Vytvořit kopii',
+				'iconCls' => 'i-page-white-copy',
 				'type'    => 'create',
 				'dataDep' => true,
 				'params'  => array(
@@ -68,6 +69,7 @@ class TemplateList extends GridList
 
 			'createInherited' => array(
 				'title'   => 'Vytvořit poděděnou',
+				'iconCls' => 'i-page-white-go',
 				'type'    => 'create',
 				'dataDep' => true,
 				'params'  => array(
@@ -139,7 +141,7 @@ class TemplateList extends GridList
 
 				'action' => array(
 					'type'  => 'actioncolumn',
-					'items' => array( 'edit', 'delete' )
+					'items' => array( 'createCopy', 'createInherited', 'edit', 'delete' )
 				)
 			),
 		);
@@ -229,8 +231,13 @@ class TemplateList extends GridList
 				$webPages = $webPageCount[ $ID ];
 			}
 
-			if( $inherited == 0 && $webPages == 0 ) {
-				$action[] = 'delete';
+			if( $webPages == 0 ) {
+				$action[] = 'createCopy';
+				$action[] = 'createInherited';
+
+				if( $inherited == 0 ) {
+					$action[] = 'delete';
+				}
 			}
 
 			return array(
