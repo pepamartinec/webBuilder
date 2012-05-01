@@ -1,6 +1,10 @@
 <?php
 namespace WebBuilder\Administration\TemplateManager;
 
+use ExtAdmin\Response\DataStoreResponse;
+
+use WebBuilder\Persistance\DatabaseDeleter;
+
 use ExtAdmin\Request\AbstractRequest;
 
 use ExtAdmin\Response\ActionResponse;
@@ -121,7 +125,19 @@ class TemplateList extends GridList
 					'title' => 'Název'
 				),
 
-				'algo' => array(
+				'webPageCount' => array(
+					'title'    => '# webových stránek',
+					'width'    => 120,
+					'sortable' => false
+				),
+
+				'inheritedCount' => array(
+					'title'    => '# poděděných šablon',
+					'width'    => 120,
+					'sortable' => false
+				),
+
+				'action' => array(
 					'type'  => 'actioncolumn',
 					'items' => array( 'edit', 'delete' )
 				)
@@ -181,19 +197,48 @@ class TemplateList extends GridList
 
 		$this->applyRequestFilters( $request, $dataFeeder );
 		$this->applyRequestSorting( $request, $dataFeeder );
-		$data = $dataFeeder->get();
+		$data = $dataFeeder->indexBy( 'ID' )->get();
 
 		$count = $this->applyRequestFilters( $request, $dataFeeder )->getCount();
 
 		if( $data === null ) {
 			$data = array();
+
+			$inheritedCount = null;
+			$webPageCount   = null;
+
+		} else {
+			$blockSetIDs = array_keys( $data );
+			$deleter     = new DatabaseDeleter( $this->database );
+
+			$inheritedCount = $deleter->getInheritedBlockSetCount( $blockSetIDs );
+			$webPageCount   = $deleter->getWebPageUsageCount( $blockSetIDs );
 		}
 
-		return new DataBrowserResponse( true, $data, $count, function( BlockSet $record ) {
+		return new DataStoreResponse( true, $data, $count, function( BlockSet $record ) use( $inheritedCount, $webPageCount ) {
+			$ID        = $record->getID();
+			$inherited = 0;
+			$webPages  = 0;
+			$action    = array( 'edit' );
+
+			if( isset( $inheritedCount[ $ID ] ) ) {
+				$inherited = $inheritedCount[ $ID ];
+			}
+
+			if( isset( $webPageCount[ $ID ] ) ) {
+				$webPages = $webPageCount[ $ID ];
+			}
+
+			if( $inherited == 0 && $webPages == 0 ) {
+				$action[] = 'delete';
+			}
+
 			return array(
 				'ID'    => $record->getID(),
 				'title' => $record->getName(),
-				'image' => 'images/templateThumb.png',
+				'inheritedCount' => $inherited,
+				'webPageCount'   => $webPages,
+				'action'         => $action,
 			);
 		} );
 	}
@@ -222,8 +267,8 @@ class TemplateList extends GridList
 		try {
 			$this->database->transactionStart();
 
-			$webPageFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockSet', $this->database );
-			$webPageFeeder->whereColumnIn( 'ID', $recordIDs )->remove();
+			$deleter = new DatabaseDeleter( $this->database );
+			$deleter->deleteBlockInstances( $recordIDs );
 
 			$this->database->transactionCommit();
 

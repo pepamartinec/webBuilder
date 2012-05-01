@@ -1,6 +1,8 @@
 <?php
 namespace WebBuilder\Persistance;
 
+use WebBuilder\Administration\TemplateManager\BlockInstanceImporter;
+
 use WebBuilder\DataDependencies\UndefinedData;
 use WebBuilder\DataDependencies\InheritedData;
 use WebBuilder\DataDependencies\ConstantData;
@@ -35,7 +37,7 @@ class DatabaseUpdater
 	public function saveBlockInstances( BlockSet $blockSet, array $clientData )
 	{
 		$blockSetID   = (int)$blockSet->getID();
-		$tmpInstances = BlockInstance::import( $clientData );
+		$tmpInstances = BlockInstanceImporter::import( $clientData );
 
 		$this->clearDataDependencies( $blockSetID );
 

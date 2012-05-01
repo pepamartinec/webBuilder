@@ -140,16 +140,11 @@ class TemplateEditor extends DataEditor
 		$blocks       = $blocksLoader->loadBlockInstances();
 		$rootBlock    = reset( $blocks );
 
-		$template = null;
-		if( $rootBlock ) {
-			$template = $rootBlock->export();
-		}
-
 		return array(
 			'ID'       => $blockSet->getID(),
 			'name'     => $blockSet->getName(),
 			'parentID' => $blockSet->getParentID(),
-			'template' => $template
+			'template' => $rootBlock
 		);
 	}
 
@@ -178,6 +173,7 @@ class TemplateEditor extends DataEditor
 		$response   = new ActionResponse( true );
 
 		$templateData = $this->loadTemplateData( $templateID, $response );
+		$templateData['template'] = BlockInstanceExporter::export( $templateData['template'] );
 
 		if( $response->getSuccess() === false ) {
 			return $response;
@@ -200,13 +196,14 @@ class TemplateEditor extends DataEditor
 		$response   = new ActionResponse( true );
 
 		$templateData = $this->loadTemplateData( $templateID, $response );
+		$templateData['template'] = BlockInstanceCopyExporter::export( $templateData['template'] );
 
 		if( $response->getSuccess() === false ) {
 			return $response;
 		}
 
 		$templateData['ID'] = null;
-		$templateData['name'] += ' (kopie)';
+		$templateData['name'] .= ' (kopie)';
 
 		$response->setData( $templateData );
 
@@ -225,6 +222,7 @@ class TemplateEditor extends DataEditor
 		$response   = new ActionResponse( true );
 
 		$templateData = $this->loadTemplateData( $templateID, $response );
+		$templateData['template'] = BlockInstanceExporter::export( $templateData['template'] );
 
 		if( $response->getSuccess() === false ) {
 			return $response;
@@ -373,107 +371,6 @@ class TemplateEditor extends DataEditor
 	}
 
 	/**
-	 * Loads simplified stylesheet
-	 *
-	 * @param RequestInterface $request
-	 * @return ResponseInterface
-	 */
-	public function loadSimplifiedStylesheet( RequestInterface $request )
-	{
-		echo $sheetFile = PATH_TO_ROOT . $request->getParameter( 'stylesheet', 'string' );
-
-		// file not found
-		if( is_file( $sheetFile ) === false ) {
-			$response = new CssResponse( '' );
-			$response->setStatus( CssResponse::S_NOT_FOUND );
-
-			return $response;
-		}
-
-		$sheetContent = file_get_contents( $sheetFile );
-
-		$parser = new \CSSParser( $sheetContent );
-		$css    = $parser->parse();
-
-		$rulesWhiteList = array(
-			'width',  'min-width',  'max-width',
-			'height', 'min-height', 'max-height',
-			'margin',
-			'float', 'clear',
-			'display'
-		);
-
-		foreach( $css->getAllRuleSets() as $ruleSet ) {
-			/* @var $ruleSet \CSSDeclarationBlock */
-
-			foreach( $ruleSet->getRules() as $rule ) {
-				/* @var $rule \CSSRule */
-				if( in_array( $rule->getRule(), $rulesWhiteList ) === false ) {
-					$ruleSet->removeRule( $rule );
-				}
-			}
-
-			if( sizeof( $ruleSet->getRules() ) === 0 ) {
-				$css->remove( $ruleSet );
-			}
-		}
-
-		$response = new CssResponse( $css->__toString() );
-		$response->setLastModified( filemtime( $sheetFile ) );
-
-		return $response;
-	}
-
-	/**
-	 * Loads block template
-	 *
-	 * @param RequestInterface $request
-	 * @return ResponseInterface
-	 */
-	public function loadMasterBlockTemplate( RequestInterface $request )
-	{
-// 		$templateID = $request->getParameter( 'templateID', 'int' );
-// 		$template   = null;
-// 		$response   = new ActionResponse( true );
-
-// 		if( $templateID ) {
-// 			$templatesFeeder = new cDBFeederBase( '\\WebBuilder\\DataObject\\BlockTemplate', $this->database );
-// 			$template        = $templatesFeeder->whereID( $tempateID )->getID();
-// 		}
-
-// 		if( $template === null ) {
-// 			$response->setSuccess( false )
-// 			         ->setMessage( "No template with ID '{$templateID}' found" );
-
-// 			return $response;
-// 		}
-
-		// init Twig
-		$loader = new \Twig_Loader_Filesystem( PATH_TO_ROOT );
-		$twig   = new \Twig_Environment( $loader, array(
-//			'cache'               => './tmp/',
-//			'base_template_class' => '\WebBuilder\Twig\WebBuilderTemplate'
-		) );
-
-		$builder = new DummyBuilder();
-		$twig->addExtension( new WebBuilderExtension( $builder ) );
-
-		/* @var $template \WebBuilder\Twig\WebBuilderTemplate */
-		$template = $twig->loadTemplate( 'templates/core/webPage_html5.twig' );
-
-		// TODO ugly hack
-
-
-		$html = $template->render( array(
-			'config' => array(
-				'stylesheet' => 'public/css/style.css'
-			)
-		) );
-
-		return new HtmlResponse( $html );
-	}
-
-	/**
 	 * Saves submitted template data
 	 *
 	 * @param RequestInterface $request
@@ -507,7 +404,7 @@ class TemplateEditor extends DataEditor
 			'ID'       => $blockSet->getID(),
 			'name'     => $blockSet->getName(),
 			'parentID' => $blockSet->getParentID(),
-			'template' => $rootInstance->export(),
+			'template' => BlockInstanceExporter::export( $rootInstance ),
 		) );
 
 		return $response;
@@ -521,13 +418,15 @@ class TemplateEditor extends DataEditor
 	 */
 	private function saveBlockSet( cDBFeederBase $blockSetsFeeder, RequestInterface $request )
 	{
-		$ID   = $request->getData( 'ID', 'int' );
-		$name = $request->getData( 'name', 'string' );
+		$ID       = $request->getData( 'ID', 'int' );
+		$parentID = $request->getData( 'parentID', 'int' );
+		$name     = $request->getData( 'name', 'string' );
 
 		$blockSet = new BlockSet( array(
-			'ID'   => $ID,
-			'name' => $name
-		) );
+			'ID'       => $ID,
+			'parentID' => $parentID,
+			'name'     => $name
+		), true );
 
 		$blockSetsFeeder->save( $blockSet );
 

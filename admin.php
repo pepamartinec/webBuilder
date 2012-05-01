@@ -15,7 +15,7 @@ require 'common.php';
 	<!-- STYLESHEETS -->
 	<link rel="stylesheet" type="text/css" href="vendor/Sencha/ExtJS/resources/css/ext-all-debug.css" />
 	<link rel="stylesheet" type="text/css" href="http://dev-cdn/dumpJS/dump.css" />
-	<link rel="stylesheet" type="text/css" href="vendor/extAdmin/extAdmin/resources/css/extAdmin.css" />
+	<link rel="stylesheet" type="text/css" href="http://dev-local/extAdmin/resources/css/extAdmin.css" />
 
 	<link rel="stylesheet" type="text/css" href="public/css/webBuilder.css" />
 </head>
@@ -30,7 +30,7 @@ require 'common.php';
 			enabled        : true,
 			disableCaching : false,
 			paths : {
-				'extAdmin'   : 'vendor/extAdmin/extAdmin/client',
+				'extAdmin'   : 'http://dev-local/extAdmin/client',
 				'WebBuilder' : 'public/js/WebBuilder/lib',
 				'DemoCMS'    : 'public/js/DemoCMS/lib'
 			}

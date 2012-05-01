@@ -1,6 +1,8 @@
 <?php
 namespace DemoCMS\Administration\WebEditor;
 
+use WebBuilder\Administration\TemplateManager\BlockInstanceExporter;
+
 use ExtAdmin\Response\HtmlResponse;
 
 use WebBuilder\WebBlocksFactory;
@@ -195,7 +197,7 @@ abstract class AbstractPageEditor extends DataEditor
 				$data['parentBlockSetID'] = $blockSet->getParentID();
 			}
 
-			$data['template'] = $rootInstance->export();
+			$data['template'] = BlockInstanceExporter::export( $rootInstance );
 		}
 
 		// load associated data
@@ -327,7 +329,7 @@ abstract class AbstractPageEditor extends DataEditor
 			'validFrom'  => $webPage->getValidFrom(),
 			'validTo'    => $webPage->getValidTo(),
 
-			'template'   => $rootInstance->export(),
+			'template'   => BlockInstanceExporter::export( $rootInstance ),
 			'discussion' => $postsData,
 		) + $response->getData() );
 
