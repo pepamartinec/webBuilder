@@ -127,11 +127,9 @@ class ImageList extends ModuleBase
 			$imageFeeder = new cDBFeederBase( '\\DemoCMS\\cImage', $this->database );
 			$images      = $imageFeeder->whereColumnIn( 'ID', $imageIDs )->get();
 
-			$pathPrefix = PATH_TO_WEBSERVER_ROOT . PATH_FROM_ROOT_TO_BASE;
-
 			foreach( $images as $image ) {
-				@unlink( $pathPrefix . $image->getFilenameFull() );
-				@unlink( $pathPrefix . $image->getFilenameThumb() );
+				@unlink( PATH_TO_ROOT . $image->getFilenameFull() );
+				@unlink( PATH_TO_ROOT . $image->getFilenameThumb() );
 			}
 
 			$imageFeeder->whereColumnIn( 'ID', $imageIDs )->remove();
@@ -195,7 +193,7 @@ class ImageList extends ModuleBase
 	 */
 	protected function processUploadedImage( $webPageID, $uploadedFile )
 	{
-		$pathPrefix       = PATH_TO_WEBSERVER_ROOT . PATH_FROM_ROOT_TO_BASE;
+		$pathPrefix       = PATH_TO_ROOT;
 		$repositoryPath   = 'public/repository/';
 		$thumbDir         = $repositoryPath . 'thumbs/';
 		$originalDir      = $repositoryPath . 'original/';

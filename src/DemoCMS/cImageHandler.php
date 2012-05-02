@@ -41,7 +41,7 @@ class cImageHandler
 		$this->database = $database;
 		$this->feeder   = new cDBFeederBase( '\\DemoCMS\\cImage', $this->database );
 
-		$this->pathPrefix  = PATH_TO_WEBSERVER_ROOT . PATH_FROM_ROOT_TO_BASE;
+		$this->pathPrefix  = PATH_TO_ROOT;
 		$repositoryPath    = 'public/repository/';
 		$this->dirOriginal = $repositoryPath . 'original/';
 		$this->dirThumb    = $repositoryPath . 'thumb/';

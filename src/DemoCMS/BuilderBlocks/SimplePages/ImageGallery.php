@@ -33,7 +33,7 @@ class ImageGallery extends WebBlock
 
 		$dimensions = array();
 
-		$pathPrefix = PATH_TO_WEBSERVER_ROOT . PATH_FROM_ROOT_TO_BASE;
+		$pathPrefix = PATH_TO_ROOT;
 		foreach( $images as $image ) {
 			$dim = array();
 
