@@ -122,6 +122,12 @@ class PageList extends TreeList
 					'type'  => 'treecolumn'
 				),
 
+				'published' => array(
+					'title' => 'Publikováno',
+					'width' => 80,
+				),
+
+
 				'urlName' => array(
 					'title' => 'URL',
 					'width' => 250,
@@ -170,6 +176,12 @@ class PageList extends TreeList
 				$children = array();
 			}
 
+			if( $webPage->getPublished() ) {
+				$published = "<img src='public/images/icons/eye.png' title='Publikováno' alt='Publikováno' />";
+			} else {
+				$published = "<img src='public/images/icons/eye_gray.png' title='Nepublikováno' alt='Nepublikováno' />";
+			}
+
 			// FIXME ugly solution
 			$actions = array( 'createMenuItem', 'createPage' );
 			switch( $webPage->getType() ) {
@@ -186,12 +198,13 @@ class PageList extends TreeList
 
 
 			return array(
-				'ID'       => $webPage->getID(),
-				'title'    => $webPage->getTitle(),
-				'urlName'  => $webPage->getUrlName(),
-				'editedOn' => $webPage->getEditedOn() ?: $webPage->getCreatedOn(),
-				'actions'  => $actions,
-				'data'     => array_map( $extractor, $children ),
+				'ID'        => $webPage->getID(),
+				'title'     => $webPage->getTitle(),
+				'urlName'   => $webPage->getUrlName(),
+				'published' => $published,
+				'editedOn'  => $webPage->getEditedOn() ?: $webPage->getCreatedOn(),
+				'actions'   => $actions,
+				'data'      => array_map( $extractor, $children ),
 			);
 		};
 

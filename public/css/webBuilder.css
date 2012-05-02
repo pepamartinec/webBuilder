@@ -37,6 +37,8 @@ body {
 .i-email-go { background-image: url('../images/icons/email_go.png'); }
 .i-error { background-image: url('../images/icons/error.png'); }
 .i-error-go { background-image: url('../images/icons/error_go.png'); }
+.i-eye { background-image: url('../images/icons/eye.png'); }
+.i-eye-gray { background-image: url('../images/icons/eye_gray.png'); }
 .i-folder { background-image: url('../images/icons/folder.png'); }
 .i-folder-explore { background-image: url('../images/icons/folder_explore.png'); }
 .i-help { background-image: url('../images/icons/help.png'); }
