@@ -1,5 +1,0 @@
-web-builder:
-  shared_writable_dirs:
-    - /tmp
-    - /vendor
-    - /public/repository
