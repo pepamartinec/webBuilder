@@ -219,6 +219,32 @@ abstract class AbstractPageEditor extends DataEditor
 	protected abstract function saveAssociatedData( RequestInterface $request, cWebPage $webPage );
 
 	/**
+	 * Checks urlName format and creates its unique variant if same urlName already exists
+	 *
+	 * @param cWebPage $webPage
+	 * @param cDBFeederBase $pageFeeder
+	 */
+	private function checkUrlName( cWebPage $webPage, cDBFeederBase $pageFeeder )
+	{
+		$webPageID = $webPage->getID();
+		$urlName   = $webPage->getUrlName();
+
+		// normalize URL form
+		if( $urlName && $urlName[0] !== '/' ) {
+			$urlName = '/'.$urlName;
+		}
+
+		// check unique value
+		$counter     = 0;
+		$originalUrl = $urlName;
+		while( $pageFeeder->whereColumnEq( 'url_name', $urlName )->getCount() > 0 ) {
+			$urlName = $originalUrl .'-'. ++$counter;
+		}
+
+		$webPage->setUrlName( $urlName );
+	}
+
+	/**
 	 * Saves the data received from the editor
 	 *
 	 * @param RequestInterface $request
@@ -259,14 +285,9 @@ abstract class AbstractPageEditor extends DataEditor
 				'validTo'    => $request->getData( 'validTo',   'string' ),
 			), true );
 
-			$urlName = $webPage->getUrlName();
-			if( $urlName && $urlName[0] !== '/' ) {
-				$urlName = '/'.$urlName;
-
-				$webPage->setUrlName( $urlName );
-			}
-
 			$webPageFeeder = new cDBFeederBase( '\\DemoCMS\\cWebPage', $this->database );
+
+			$this->checkUrlName( $webPage, $webPageFeeder );
 			$webPageFeeder->save( $webPage );
 
 			// save discussion posts
