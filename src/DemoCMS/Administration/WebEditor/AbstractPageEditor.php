@@ -237,7 +237,7 @@ abstract class AbstractPageEditor extends DataEditor
 		// check unique value
 		$counter     = 0;
 		$originalUrl = $urlName;
-		while( $pageFeeder->whereColumnEq( 'url_name', $urlName )->getCount() > 0 ) {
+		while( $pageFeeder->whereColumnEq( 'url_name', $urlName )->whereColumnEq( 'ID', $webPageID, false )->getCount() > 0 ) {
 			$urlName = $originalUrl .'-'. ++$counter;
 		}
 
