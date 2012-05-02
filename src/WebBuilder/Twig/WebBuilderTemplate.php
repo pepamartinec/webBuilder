@@ -40,6 +40,8 @@ abstract class WebBuilderTemplate extends \Twig_Template
 
 	public function render( array $context )
 	{
+		$context['_block'] = $this->block;
+
 		return parent::render( $context );
 	}
 
