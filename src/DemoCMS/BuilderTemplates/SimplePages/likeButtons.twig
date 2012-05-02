@@ -1,0 +1,23 @@
+{% container LikeButtons %}
+<div id="{{ _block.ID }}"></div>
+<script type="text/javascript" src="public/js/sharrre/jquery.sharrre-1.3.2.min.js"></script>
+<script type="text/javascript">
+	$('#{{ _block.ID }}').sharrre({
+	    url: '{{ BASE_HREF ~ webPage.urlName }}',
+	    urlCurl : 'public/js/sharrre/sharrre.php',
+	    share: {
+		    googlePlus : true,
+		    facebook   : true,
+		    twitter    : true
+	    },
+
+	    enableHover : false,
+	    enableCounter : false
+    });
+</script>
+<style type="text/css">
+	.sharrre .button{
+		float : left;
+		width : 60px;
+	}
+</style>
