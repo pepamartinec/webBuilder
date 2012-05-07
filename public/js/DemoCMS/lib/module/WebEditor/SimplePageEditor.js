@@ -34,6 +34,8 @@ Ext.define( 'DemoCMS.module.WebEditor.SimplePageEditor',
 		});
 
 		me.contentTab   = Ext.create( 'DemoCMS.module.WebEditor.pageEditor.Content', {
+			env    : me.env,
+			editor : me,
 			border : false,
 			title  : 'Obsah'
 		});

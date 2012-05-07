@@ -108,6 +108,8 @@ body {
 	margin     : 0px auto;
 }
 
+/************* HTML EDITOR *************/
+.x-edit-insertimage { background-image: url('../images/icons/image_add.png'); }
 
 /************* CANVAS *************/
 html, body {
