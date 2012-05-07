@@ -122,6 +122,7 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Template',
 						//	me.clearBlockInstanceID( template );
 
 							me.templateEditor.setValue( template );
+							me.parentIdField.setValue( data.data.ID );
 						}
 					});
 				},
