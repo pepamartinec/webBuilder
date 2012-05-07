@@ -38,7 +38,7 @@ Ext.define( 'DemoCMS.module.WebEditor.MenuItemEditor',
 				fieldLabel : 'Název'
 			},{
 				xtype      : 'checkbox',
-				name       : 'publish',
+				name       : 'published',
 				fieldLabel : 'Publikovat'
 			}]
 		});
