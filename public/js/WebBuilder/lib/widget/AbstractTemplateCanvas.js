@@ -97,6 +97,13 @@ Ext.define( 'WebBuilder.widget.AbstractTemplateCanvas', {
 	titleCls : Ext.baseCSSPrefix +'title',
 
 	/**
+	 * ClassName of the empty slot nodes
+	 *
+	 * @cfg {String} slotCls
+	 */
+	emptyCls : Ext.baseCSSPrefix +'empty',
+
+	/**
 	 * Slot highlight className
 	 *
 	 * @cfg {String} overCls
@@ -249,6 +256,7 @@ Ext.define( 'WebBuilder.widget.AbstractTemplateCanvas', {
 
 			blockCls     : me.blockCls,
 			slotCls      : me.slotCls,
+			emptyCls     : me.emptyCls,
 			overCls      : me.overCls,
 			insertPtrDom : me.insertPtrDom,
 			instanceIdRe : me.instanceIdRe,
@@ -381,6 +389,8 @@ Ext.define( 'WebBuilder.widget.AbstractTemplateCanvas', {
 				instanceTpl.append( slotDom, instance );
 			}
 
+			Ext.fly( slotDom ).removeCls( me.emptyCls );
+
 		} else {
 			var iframeDoc = this.iframeEl.dom.contentDocument,
 			    docTpl    = me.getDocumentTpl( instance );
@@ -413,9 +423,14 @@ Ext.define( 'WebBuilder.widget.AbstractTemplateCanvas', {
 	 * @param {WebBuilder.EditorStore} [store]
 	 * @param {WebBuilder.BlockInstance} [instance]
 	 */
-	handleInstanceRemove : function( store, instance )
+	handleInstanceRemove : function( store, instance, originalParent, slotId, position )
 	{
-		var blockDom = this.findBlockDom( instance );
+		var me       = this,
+		    blockDom = me.findBlockDom( instance );
+
+		if( originalParent && originalParent.slots[ slotId ].length == 0 ) {
+			Ext.fly( blockDom ).findParentNode( '.'+me.slotCls, 5, true ).addCls( me.emptyCls );
+		}
 
 		if( blockDom ) {
 			Ext.fly( blockDom ).remove();

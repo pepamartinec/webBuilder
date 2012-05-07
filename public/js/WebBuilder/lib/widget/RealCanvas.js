@@ -1,6 +1,9 @@
 Ext.define( 'WebBuilder.widget.RealCanvas', {
 	extend : 'WebBuilder.widget.AbstractTemplateCanvas',
 
+	emptyRootHeader  : 'Zde vytvořte strukturu stránky',
+	emptyRootContent : 'Začít můžete tím, že si v knihovně po pravé straně vyberete vhodný layout stránky a přetažením ho umístíte na tuto plochu.',
+
 	initComponent : function()
 	{
 		var me = this;
@@ -19,8 +22,14 @@ Ext.define( 'WebBuilder.widget.RealCanvas', {
 
 		// create the slot renderer
 		tpl = Ext.create( 'Ext.Template',
-			'<div id="template-block-instance-{id}-slot-{slotName}" class="{slotCls}{% if( values.isRoot() ) { %} x-root{% } %}">',
+			'<div id="template-block-instance-{id}-slot-{slotName}" class="{slotCls}{% if( values.slots[\'{slotName}\'].length == 0 ) { %} {emptyCls}{% } %}{% if( values.isRoot() ) { %} x-root{% } %}">',
 				'<div class="{titleCls} {slotTitleCls}">{[ values.template.slots().findRecord("codeName","{slotName}").get("title") ]}</div>',
+				'{% if( values.isRoot() ) { %}',
+					'<div class="x-empty-root-overlay">',
+						'<h1>', me.emptyRootHeader ,'</h1>',
+						'<p>', me.emptyRootContent ,'</p>',
+					'</div>',
+				'{% } %}',
 				'<tpl for="values.slots[\'{slotName}\']">',
 					'{[ this.getInstanceTpl( values ).apply( values ) ]}',
 				'</tpl>',
@@ -30,6 +39,7 @@ Ext.define( 'WebBuilder.widget.RealCanvas', {
 		me.slotRendererCode = tpl.apply({
 		    blockCls      : me.blockCls,
 		    slotCls       : me.slotCls,
+		    emptyCls      : me.emptyCls,
 		    titleCls      : me.titleCls,
 		    blockTitleCls : me.blockTitleCls,
 		    slotTitleCls  : me.slotTitleCls,
@@ -136,11 +146,12 @@ Ext.define( 'WebBuilder.widget.RealCanvas', {
 			// setup slot rendering
 			content = content.replace( localSlotRe, me.slotRendererCode );
 
-			var tpl = Ext.create( 'Ext.XTemplate',
-					instance.isRoot() ? '' : me.blockHeader,
-						content,
-					instance.isRoot() ? '' : me.blockFooter,
+			if( ! instance.isRoot() ) {
+				content = me.blockHeader + content + me.blockFooter;
+			}
 
+			var tpl = Ext.create( 'Ext.XTemplate',
+					content,
 					{
 						disableFormats : true,
 						compiled       : true,

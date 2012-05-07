@@ -144,6 +144,24 @@ html, body {
     display : none;
 }
 
+.x-template-canvas .x-root > .x-empty-root-overlay {
+    display    : none;
+    text-align : center;
+    width      : 450px;
+    margin     : 75px auto;
+}
+
+.x-template-canvas .x-root > .x-empty-root-overlay > p {
+    font-size  : 125%;
+    margin-top : 20px;
+}
+
+.x-template-canvas .x-root.x-empty > .x-empty-root-overlay {
+    display : block;
+}
+
+
+
 .x-template-canvas .x-block.x-over {
     border-color : #f00;
 }

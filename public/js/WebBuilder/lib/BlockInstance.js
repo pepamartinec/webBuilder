@@ -272,7 +272,7 @@ Ext.define( 'WebBuilder.BlockInstance', {
 		instance.parent = null;
 
 		// notify store
-		me.storeChangeCommit( 'removeChild', arguments );
+		me.storeChangeCommit( 'removeChild', [ instance, slotId, instanceIdx ] );
 
 		return instance;
 	},
