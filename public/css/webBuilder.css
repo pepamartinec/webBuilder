@@ -108,6 +108,20 @@ body {
 	margin     : 0px auto;
 }
 
+
+
+.x-tree-icon.simplePage,
+.i-simple-page {
+	background-image: url('../images/icons/layout_content.png');
+}
+
+.x-tree-icon.menuItem,
+.i-menu-item {
+	background-image: url('../images/icons/text_list_bullets.png');
+}
+
+
+
 /************* HTML EDITOR *************/
 .x-edit-insertimage { background-image: url('../images/icons/image_add.png'); }
 

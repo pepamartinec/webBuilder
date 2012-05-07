@@ -49,10 +49,11 @@ class PageList extends TreeList
 			'moveItem'     => true,
 
 			'createMenuItem' => array(
-				'title'  => 'Založit prázdnou položku menu',
-				'type'   => 'create',
+				'title'   => 'Založit prázdnou položku menu',
+				'type'    => 'create',
+				'iconCls' => 'i-menu-item',
 				'dataDep' => true,
-				'params' => array(
+				'params'  => array(
 					'editor'      => 'MenuItemEditor',
 					'loadDefault' => 'loadData_new',
 				),
@@ -73,10 +74,11 @@ class PageList extends TreeList
  			),
 
 			'createPage' => array(
-				'title'  => 'Založit novou webovou stránku',
-				'type'   => 'create',
+				'title'   => 'Založit novou webovou stránku',
+				'type'    => 'create',
+				'iconCls' => 'i-simple-page',
 				'dataDep' => true,
-				'params' => array(
+				'params'  => array(
 					'editor'      => 'SimplePageEditor',
 					'loadDefault' => 'loadData_new',
 				),
@@ -106,7 +108,7 @@ class PageList extends TreeList
 	public function viewConfiguration()
 	{
 		return array(
-			'barActions' => array( 'createMenuItem', 'createPage' ),
+			'barActions' => array( 'createPage', 'createMenuItem' ),
 
 			'moveAction' => 'moveItem',
 
@@ -131,6 +133,10 @@ class PageList extends TreeList
 					'title' => 'Poslední úprava',
 					'type'  => 'datecolumn',
 					'width' => 200,
+				),
+
+				'iconCls' => array(
+					'display' => false
 				),
 
 				'actions' => array(
@@ -197,6 +203,7 @@ class PageList extends TreeList
 				'urlName'   => $webPage->getUrlName(),
 				'published' => $published,
 				'editedOn'  => $webPage->getEditedOn() ?: $webPage->getCreatedOn(),
+				'iconCls'   => $webPage->getType(),
 				'actions'   => $actions,
 				'data'      => array_map( $extractor, $children ),
 			);
