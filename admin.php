@@ -78,7 +78,21 @@ require 'common.php';
 			}, function() {
 				// launch the desktop app
 				var admin = Ext.create( 'extAdmin.Desktop', {
-					env : env
+					env : env,
+
+					menuItems : [{
+						name        : 'Editor Webu',
+						iconCls     : 'i-web-editor',
+						entryModule : '\\DemoCMS\\Administration\\WebEditor\\PageList',
+					},{
+						name        : 'Šablony stránek',
+						iconCls     : 'i-template-manager',
+						entryModule : '\\WebBuilder\\Administration\\TemplateManager\\TemplateList',
+					},{
+						name        : 'Textové bloky',
+						iconCls     : 'i-text-block-manager',
+						entryModule : '\\DemoCMS\\Administration\\TextBlockManager\\TextBlockList',
+					}]
 				});
 
 				admin.openModule( '\\DemoCMS\\Administration\\WebEditor\\PageList' );
