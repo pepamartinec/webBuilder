@@ -212,7 +212,7 @@ Ext.define( 'WebBuilder.BlockInstance', {
 			slot.push( instance );
 
 		} else {
-			Ext.Array.insert( slot, position, instance );
+			Ext.Array.insert( slot, position, [ instance ] );
 		}
 
 		// link self as parent

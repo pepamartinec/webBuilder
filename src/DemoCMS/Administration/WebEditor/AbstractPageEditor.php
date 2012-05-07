@@ -1,6 +1,8 @@
 <?php
 namespace DemoCMS\Administration\WebEditor;
 
+use WebBuilder\Administration\TemplateManager\BlockInstanceCopyExporter;
+
 use WebBuilder\Administration\TemplateManager\BlockInstanceExporter;
 
 use ExtAdmin\Response\HtmlResponse;
@@ -122,11 +124,44 @@ abstract class AbstractPageEditor extends DataEditor
 	 */
 	public function loadData_new( RequestInterface $request )
 	{
-		$response = new ActionResponse( true );
-		$response->setData( array(
-			'parentID' => $request->getData( 'ID', 'int' )
-		) );
+		$parentID = $request->getData( 'ID', 'int' );
 
+		// load parent
+		$webPageFeeder = new cDBFeederBase( '\\DemoCMS\\cWebPage', $this->database );
+		$parent        = $webPageFeeder->whereID( $parentID )->getOne();
+
+		if( $parent == null ) {
+			$response = new ActionResponse( false );
+			$response->setMessage( 'Nebyl vybrán žádný předek stránky' );
+			return $response;
+		}
+
+		$data = array(
+			'parentID' => $parent->getID(),
+		);
+
+
+
+		// load parent template
+		$blockSetID = $parent->getBlockSetID();
+
+		if( $blockSetID ) {
+			$blockSetFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockSet', $this->database );
+			$blockSet       = $blockSetFeeder->whereID( $blockSetID )->getOne();
+
+			$loader       = new DatabaseLoader( $this->database, $blockSetID );
+			$instances    = $loader->loadBlockInstances( $blockSet );
+			$rootInstance = reset( $instances );
+
+			if( $blockSet ) {
+				$data['parentBlockSetID'] = $blockSet->getParentID();
+			}
+
+			$data['template'] = BlockInstanceExporter::export( $rootInstance );
+		}
+
+		$response = new ActionResponse( true );
+		$response->setData( $data );
 		return $response;
 	}
 

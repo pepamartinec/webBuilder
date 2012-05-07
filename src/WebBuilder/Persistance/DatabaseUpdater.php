@@ -66,7 +66,7 @@ class DatabaseUpdater
 	public function fakeBlockInstances( BlockSet $blockSet, array $clientData )
 	{
 		$blockSetID = (int)$blockSet->getID();
-		$instances  = BlockInstance::import( $clientData );
+		$instances  = BlockInstanceImporter::import( $clientData );
 
 		$this->loadMissingData( $instances );
 		$this->loadMissingDataDependencies( $instances );

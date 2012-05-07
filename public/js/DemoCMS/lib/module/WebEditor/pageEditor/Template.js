@@ -238,7 +238,7 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Template',
 	{
 		var code = e.keyCode || e.charCode;
 
-		// TODO let Ext handle the hardcoded keyCode
+		// TODO let Ext handle the hardcoded F5 keyCode
 
 		if( code == 116 ) {
 			this.showPreview();
