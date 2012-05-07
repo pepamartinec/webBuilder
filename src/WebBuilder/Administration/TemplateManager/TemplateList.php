@@ -161,7 +161,7 @@ class TemplateList extends GridList
 		}
 
 		if( ! $request->hasFilter( 'pageTemplates') ) {
-			$feeder->where( 'ID NOT IN ( SELECT block_set_ID FROM web_pages )' );
+			$feeder->where( 'ID NOT IN ( SELECT block_set_ID FROM web_pages WHERE block_set_ID IS NOT NULL )' );
 		}
 
 		return $feeder;

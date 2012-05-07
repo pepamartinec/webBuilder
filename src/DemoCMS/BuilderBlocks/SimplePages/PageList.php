@@ -27,13 +27,22 @@ class PageList extends WebBlock
 	public function setupData( cWebPage $webPage )
 	{
 		$webPageFeeder = new cDBFeederBase( '\\DemoCMS\\cWebPage', $this->database );
-		$webPages      = $webPageFeeder->whereColumnEq( 'parent_ID', $webPage->getID() )->indexBy( 'ID' )->get();
+		$webPages      = $webPageFeeder->whereColumnEq( 'parent_ID', $webPage->getID() )
+		                               ->whereColumnEq( 'published', true )
+		                               ->indexBy( 'ID' )
+		                               ->get();
 
 		if( $webPages ) {
+			// load content pages
+			$simplePageFeeder = new cDBFeederBase( '\\DemoCMS\\cSimplePage', $this->database );
+			$simplePages      = $simplePageFeeder->whereColumnIn( 'web_page_ID', array_keys( $webPages ) )
+			                                     ->indexBy( 'web_page_ID' )
+			                                     ->get();
+
 			// load title images
 			$titleImageIDs = array();
-			foreach( $webPages as $webPage ) {
-				$titleImageID = $webPage->getTitleImageID();
+			foreach( $simplePages as $simplePage ) {
+				$titleImageID = $simplePage->getTitleImageID();
 
 				if( $titleImageID ) {
 					$titleImageIDs[] = $titleImageID;
@@ -43,29 +52,36 @@ class PageList extends WebBlock
 			if( sizeof( $titleImageIDs ) > 0 ) {
 				$imageHandler = new cImageHandler( $this->database );
 				$imageFeeder  = $imageHandler->getImageFeeder();
-				$titleImages  = $imageFeeder->whereColumnIn( 'ID', $titleImageIDs )->get();
+				$titleImages  = $imageFeeder->whereColumnIn( 'ID', $titleImageIDs )
+				                            ->indexBy( 'ID' )
+				                            ->get();
 
 			} else {
-				$titleImages = null;
+				$titleImages = array();
 			}
 
-			// load content pages
-			$simplePageFeeder = new cDBFeederBase( '\\DemoCMS\\cSimplePage', $this->database );
-			$simplePages      = $simplePageFeeder->whereColumnIn( 'web_page_ID', array_keys( $webPages ) )->indexBy( 'web_page_ID' )->get();
+			$validWebPages = array();
 
-			// attach to the webb pages
+			// attach to the web pages
 			foreach( $webPages as $webPageID => $webPage ) {
-				if( isset( $simplePages[ $webPageID ] ) ) {
-					$simplePages[ $webPageID ]->setWebPage( $webPage );
-					$webPage->setContentItem( $simplePages[ $webPageID ] );
+				if( ! isset( $simplePages[ $webPageID ] ) ) {
+					continue;
 				}
 
-				$titleImageID = $webPage->getTitleImageID();
+				$simplePage = $simplePages[ $webPageID ];
 
+				$simplePage->setWebPage( $webPage );
+				$webPage->setContentItem( $simplePage );
+
+				$titleImageID = $simplePage->getTitleImageID();
 				if( $titleImageID && isset( $titleImages[ $titleImageID ] ) ) {
-					$webPage->setTitleImage( $titleImages[ $titleImageID ] );
+					$simplePage->setTitleImage( $titleImages[ $titleImageID ] );
 				}
+
+				$validWebPages[] = $webPage;
 			}
+
+			$webPages = $validWebPages;
 		}
 
 		return array(

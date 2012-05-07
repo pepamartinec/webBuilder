@@ -56,6 +56,10 @@ class cSimplePage extends aDataObject
 
 		'webPage' => array(
 			'type' => 'cWebPage'
+		),
+
+		'titleImage' => array(
+			'type' => 'cImage'
 		)
 	);
 

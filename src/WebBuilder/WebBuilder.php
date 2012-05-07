@@ -65,6 +65,7 @@ class WebBuilder implements WebBuilderInterface
 		) );
 
 		$this->twig->addExtension( new WebBuilderExtension( $this ) );
+		$this->twig->getExtension('core')->setDateFormat('j.n.Y', '%d dnů');
 	}
 
 	/**

@@ -19,6 +19,14 @@ form textarea {
 	width : 100%;
 }
 
+.clearAfter:after {
+    content    : '.';
+    display    : block;
+    height     : 0;
+    clear      : both;
+    visibility : hidden;
+}
+
 /****************** DISCUSSION ******************/
 .discussion .form .authorName,
 .discussion .form .authorEmail {
@@ -53,7 +61,7 @@ form textarea {
     float: right;
 }
 
-/****************** DISCUSSION ******************/
+/****************** IMAGE GALLERY ******************/
 .imageGallery-plain {
 	list-style: none;
 }
@@ -63,9 +71,17 @@ form textarea {
 	margin: 5px;
 }
 
+/****************** PAGE LIST ******************/
 
+.pageList .pageOverview {
+    margin : 15px 5px;
+}
 
+.pageList .createdOn {
+	float : right;
+}
 
-
-
-
+.pageList .titleImage {
+	float : left;
+	margin-right : 10px;
+}

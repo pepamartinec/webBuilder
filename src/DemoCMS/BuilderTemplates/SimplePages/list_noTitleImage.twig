@@ -1,13 +1,14 @@
 {% container PageList %}
-<div class="page-list">
+<div class="pageList">
 {% for page in pages %}
-	<div class="title">
-		<div class="left">
+	<div class="pageOverview clearAfter">
+		<div class="createdOn">Vytvořeno: {{ page.createdOn|date }}</div>
+		<div class="title">
 			<a href="{{ BASE_HREF ~ page.urlName }}">{{ page.title }}</a>
 		</div>
-	</div>
-	<div class="content">
-		{{ page.perex }}
+		<div class="content">
+			{{ page.contentItem.perex|raw }}
+		</div>
 	</div>
 {% endfor %}
 </div>

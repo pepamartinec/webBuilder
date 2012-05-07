@@ -1,20 +1,21 @@
 {% container PageList %}
-<div class="page-list">
+<div class="pageList">
 {% for page in pages %}
-	<div class="title">
-		<div class="left">
-			<a href="{{ BASE_HREF ~ page.urlName }}">{{ page.title }}</a>
+	<div class="pageOverview clearAfter">
+		<div class="createdOn">Vytvořeno: {{ page.createdOn|date }}</div>
+		<div class="title">
+			<h3><a href="{{ BASE_HREF ~ page.urlName }}">{{ page.title }}</a></h3>
 		</div>
-	</div>
-	{% if page.titleImage %}
-		<div class="titleImage">
-			<a href="{{ BASE_HREF ~ page.urlName }}">
-				<img src="{{ page.titleImage.filenameThumb }}" alt="{{ page.title }}" title="{{ page.title }}" />
-			</a>
+		{% if page.contentItem.titleImage %}
+			<div class="titleImage">
+				<a href="{{ BASE_HREF ~ page.urlName }}">
+					<img src="{{ page.contentItem.titleImage.filenameThumb }}" alt="{{ page.title }}" title="{{ page.title }}" />
+				</a>
+			</div>
+		{% endif %}
+		<div class="content">
+			{{ page.contentItem.perex|raw }}
 		</div>
-	{% endif %}
-	<div class="content">
-		{{ page.perex }}
 	</div>
 {% endfor %}
 </div>
