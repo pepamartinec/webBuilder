@@ -22,10 +22,23 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.Discussion',
 
 	onItemClick : function( record, itemDom, idx, e )
 	{
-		var btnDom = e.getTarget( '.x-remove' );
+		var me = this;
 
-		if( btnDom ) {
-			this.store.remove( record );
+		if( e.getTarget( '.x-remove' ) ) {
+			Ext.MessageBox.show({
+				title    : 'Smazat diskuzní příspěvek?',
+				msg      : 'Opravdu chcete tento diskuzní příspěvek smazat?',
+				buttons  : Ext.MessageBox.YESNO,
+				icon     : Ext.MessageBox.QUESTION,
+				closable : false,
+				fn       : function( buttonId ) {
+					if( buttonId !== 'yes' ) {
+						return;
+					}
+
+					me.store.remove( record );
+				}
+			});
 		}
 	},
 
