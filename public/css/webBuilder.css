@@ -61,35 +61,58 @@ body {
 .i-table-edit { background-image: url('../images/icons/table_edit.png'); }
 .i-time-go { background-image: url('../images/icons/time_go.png'); }
 
+.module .i-web-editor { background-image: url('../images/module/web_editor.png'); }
+.module .i-template-manager { background-image: url('../images/module/template_manager.png'); }
+.module .i-text-block-manager { background-image: url('../images/module/text_block_manager.png'); }
+
+.x-blocks-list .x-icon.i-titlePage { background-image: url('../images/block/titlePage.png'); }
+.x-blocks-list .x-icon.i-page { background-image: url('../images/block/page.png'); }
+.x-blocks-list .x-icon.i-image { background-image: url('../images/block/image.png'); }
+.x-blocks-list .x-icon.i-imageGallery { background-image: url('../images/block/image.png'); }
+.x-blocks-list .x-icon.i-pageDetail { background-image: url('../images/block/pageDetail.png'); }
+.x-blocks-list .x-icon.i-discussion { background-image: url('../images/block/discussion.png'); }
+.x-blocks-list .x-icon.i-pageList { background-image: url('../images/block/pageList.png'); }
+.x-blocks-list .x-icon.i-likeButtons { background-image: url('../images/block/likeButtons.png'); }
+.x-blocks-list .x-icon.i-menu { background-image: url('../images/block/discussion.png'); }
+.x-blocks-list .x-icon.i-breadcrumbs { background-image: url('../images/block/breadcrumbs.png'); }
+.x-blocks-list .x-icon.i-textBlock { background-image: url('../images/block/pageDetail.png'); }
+.x-blocks-list .x-icon.i-contactForm { background-image: url('../images/block/contactForm.png'); }
+
 .x-blocks-list {
 	
 }
 
-.x-blocks-list .x-dataview {
-
-}
-
-.x-blocks-list .x-dataview-item {
-	margin  : 5px auto;
-	padding : 3px;
-	width   : 90px;
-	height  : 50px;
+.x-blocks-list .x-template-block {
+	margin  : 5px auto 15px auto;
+	padding : 10px;
+	width   : 100px;
 	
 	text-align    : center;
+	border        : 1px solid transparent;
 	border-radius : 3px;
 }
 
-.x-blocks-list .x-dataview-item:hover,
+.x-blocks-list .x-template-block:hover,
 .x-blocks-list .x-view-selected {
 	background-color : #dfe8f6;
 	border           : 1px solid #abf;
 }
 
+.x-blocks-list .x-icon {
+	background-repeat   : no-repeat;
+	background-position : top center;
+	background-image    : url('../images/block/generic.png');
+	width      : 48px;
+	height     : 48px;
+	display    : block;
+	margin     : 0px auto;
+}
+
 
 /************* CANVAS *************/
 html, body {
-        width   : 100%;
-        height  : 100%;
+	width   : 100%;
+	height  : 100%;
 }
 
 .x-template-canvas .x-title {
