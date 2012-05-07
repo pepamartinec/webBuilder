@@ -49,7 +49,7 @@ class PageList extends TreeList
 			'moveItem'     => true,
 
 			'createMenuItem' => array(
-				'title'  => 'Položku menu',
+				'title'  => 'Založit prázdnou položku menu',
 				'type'   => 'create',
 				'dataDep' => true,
 				'params' => array(
@@ -73,7 +73,7 @@ class PageList extends TreeList
  			),
 
 			'createPage' => array(
-				'title'  => 'Stránku',
+				'title'  => 'Založit novou webovou stránku',
 				'type'   => 'create',
 				'dataDep' => true,
 				'params' => array(
@@ -106,13 +106,7 @@ class PageList extends TreeList
 	public function viewConfiguration()
 	{
 		return array(
-			'barActions' => array(
-				array(
-					'type'  => 'splitButton',
-					'title' => 'Založit nový',
-					'items' => array( 'createMenuItem', 'createPage' )
-				),
-			),
+			'barActions' => array( 'createMenuItem', 'createPage' ),
 
 			'moveAction' => 'moveItem',
 
