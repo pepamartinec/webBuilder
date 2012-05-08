@@ -149,15 +149,17 @@ abstract class AbstractPageEditor extends DataEditor
 			$blockSetFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockSet', $this->database );
 			$blockSet       = $blockSetFeeder->whereID( $blockSetID )->getOne();
 
-			$loader       = new DatabaseLoader( $this->database, $blockSetID );
-			$instances    = $loader->loadBlockInstances( $blockSet );
-			$rootInstance = reset( $instances );
-
 			if( $blockSet ) {
 				$data['parentBlockSetID'] = $blockSet->getParentID();
 			}
 
-			$data['template'] = BlockInstanceExporter::export( $rootInstance );
+			$loader       = new DatabaseLoader( $this->database, $blockSetID );
+			$instances    = $loader->loadBlockInstances( $blockSet );
+			$rootInstance = reset( $instances );
+
+			if( $rootInstance ) {
+				$data['template'] = BlockInstanceExporter::export( $rootInstance );
+			}
 		}
 
 		$response = new ActionResponse( true );
@@ -223,17 +225,19 @@ abstract class AbstractPageEditor extends DataEditor
 
 		if( $blockSetID ) {
 			$blockSetFeeder = new cDBFeederBase( '\\WebBuilder\\DataObjects\\BlockSet', $this->database );
-			$blockSet       = $blockSetFeeder->whereID( $webPage->getBlockSetID() )->getOne();
-
-			$loader       = new DatabaseLoader( $this->database, $webPage->getBlockSetID() );
-			$instances    = $loader->loadBlockInstances( $blockSet );
-			$rootInstance = reset( $instances );
+			$blockSet       = $blockSetFeeder->whereID( $blockSetID )->getOne();
 
 			if( $blockSet ) {
 				$data['parentBlockSetID'] = $blockSet->getParentID();
 			}
 
-			$data['template'] = BlockInstanceExporter::export( $rootInstance );
+			$loader       = new DatabaseLoader( $this->database, $blockSetID );
+			$instances    = $loader->loadBlockInstances( $blockSet );
+			$rootInstance = reset( $instances );
+
+			if( $rootInstance ) {
+				$data['template'] = BlockInstanceExporter::export( $rootInstance );
+			}
 		}
 
 		// load associated data
