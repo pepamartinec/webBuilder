@@ -36,22 +36,14 @@ Ext.define( 'DemoCMS.widget.ImageUploadPopup',
 	{
 		var me = this;
 
-		me.webPageIdField = Ext.create( 'Ext.form.field.Hidden', {
-			name  : 'webPageID'
-		});
-
 		me.form = Ext.create( 'Ext.form.Panel', {
 			bodyPadding : 5,
 			url : me.module.getActionUrl( 'uploadImages' ),
 
 			defaults : {
 				anchor : '100%'
-			},
-
-			items : [ me.webPageIdField ]
+			}
 		});
-
-		me.fileFields = [];
 
 		Ext.apply( me, {
 			layout : 'fit',
@@ -81,9 +73,7 @@ Ext.define( 'DemoCMS.widget.ImageUploadPopup',
 	{
 		var me = this;
 
-		me.form.remove( me.fileFields );
-		me.fileFields = [];
-
+		me.form.removeAll( true );
 		me.addFileInput();
 
 		me.callParent();
@@ -109,18 +99,24 @@ Ext.define( 'DemoCMS.widget.ImageUploadPopup',
 
 		field.on( 'change', me.addFileInput, me );
 
-		me.fileFields.push( field );
 		me.form.add( field );
 	},
 
 	doUpload : function()
 	{
-		var me = this;
+		var me   = this,
+		    form = me.form;
 
-		me.webPageIdField.setValue( me.webPageId );
+		var webPageIdField = Ext.create( 'Ext.form.field.Hidden', {
+			name  : 'webPageID',
+			value : me.webPageId
+		});
 
-		me.form.submit({
-			success : function( form, action ) {
+		form.add( webPageIdField );
+
+		form.submit({
+			success : function( bForm, action ) {
+				form.remove( webPageIdField, true );
 				me.fireEvent( 'uploadcomplete' );
 
 				me.close();
