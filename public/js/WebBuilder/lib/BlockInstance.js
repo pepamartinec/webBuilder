@@ -97,6 +97,33 @@ Ext.define( 'WebBuilder.BlockInstance', {
 	},
 
 	/**
+	 * Checks whether the instance has undefined value
+	 * at any mandatory config
+	 *
+	 * @return {Boolean}
+	 */
+	hasUndefinedConfig : function()
+	{
+		var config = this.block.get('config');
+
+		if( ! config ) {
+			return false;
+		}
+
+		var data               = this.data,
+			hasUndefinedConfig = false;
+
+		Ext.Object.each( config, function( name, def ) {
+			if( def.required && data[ name ] == null ) {
+				hasUndefinedConfig = true;
+				return false;
+			}
+		});
+
+		return hasUndefinedConfig;
+	},
+
+	/**
 	 * Tries to solve block data dependencies
 	 *
 	 */

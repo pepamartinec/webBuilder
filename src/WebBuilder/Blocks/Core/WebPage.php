@@ -11,18 +11,4 @@ class WebPage extends WebBlock
 			'webPage' => 'WebPageInterface'
 		);
 	}
-
-	public static function config()
-	{
-		return array(
-			'stylesheet' => array(
-				'type'      => 'combo',
-				'default'   => 'public/css/style.css',
-				'allowNull' => false,
-				'items'     => array(
-					'public/css/style.css' => 'Standard'
-				),
-			)
-		);
-	}
 }

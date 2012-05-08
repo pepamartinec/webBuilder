@@ -400,6 +400,11 @@ Ext.define( 'WebBuilder.widget.AbstractTemplateCanvas', {
 			iframeDoc.write( docTpl.apply( instance ) );
 			iframeDoc.close();
 		}
+
+		if( instance.hasUndefinedConfig() ) {
+			me.configPopup.setInstance( instance );
+			me.configPopup.show();
+		}
 	},
 
 	/**
