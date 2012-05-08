@@ -68,9 +68,9 @@ Ext.define( 'WebBuilder.widget.RealCanvas', {
 					'{% if( ! values.isLocked() ) { %}',
 						'<div class="{blockToolsCls}">',
 							'<div class="{blockToolCls} {configToolCls}"></div>',
-						'<div class="{blockToolCls} {removeToolCls}"></div>',
+							'<div class="{blockToolCls} {removeToolCls}"></div>',
+						'</div>',
 					'{% } %}',
-					'</div>',
 				'</div>'
 
 				// here comes the {content}
