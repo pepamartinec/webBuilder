@@ -68,6 +68,11 @@ class DatabaseUpdater
 		$blockSetID = (int)$blockSet->getID();
 		$instances  = BlockInstanceImporter::import( $clientData );
 
+		// fake the instance IDs
+		foreach( $instances as $tmpID => $instance ) {
+			$instance->ID = $tmpID;
+		}
+
 		$this->loadMissingData( $instances );
 		$this->loadMissingDataDependencies( $instances );
 
