@@ -131,8 +131,9 @@ Ext.define( 'WebBuilder.widget.config.ForeignDataField', {
 
 		me.popup = Ext.create( 'Ext.window.Window', {
 			layout : 'fit',
-			width  : 400,
-			height : 200,
+			width  : 600,
+			height : 400,
+			modal  : true,
 
 			closeAction : 'hide',
 
@@ -152,8 +153,10 @@ Ext.define( 'WebBuilder.widget.config.ForeignDataField', {
 			},{
 				text    : me.cancelBtnTitle,
 				iconCls : 'i-cancel',
-				handler : me.close,
-				scope   : me
+				handler : function()
+				{
+					me.popup.close();
+				}
 			}]
 		});
 	},

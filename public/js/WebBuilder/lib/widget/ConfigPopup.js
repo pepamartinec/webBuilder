@@ -124,7 +124,9 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 
 		itemCfg = Ext.Object.merge( {
 			env        : me.env,
-			fieldLabel : name
+			fieldLabel : ( definition.title || name ) + ( definition.required ? ' *' : '' ),
+
+			allowBlank : !definition.required
 		}, definition );
 
 		delete itemCfg['type'];
@@ -175,17 +177,23 @@ Ext.define( 'WebBuilder.widget.ConfigPopup', {
 
 		// apply config to the current instance
 		} else {
-			// set template
-			me.currentInstance.setTemplate( me.currentInstance.block.templates().getById( me.templateField.getValue() ) );
-
 			// apply data
-			var data = {};
+			var data  = {},
+			    valid = true;
 
 			Ext.Object.each( me.dataFields, function( name, field ) {
 				data[ name ] = Ext.create( 'WebBuilder.ConstantData', field.getValue() );
+				valid       &= field.validate();
 			});
 
+			if( ! valid ) {
+				return;
+			}
+
 			me.currentInstance.setData( data );
+
+			// set template
+			me.currentInstance.setTemplate( me.currentInstance.block.templates().getById( me.templateField.getValue() ) );
 		}
 
 		me.close();

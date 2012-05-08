@@ -54,8 +54,8 @@ Ext.define( 'DemoCMS.component.TextBlockSelector',
 
 		Ext.apply( me, {
 			layout : 'fit',
-			width  : 400,
-			height : 200,
+			width  : 600,
+			height : 400,
 
 			items   : [ me.list ],
 			buttons : [{
@@ -66,8 +66,7 @@ Ext.define( 'DemoCMS.component.TextBlockSelector',
 			},{
 				text    : me.cancelBtnTitle,
 				iconCls : 'i-cancel',
-				handler : me.close,
-				scope   : me
+				handler : function() { me.close(); }
 			}]
 		});
 

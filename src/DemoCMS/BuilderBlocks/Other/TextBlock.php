@@ -36,6 +36,7 @@ class TextBlock extends WebBlock
 			'textBlockID' => array(
 				'required' => true,
 				'type'     => 'WebBuilder.widget.config.ForeignDataField',
+				'title'    => 'Textový blok',
 
 				'module'       => '\\DemoCMS\\Administration\\TextBlockManager\\TextBlockList',
 				'displayField' => 'title'
