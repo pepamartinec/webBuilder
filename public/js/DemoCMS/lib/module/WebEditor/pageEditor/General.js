@@ -104,8 +104,15 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.General',
 
 	setData : function( data )
 	{
-		this.titleImageField.parentId = data.ID;
+		var me = this;
 
-		return this.form.setValues( data );
+		me.titleImageField.parentId = data.ID;
+
+		if( ! data.parentID ) {
+			me.urlField.setReadOnly( true );
+			me.urlField.setValue( '/' );
+		}
+
+		return me.form.setValues( data );
 	}
 });
