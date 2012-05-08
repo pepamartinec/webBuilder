@@ -3,7 +3,7 @@ namespace DemoCMS\BuilderBlocks\Layouts;
 
 use WebBuilder\WebBlock;
 
-class SimplePage extends WebBlock
+class Simple extends WebBlock
 {
 	/**
 	 * Tells which data block requires from parent block
