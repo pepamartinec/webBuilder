@@ -1,19 +1,8 @@
-{% container TitlePage %}
-<div class="container">
-	<header>
-		{% slot header %}
-	</header>
+{% container LandingPage %}
+<div class="hero-unit">
+	{% slot welcomeText %}
+</div>
 
-	<div class="hero-unit">
-		{% slot welcomeText %}
-	</div>
-
-	<div class="row">
-		{% slot smallText %}
-	</div>
-
-	<hr>
-	<footer>
-		{% slot footer %}
-	</footer>
+<div class="row">
+	{% slot smallText %}
 </div>

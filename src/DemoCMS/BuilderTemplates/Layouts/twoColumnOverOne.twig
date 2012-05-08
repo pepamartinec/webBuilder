@@ -1,0 +1,15 @@
+{% container TwoColumnOverOne %}
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span6">
+			{% slot leftColumn %}
+		</div>
+
+		<div class="span6">
+			{% slot rightColumn %}
+		</div>
+	</div>
+	<div class="span12">
+		{% slot content %}
+	</div>
+</div>

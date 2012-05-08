@@ -1,0 +1,12 @@
+{% container LeftColumn %}
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span4">
+			{% slot leftColumn %}
+		</div>
+
+		<div class="span8">
+			{% slot content %}
+		</div>
+	</div>
+</div>
