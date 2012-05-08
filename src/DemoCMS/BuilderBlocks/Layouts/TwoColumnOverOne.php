@@ -3,7 +3,7 @@ namespace DemoCMS\BuilderBlocks\Layouts;
 
 use WebBuilder\WebBlock;
 
-class TwoColumnOveOne extends WebBlock
+class TwoColumnOverOne extends WebBlock
 {
 	/**
 	 * Tells which data block requires from parent block
