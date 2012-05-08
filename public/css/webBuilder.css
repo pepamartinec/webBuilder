@@ -146,18 +146,6 @@ html, body {
     background-color : #F0FFD1;
 }
 
-.x-template-canvas .x-root > .x-block {
-    width  : 100%;
-    height : 100%;
-    margin : 0;
-    border     : none;
-    background : none;
-}
-
-.x-template-canvas .x-root > .x-title {
-    display : none;
-}
-
 .x-template-canvas .x-root > .x-empty-root-overlay {
     display    : none;
     text-align : center;
@@ -268,16 +256,14 @@ html, body {
 	background-color : #fff;
 	
 	position   : relative;
-	min-height : 16px;
+	
+}
+
+.x-template-canvas .x-slot.x-empty {
+	min-height : 64px;
 	min-width  : 32px;
 }
 
-.x-template-canvas .x-slot.x-root {
-	margin : auto;
-	width  : 100%;
-	height : 100%;
-	border : none;
-}
 
 /************* SLOT TITLE *************/
 .x-template-canvas .x-block .x-slot > .x-title {
@@ -296,7 +282,8 @@ html, body {
     font-weight      : bold;
 }
 
-.x-template-canvas .x-block.x-over .x-slot > .x-title {
+.x-template-canvas .x-block.x-over .x-slot > .x-title,
+.x-template-canvas .x-slot.x-empty > .x-title {
     z-index : 2;
 }
 
