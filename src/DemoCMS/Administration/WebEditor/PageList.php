@@ -74,7 +74,7 @@ class PageList extends TreeList
  			),
 
 			'createPage' => array(
-				'title'   => 'Založit novou webovou stránku',
+				'title'   => 'Založit novou stránku',
 				'type'    => 'create',
 				'iconCls' => 'i-simple-page',
 				'dataDep' => true,
