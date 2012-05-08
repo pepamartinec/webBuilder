@@ -216,6 +216,7 @@ Ext.define( 'DemoCMS.widget.TitleImage',
 		if( me.popup == null ) {
 			me.popup = Ext.create( 'DemoCMS.component.ImageSelectorPopup', {
 				env         : me.env,
+				editor      : me.editor,
 				closeAction : 'hide',
 
 				handler : function( images ) {

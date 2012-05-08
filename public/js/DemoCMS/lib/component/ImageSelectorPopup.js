@@ -18,6 +18,12 @@ Ext.define( 'DemoCMS.component.ImageSelectorPopup',
 	env : null,
 
 	/**
+	 * @required
+	 * @cfg {extAdmin.component.editor.EditorFeature} editor
+	 */
+	editor : null,
+
+	/**
 	 * @cfg {Array/String} blocksLoadAction
 	 */
 	loadAction : 'loadListData',
@@ -33,7 +39,8 @@ Ext.define( 'DemoCMS.component.ImageSelectorPopup',
 		me.module = me.env.getModule( '\\DemoCMS\\Administration\\WebEditor\\ImageList' );
 
 		me.list = Ext.create( 'DemoCMS.component.ImageManager', {
-			env : me.env
+			env    : me.env,
+			editor : me.editor
 		});
 
 		Ext.apply( me, {
