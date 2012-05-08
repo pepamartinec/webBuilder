@@ -90,7 +90,8 @@ Ext.define( 'DemoCMS.module.WebEditor.pageEditor.General',
 				fieldLabel : 'Perex',
 				name       : 'perex',
 				labelAlign : 'top',
-				flex       : 1
+				flex       : 1,
+				enableSourceEdit : false
 			}]
 		});
 

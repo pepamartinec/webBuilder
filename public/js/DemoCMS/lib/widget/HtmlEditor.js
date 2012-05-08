@@ -7,6 +7,8 @@ Ext.define( 'DemoCMS.widget.HtmlEditor', {
 	 */
 	editor : null,
 
+	enableSourceEdit : false,
+
 	createBtn : function ( id, toggle, handler, tooltip )
 	{
 		var baseCSSPrefix = Ext.baseCSSPrefix,
