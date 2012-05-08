@@ -233,6 +233,7 @@ Ext.define( 'WebBuilder.widget.AbstractTemplateCanvas', {
 
 		// mark canvas root
 		me.bodyEl.addCls( me.canvasCls );
+		me.bodyEl.addCls( me.blockCls );
 
 		// add iFrame to document.getElementById chain
 		extAdmin.addElementGetter( doc.getElementById, doc );
