@@ -2,7 +2,7 @@
 
 include_once 'common.php';
 
-$pdo = new PDO( "mysql:host=localhost;dbname=webBuilder", USER, PASSWORD );
+$pdo = new PDO( "mysql:host=localhost;dbname=".DATABASE, USER, PASSWORD );
 $pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
 $generator = new WebBuilder\BlocksGenerator( $pdo );

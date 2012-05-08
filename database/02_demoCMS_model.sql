@@ -35,7 +35,7 @@ CREATE TABLE `simple_pages` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `web_page_ID` int(10) unsigned NOT NULL,
   `title_image_ID` int(10) unsigned DEFAULT NULL,
-  `perex` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `perex` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `content` text COLLATE utf8_unicode_ci,
   `created_on` datetime DEFAULT NULL,
   `created_by` int(10) unsigned DEFAULT NULL,
