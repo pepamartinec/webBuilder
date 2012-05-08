@@ -57,7 +57,7 @@ Ext.define( 'WebBuilder.widget.RealCanvas', {
 
 		// create the instance tpl
 		tpl = Ext.create( 'Ext.Template',
-			'<div id="template-block-instance-{id}" class="{blockCls}{% if( values.isRoot() ) { %} x-root{% } %}">',
+			'<div id="template-block-instance-{id}" class="{blockCls} x-block-category-{[ this.getBlockCategory( values ) ]}{% if( values.isRoot() ) { %} x-root{% } %}{% if( values.isLocked() ) { %} x-locked{% } %}">',
 				'<div class="{titleCls} {blockTitleCls}">',
 					'<span>',
 						'{blockTitle}',
@@ -151,13 +151,16 @@ Ext.define( 'WebBuilder.widget.RealCanvas', {
 			}
 
 			var tpl = Ext.create( 'Ext.XTemplate',
-					content,
-					{
-						disableFormats : true,
-						compiled       : true,
-
-						getInstanceTpl : Ext.Function.bind( me.getInstanceTpl, me )
+				content,
+				{
+					disableFormats : true,
+					compiled       : true,
+					getInstanceTpl   : Ext.Function.bind( me.getInstanceTpl, me ),
+					getBlockCategory : function( instance ) {
+						var nameParts = instance.block.get('codeName').split('\\');
+						return Ext.String.uncapitalize( nameParts[ nameParts.length - 2 ] );
 					}
+				}
 			);
 
 			me.tplCache[ template.getId() ] = tpl;

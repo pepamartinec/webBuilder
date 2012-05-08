@@ -146,6 +146,10 @@ html, body {
     background-color : #F0FFD1;
 }
 
+.x-template-canvas .x-block.x-block-category-layouts {
+	background-color : #DCBE89;
+}
+
 .x-template-canvas .x-root > .x-empty-root-overlay {
     display    : none;
     text-align : center;
