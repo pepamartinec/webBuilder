@@ -230,11 +230,6 @@ class DatabaseUpdater
 		$this->database->query( $sql );
 		$resultSet = $this->database->fetchArray();
 
-		if( sizeof( $resultSet ) !== sizeof( $instances ) ) {
-			// TODO better exception
-			throw new \Exception("Instance count does not match");
-		}
-
 		$templates = array();
 		foreach( $resultSet as $resultItem ) {
 			$templateID = (int)$resultItem['template_ID'];
