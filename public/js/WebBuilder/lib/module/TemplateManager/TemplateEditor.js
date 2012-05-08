@@ -99,6 +99,6 @@ Ext.define( 'WebBuilder.module.TemplateManager.TemplateEditor',
 
 	isDirty : function()
 	{
-		return true;
+		return false;
 	}
 });

@@ -66,6 +66,6 @@ Ext.define( 'DemoCMS.module.WebEditor.MenuItemEditor',
 
 	isDirty : function()
 	{
-		return this.form.isDirty();
+		return false;
 	}
 });
