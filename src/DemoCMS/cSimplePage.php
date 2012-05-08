@@ -13,12 +13,14 @@ class cSimplePage extends aDataObject
 
 		'webPageID' => array(
 			'dbColumn' => 'web_page_ID',
-			'type'     => 'int'
+			'type'     => 'int',
+			'sanitize' => 'foreingKey',
 		),
 
 		'titleImageID' => array(
 			'dbColumn' => 'title_image_ID',
-			'type' => 'int'
+			'type' => 'int',
+			'sanitize' => 'foreingKey',
 		),
 
 		'perex' => array(
@@ -36,21 +38,9 @@ class cSimplePage extends aDataObject
 			'type'     => 'datetime',
 		),
 
-		'createdBy' => array(
-			'dbColumn' => 'created_by',
-			'type'     => 'int',
-			'sanitize' => 'foreingKey',
-		),
-
 		'editedOn' => array(
 			'dbColumn' => 'edited_on',
 			'type'     => 'datetime',
-		),
-
-		'editedBy' => array(
-			'dbColumn' => 'edited_by',
-			'type'     => 'int',
-			'sanitize' => 'foreingKey',
 		),
 
 

@@ -71,19 +71,9 @@ class cWebPage extends aDataObject implements WebPageInterface
 			'type' => 'string',
 		),
 
-		'createdBy' => array(
-			'dbColumn' => 'created_by',
-			'type' => 'integer',
-		),
-
 		'editedOn' => array(
 			'dbColumn' => 'edited_on',
 			'type' => 'string',
-		),
-
-		'editedBy' => array(
-			'dbColumn' => 'edited_by',
-			'type' => 'integer',
 		),
 
 

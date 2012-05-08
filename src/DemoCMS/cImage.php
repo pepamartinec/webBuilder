@@ -13,7 +13,8 @@ class cImage extends aDataObject
 
 		'webPageID' => array(
 			'dbColumn' => 'web_page_ID',
-			'type'     => 'int'
+			'type'     => 'int',
+			'sanitize' => 'foreingKey',
 		),
 
 		'title' => array(

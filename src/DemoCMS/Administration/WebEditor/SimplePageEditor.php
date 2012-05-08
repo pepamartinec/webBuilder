@@ -46,7 +46,7 @@ class SimplePageEditor extends AbstractPageEditor
 			'perex'        => $request->getData( 'perex', 'string' ),
 			'content'      => $request->getData( 'content', 'string' ),
 			'titleImageID' => $request->getData( 'titleImageID', 'int' ),
-		) );
+		), true );
 
 		$simplePageFeeder->save( $simplePage );
 
