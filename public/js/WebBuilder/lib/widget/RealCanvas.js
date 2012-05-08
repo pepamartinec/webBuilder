@@ -22,7 +22,7 @@ Ext.define( 'WebBuilder.widget.RealCanvas', {
 
 		// create the slot renderer
 		tpl = Ext.create( 'Ext.Template',
-			'<div id="template-block-instance-{id}-slot-{slotName}" class="{slotCls}{% if( values.slots[\'{slotName}\'].length == 0 ) { %} {emptyCls}{% } %}{% if( values.isRoot() ) { %} x-root{% } %}">',
+			'<div id="template-block-instance-{id}-slot-{slotName}" class="{slotCls}{% if( values.slots[\'{slotName}\'].length == 0 ) { %} {emptyCls}{% } %}{% if( values.isRoot() ) { %} x-root{% } %}{% if( values.isLocked() && values.slots[\'{slotName}\'].length > 0 ) { %} x-locked{% } %}">',
 				'<div class="{titleCls} {slotTitleCls}">{[ values.template.slots().findRecord("codeName","{slotName}").get("title") ]}</div>',
 				'{% if( values.isRoot() && \'{slotName}\' == \'content\' ) { %}',
 					'<div class="x-empty-root-overlay">',

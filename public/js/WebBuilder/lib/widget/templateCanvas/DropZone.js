@@ -142,6 +142,11 @@ Ext.define( 'WebBuilder.widget.templateCanvas.DropZone', {
 	{
 		var me = this;
 
+		// check for the locked slot
+		if( Ext.fly( slotDom ).hasCls( 'x-locked' ) ) {
+			return Ext.dd.DropZone.prototype.dropNotAllowed;
+		}
+
 		// check for the drop inside self
 		if( data.blockDom ) {
 			var blockDom = data.blockDom,
