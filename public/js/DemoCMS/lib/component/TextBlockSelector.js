@@ -56,6 +56,7 @@ Ext.define( 'DemoCMS.component.TextBlockSelector',
 			layout : 'fit',
 			width  : 600,
 			height : 400,
+			modal  : true,
 
 			items   : [ me.list ],
 			buttons : [{

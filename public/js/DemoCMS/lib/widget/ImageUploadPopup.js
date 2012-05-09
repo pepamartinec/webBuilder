@@ -48,6 +48,7 @@ Ext.define( 'DemoCMS.widget.ImageUploadPopup',
 		Ext.apply( me, {
 			layout : 'fit',
 			width  : 400,
+			modal  : true,
 
 			items : [ me.form ],
 

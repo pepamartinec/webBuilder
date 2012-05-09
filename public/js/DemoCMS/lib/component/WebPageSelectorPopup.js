@@ -70,6 +70,7 @@ Ext.define( 'DemoCMS.component.TemplateSelectorPopup',
 			layout : 'fit',
 			width  : 400,
 			height : 200,
+			modal  : true,
 
 			items   : [ me.list ],
 			buttons : [{

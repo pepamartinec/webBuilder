@@ -47,6 +47,7 @@ Ext.define( 'DemoCMS.component.ImageSelectorPopup',
 			layout : 'fit',
 			width  : 600,
 			height : 600,
+			modal  : true,
 
 			items   : [ me.list ],
 			buttons : [{
