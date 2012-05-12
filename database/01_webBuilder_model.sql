@@ -142,3 +142,6 @@ CREATE TABLE `blocks_templates_slots` (
   CONSTRAINT `FK__blocks_slots__block_ID` FOREIGN KEY (`template_ID`) REFERENCES `blocks_templates` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+
+-- 2012-05-11 11:08:45
+

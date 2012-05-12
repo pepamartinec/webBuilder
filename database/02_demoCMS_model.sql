@@ -35,7 +35,7 @@ CREATE TABLE `simple_pages` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `web_page_ID` int(10) unsigned NOT NULL,
   `title_image_ID` int(10) unsigned DEFAULT NULL,
-  `perex` text COLLATE utf8_unicode_ci DEFAULT NULL,
+  `perex` text COLLATE utf8_unicode_ci,
   `content` text COLLATE utf8_unicode_ci,
   `created_on` datetime DEFAULT NULL,
   `created_by` int(10) unsigned DEFAULT NULL,
@@ -86,4 +86,7 @@ CREATE TABLE `web_pages` (
   CONSTRAINT `FK__web_pages__blocks_set_ID` FOREIGN KEY (`block_set_ID`) REFERENCES `block_sets` (`ID`) ON UPDATE CASCADE,
   CONSTRAINT `FK__web_pages__parent_ID` FOREIGN KEY (`parent_ID`) REFERENCES `web_pages` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+-- 2012-05-11 11:09:18
 
