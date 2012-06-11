@@ -1,16 +1,15 @@
 {
-    "name"    : "webBuilder/webBuilder",
-    "version" : "0.1",
-    
-    "repositories": [{
-        "type" : "git",
-        "url"  : "https://joker806@github.com/joker806/extAdmin"
+    "name"        : "webBuilder/webBuilder",
+    "type"        : "library",
+    "description" : "Core of the WebBuilder project",
+    "license"     : "GPL-3.0",
+    "authors"     : [{
+    	"name" : "Josef Martinec", "email" : "joker806@gmail.com"
     }],
     
     "require" : {
-        "php"               : ">=5.3",
-        "twig/twig"         : "1.6.*",
-        "extAdmin/extAdmin" : "master-dev"
+        "php"       : ">=5.3",
+        "twig/twig" : "1.6.*"
     },
     
     "autoload" : {
