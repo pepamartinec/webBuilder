@@ -1,29 +1,8 @@
 {
-    "name"    : "WebBuilder/WebBuilder",
+    "name"    : "webBuilder/webBuilder",
     "version" : "0.1",
     
     "repositories": [{
-        "type"    : "package",
-        "package" : {
-            "name"    : "sabberworm/PHP-CSS-Parser",
-            "version" : "1.0.0-dev", 
-            "source"  : {
-            	"type"      : "git",
-                "url"       : "https://github.com/sabberworm/PHP-CSS-Parser.git",
-                "reference" : "master"
-            }
-        }
-    },{
-        "type" : "package",
-        "package" : {
-            "name"    : "Sencha/ExtJS",
-            "version" : "4.1.0", 
-            "dist"    : {
-                "url"  : "http://cdn.sencha.io/ext-4.1.0-gpl.zip",
-                "type" : "zip"
-            }
-        }
-    },{
         "type" : "git",
         "url"  : "https://joker806@github.com/joker806/extAdmin"
     }],
@@ -31,14 +10,11 @@
     "require" : {
         "php"               : ">=5.3",
         "twig/twig"         : "1.6.*",
-        "Sencha/ExtJS"      : "4.1.*",
-        "extAdmin/extAdmin" : "master-dev",
-        "imagine/Imagine"   : "0.2.8"
+        "extAdmin/extAdmin" : "master-dev"
     },
     
     "autoload" : {
         "psr-0" : {
-        	"DemoCMS"    : "src/",
             "Inspirio"   : "src/",
             "WebBuilder" : "src/"
         }

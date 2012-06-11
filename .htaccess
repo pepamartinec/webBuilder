@@ -1,6 +1,0 @@
-RewriteEngine on
-
-RewriteRule ^admin\/?$ admin.php [L,QSA]
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^.*$ index.php?url=$0 [L,QSA]
