@@ -7,9 +7,15 @@
     	"name" : "Josef Martinec", "email" : "joker806@gmail.com"
     }],
     
+    "repositories": [{
+        "type" : "git",
+        "url"  : "https://github.com/propelorm/Propel2"
+    }],
+    
     "require" : {
-        "php"       : ">=5.3",
-        "twig/twig" : "1.6.*"
+        "php"           : ">=5.3",
+        "twig/twig"     : "1.6.*",
+        "propel/propel" : "master-dev"
     },
     
     "autoload" : {
