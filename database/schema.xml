@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="webbuilder" defaultIdMethod="native" namespace="WebBuilder\DataObjects"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://xsd.propelorm.org/1.6/database.xsd" >
+	
+	<!--============== BLOCK DEFINITION PART ==============-->
+	
+	<table name="block_categories" phpName="BlockCategory">
+		<column name="ID" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+		<column name="title" type="VARCHAR" required="true" primaryString="true" />
+	</table>
+	
+	<table name="blocks" phpName="Block">
+		<column name="ID" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+		<column name="code_name" type="VARCHAR" required="true" />
+		<column name="category_ID" type="INTEGER" />
+		<column name="title" type="VARCHAR" primaryString="true" />
+		
+		<foreign-key foreignTable="block_categories" phpName="Category">
+			<reference local="category_ID" foreign="ID" />
+		</foreign-key>
+	</table>
+
+	<table name="block_templates" phpName="BlockTemplate">
+		<column name="ID" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+		<column name="block_ID" type="INTEGER" required="true" />
+		<column name="filename" type="VARCHAR" required="true" />
+		<column name="title" type="VARCHAR" primaryString="true" />
+		
+		<foreign-key foreignTable="blocks" refPhpName="Template">
+			<reference local="block_ID" foreign="ID" />
+		</foreign-key>
+	</table>
+
+	<table name="block_slots" phpName="BlockSlot">
+		<column name="ID" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+		<column name="template_ID" type="INTEGER" required="true" />
+		<column name="code_name" type="VARCHAR" required="true" />
+		<column name="title" type="VARCHAR" primaryString="true" />
+		
+		<foreign-key foreignTable="block_templates" phpName="Template" refPhpName="Slot">
+			<reference local="template_ID" foreign="ID" />
+		</foreign-key>
+	</table>
+
+	<table name="block_data_properties" phpName="BlockDataProperty">
+		<column name="ID" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+		<column name="block_ID" type="INTEGER" required="true" />
+		<column name="name" type="VARCHAR" required="true" />
+		<column name="data_type" type="VARCHAR" />
+		
+		<foreign-key foreignTable="blocks" refPhpName="DataProperty">
+			<reference local="block_ID" foreign="ID" />
+		</foreign-key>
+	</table>
+
+	<table name="block_data_accessors" phpName="BlockDataAccessor">
+		<column name="ID" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+		<column name="source_ID" type="INTEGER" required="true" />
+		<column name="target_ID" type="INTEGER" required="true" />
+		<column name="path" type="VARCHAR" />
+		
+		
+		<foreign-key foreignTable="block_data_properties" phpName="SourceProperty">
+			<reference local="source_ID" foreign="ID" />
+		</foreign-key>
+		<foreign-key foreignTable="block_data_properties" phpName="TargetProperty">
+			<reference local="target_ID" foreign="ID" />
+		</foreign-key>
+	</table>
+	
+	<!--============== BLOCK COMPOSITION PART ==============-->
+	
+	<table name="block_sets" phpName="BlockSet">
+		<column name="ID" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+		<column name="title" type="VARCHAR" required="true" />
+		<column name="parent_ID" type="INTEGER" />
+		
+		<foreign-key foreignTable="block_sets" phpName="Parent" refPhpName="Children">
+			<reference local="parent_ID" foreign="ID"/>
+		</foreign-key>
+	</table>
+	
+	<table name="block_instances" phpName="BlockInstance">
+		<column name="ID" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+		<column name="block_set_ID" type="INTEGER" required="true" />
+		<column name="template_ID" type="INTEGER" required="true" />
+		
+		<foreign-key foreignTable="block_sets">
+			<reference local="block_set_ID" foreign="ID"/>
+		</foreign-key>		
+		<foreign-key foreignTable="block_templates">
+			<reference local="template_ID" foreign="ID"/>
+		</foreign-key>
+	</table>
+	
+	<table name="block_instance_subblocks" phpName="BlockInstanceSubblock">
+		<column name="ID" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+		<column name="parent_ID" type="INTEGER" required="true" />
+		<column name="slot_ID" type="INTEGER" required="true" />
+		<column name="position" type="INTEGER" required="true" />
+		<column name="child_ID" type="INTEGER" required="true" default="NULL" />
+		
+		<foreign-key foreignTable="block_instances" phpName="Parent" refPhpName="Child">
+			<reference local="parent_ID" foreign="ID"/>
+		</foreign-key>
+		<foreign-key foreignTable="block_instances" phpName="Child" refPhpName="Parent">
+			<reference local="child_ID" foreign="ID"/>
+		</foreign-key>
+		<foreign-key foreignTable="block_slots" phpName="Slot">
+			<reference local="slot_ID" foreign="ID"/>
+		</foreign-key>
+	</table>
+	
+	<table name="block_instance_data_inherited" phpName="BlockInstanceDataInherited">
+		<column name="ID" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+		<column name="source_ID" type="INTEGER" required="true" />
+		<column name="target_ID" type="INTEGER" required="true" />
+		<column name="accessor_ID" type="INTEGER" required="true" />
+		
+		<foreign-key foreignTable="block_instances" phpName="Source">
+			<reference local="source_ID" foreign="ID"/>
+		</foreign-key>
+		<foreign-key foreignTable="block_instances" phpName="Target" refPhpName="DataInherited">
+			<reference local="target_ID" foreign="ID"/>
+		</foreign-key>
+		<foreign-key foreignTable="block_data_accessors" phpName="Accessor">
+			<reference local="accessor_ID" foreign="ID"/>
+		</foreign-key>
+	</table>
+	
+	<table name="block_instance_data_constant" phpName="BlockInstanceDataConstant">
+		<column name="ID" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+		<column name="target_ID" type="INTEGER" required="true" />
+		<column name="property_ID" type="INTEGER" required="true" />
+		<column name="value" type="VARCHAR" required="true" />
+		
+		<foreign-key foreignTable="block_instances" phpName="Target" refPhpName="DataConstant">
+			<reference local="target_ID" foreign="ID"/>
+		</foreign-key>
+		<foreign-key foreignTable="block_data_properties" phpName="Property">
+			<reference local="property_ID" foreign="ID"/>
+		</foreign-key>
+	</table>
+</database>
