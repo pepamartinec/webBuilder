@@ -1,65 +1,62 @@
 <?php
 namespace WebBuilder;
 
-use Inspirio\Database\cDatabase;
-
 /**
  * Web block interface
  *
- * Interface, that every WebBlock is requested to implement
+ * Interface that must be implemented by every WebBlock
  *
- * @author Josef Martinec
+ * @author Josef Martinec <joker806@gmail.com>
  */
 interface WebBlockInterface
 {
-	/**
-	 * Constructor
-	 *
-	 * @param \Database $database
-	 */
-	public function __construct( cDatabase $database );
+    // TODO make this a WebBuilder settings
+    const FORM_TOKEN_KEY = 'wbfk';
 
 	/**
-	 * Setups data
-	 *
-	 */
-//	public abstract function setup();
-
-	/**
-	 * Tells which data block requires from parent block
-	 *
-	 * This is dummy implementation for blocks which does not
-	 * require any data.
+	 * Tells which data the block requires.
 	 *
 	 * @return array|null
 	 */
 	public static function requires();
 
 	/**
-	 * Tells which data block provides to nested blocks
-	 *
-	 * This is dummy implementation for blocks which does not
-	 * provide any data.
+	 * Tells which data the block provides.
 	 *
 	 * @return array|null
 	 */
 	public static function provides();
 
 	/**
-	 * Tells which data block provides to nested blocks,
-	 * takes data provided by parent blocks in account
+	 * Returns the block configuration options.
 	 *
-	 * @param  array      $context
 	 * @return array|null
 	 */
-	public static function contextedProvides( array $context );
+	public static function config();
 
 	/**
-	 * Block wireframe definition
+	 * Returns the block form token name.
 	 *
-	 * Wireframe is used for rendering block in templates administration canvas.
-	 *
-	 * @return string|null
+	 * @return string
 	 */
-//	public static function wireframe();
+	public function getFormTokenKey();
+
+	/**
+	 * Returns the block form token value.
+	 *
+	 * @return string
+	 */
+	public function getFormTokenValue();
+
+    /**
+     * Proccesses the action data.
+     */
+	public function proccessFormData();
+
+	/**
+	 * Setups the data needed to render the block.
+	 *
+	 * @return array
+	 */
+	public function setupRenderData();
 }
