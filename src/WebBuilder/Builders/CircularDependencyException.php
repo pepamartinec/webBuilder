@@ -5,6 +5,11 @@ use WebBuilder\BlockInstance;
 
 use inspirio\BuilderException;
 
+/**
+ * Thrown when circular data dependency between some blocks is found.
+ *
+ * @author Josef Martinec <joker806@gmail.com>
+ */
 class CircularDependencyException extends \RuntimeException
 {
 	public function __construct(BlockInstance $block, $property)

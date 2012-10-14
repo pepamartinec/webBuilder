@@ -16,7 +16,7 @@ class BlocksBuildersFactory
 	 * @param WebBlocksFactory  $blocksFactory
 	 * @param \Twig_Environment $twig
 	 */
-	public function __construct( WebBlocksFactory $blocksFactory )
+	public function __construct(WebBlocksFactory $blocksFactory)
 	{
 		$this->blocksFactory = $blocksFactory;
 	}
@@ -42,7 +42,7 @@ class BlocksBuildersFactory
 	 * @param  array $instances
 	 * @return string
 	 */
-	public static function analyzeBlockSet( array $instances )
+	public static function analyzeBlockSet(array $instances)
 	{
 		// TODO
 		return 'CrossDependenciesBuilder';
@@ -57,20 +57,20 @@ class BlocksBuildersFactory
 	 *
 	 * @throws InvalidBuilderTypeException
 	 */
-	public function getBlocksBuilder( $builderType, array $instances, $forceAnalysis = false )
+	public function getBlocksBuilder($builderType, array $instances, $forceAnalysis = false)
 	{
 		// no pregenerated type or analysis forced
-		if( $builderType == null || $forceAnalysis === true ) {
-			$builderType = self::analyzeBlockSet( $instances );
+		if ($builderType == null || $forceAnalysis === true) {
+			$builderType = self::analyzeBlockSet($instances);
 		}
 
 		// invalid builder type
-		if( in_array( $builderType, self::getAvailableBuilders() ) === false ) {
-			throw new InvalidBuilderTypeException( $builderType );
+		if (in_array($builderType, self::getAvailableBuilders()) === false) {
+			throw new InvalidBuilderTypeException($builderType);
 		}
 
 		// create builder
 		$builderClass = __NAMESPACE__ .'\\Builders\\'. $builderType;
-		return new $builderClass( $this->blocksFactory );
+		return new $builderClass($this->blocksFactory);
 	}
 }

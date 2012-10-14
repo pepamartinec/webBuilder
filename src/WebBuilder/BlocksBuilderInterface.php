@@ -4,8 +4,9 @@ namespace WebBuilder;
 /**
  * Blocks tree builder
  *
- * Used for implementation of various tree
- * building algorythms
+ * Used for implementation of various tree building algorythms
+ *
+ * @author Josef Martinec <joker806@gmail.com>
  */
 interface BlocksBuilderInterface
 {
@@ -14,19 +15,19 @@ interface BlocksBuilderInterface
 	 *
 	 * @param WebBlocksFactoryInterface $blocksFactory
 	 */
-	public function __construct( WebBlocksFactoryInterface $blocksFactory );
+	public function __construct(WebBlocksFactoryInterface $blocksFactory);
 
 	/**
 	 * Renders given block
 	 *
 	 * @param BlockInstance $block
 	 */
-	public function buildBlock( BlockInstance $block );
+	public function buildBlock(BlockInstance $block);
 
 	/**
 	 * Tests whether builder is capable of rendering given blocks set
 	 *
 	 * @param array $blocks
 	 */
-	public function testBlocks( array $blocks );
+	public function testBlocks(array $blocks);
 }

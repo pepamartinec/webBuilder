@@ -4,14 +4,14 @@ namespace WebBuilder;
 /**
  * Web block interface
  *
- * Interface that must be implemented by every WebBlock
+ * Interface that must be implemented by every WebBlock.
  *
  * @author Josef Martinec <joker806@gmail.com>
  */
 interface WebBlockInterface
 {
-    // TODO make this a WebBuilder settings
-    const FORM_TOKEN_KEY = 'wbfk';
+
+// ================= RENDER DATA MAPPING =================
 
 	/**
 	 * Tells which data the block requires.
@@ -34,24 +34,7 @@ interface WebBlockInterface
 	 */
 	public static function config();
 
-	/**
-	 * Returns the block form token name.
-	 *
-	 * @return string
-	 */
-	public function getFormTokenKey();
-
-	/**
-	 * Returns the block form token value.
-	 *
-	 * @return string
-	 */
-	public function getFormTokenValue();
-
-    /**
-     * Proccesses the action data.
-     */
-	public function proccessFormData();
+// ================= RENDERING =================
 
 	/**
 	 * Setups the data needed to render the block.
@@ -59,4 +42,13 @@ interface WebBlockInterface
 	 * @return array
 	 */
 	public function setupRenderData();
+
+// ================= FORM DATA PROCCESSING =================
+
+    /**
+     * Proccesses the action data.
+     *
+     * @return mixed|null
+     */
+	public function proccessFormData();
 }

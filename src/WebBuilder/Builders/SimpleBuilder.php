@@ -5,6 +5,15 @@ use WebBuilder\BlocksBuilderInterface;
 use WebBuilder\BlockInstance;
 use WebBuilder\WebBlocksFactoryInterface;
 
+/**
+ * Simple blocks builder
+ *
+ * The fastest and simplest builder variant. Is intended
+ * to use for blockSets with plain tree data dependencies
+ * (no cross-dependencies).
+ *
+ * @author Josef Martinec <joker806@gmail.com>
+ */
 class SimpleBuilder implements BlocksBuilderInterface
 {
 	/**
@@ -19,7 +28,7 @@ class SimpleBuilder implements BlocksBuilderInterface
 	 *
 	 * @param WebBlocksFactoryInterface $blocksFactory
 	 */
-	public function __construct( WebBlocksFactoryInterface $blocksFactory )
+	public function __construct(WebBlocksFactoryInterface $blocksFactory)
 	{
 		$this->blocksFactory = $blocksFactory;
 	}
@@ -29,20 +38,20 @@ class SimpleBuilder implements BlocksBuilderInterface
 	 *
 	 * @param BlockInstance $block
 	 */
-	public function buildBlock( BlockInstance $block )
+	public function buildBlock(BlockInstance $block)
 	{
 		// init required data
 		$block->data = array();
-		foreach( $block->dataDependencies as $property => $dependency ) {
+		foreach ($block->dataDependencies as $property => $dependency) {
 			/* @var $dependency \WebBuilder\DataDependencyInterface */
-			$block->data[ $property ] = $dependency->getTargetData();
+			$block->data[$property] = $dependency->getTargetData();
 		}
 
 		// setup provided data
-		if( method_exists( $block->blockName, 'setupData' ) ) {
-			$blockObj = $this->blocksFactory->createBlock( $block->blockName );
+		if (method_exists($block->blockName, 'setupData')) {
+			$blockObj = $this->blocksFactory->createBlock($block->blockName);
 
-			$block->data += call_user_func_array( array( $blockObj, 'setupData' ), $block->data );
+			$block->data += call_user_func_array(array($blockObj, 'setupRenderData'), $block->data);
 		}
 	}
 
@@ -51,7 +60,7 @@ class SimpleBuilder implements BlocksBuilderInterface
 	 *
 	 * @param array $blocks
 	 */
-	public function testBlocks( array $blocks )
+	public function testBlocks(array $blocks)
 	{
 		return true;
 	}
