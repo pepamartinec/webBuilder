@@ -1,7 +1,7 @@
 <?php
 namespace WebBuilder;
 
-class DataIntegrityException extends WebBuilderException
+class DataIntegrityException extends \RuntimeException
 {
-	
+
 }

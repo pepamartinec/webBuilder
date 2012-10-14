@@ -1,21 +1,24 @@
 <?php
-namespace WebBuilder;
+namespace WebBuilder\BuildStrategy;
+
+use WebBuilder\BlockInstance;
+use WebBuilder\BlockFactoryInterface;
 
 /**
- * Blocks tree builder
+ * Blocks tree builder interface
  *
  * Used for implementation of various tree building algorythms
  *
  * @author Josef Martinec <joker806@gmail.com>
  */
-interface BlocksBuilderInterface
+interface BuildStrategyInterface
 {
 	/**
 	 * Constructs new tree builder
 	 *
 	 * @param WebBlocksFactoryInterface $blocksFactory
 	 */
-	public function __construct(WebBlocksFactoryInterface $blocksFactory);
+	public function __construct(BlockFactoryInterface $blocksFactory);
 
 	/**
 	 * Renders given block

@@ -1,7 +1,7 @@
 <?php
-namespace WebBuilder\Builders;
+namespace WebBuilder\BuildStrategy;
 
-use WebBuilder\BlocksBuilderInterface;
+use WebBuilder\BuildStrategyInterface;
 use WebBuilder\BlockInstance;
 use WebBuilder\WebBlocksFactoryInterface;
 
@@ -14,7 +14,7 @@ use WebBuilder\WebBlocksFactoryInterface;
  *
  * @author Josef Martinec <joker806@gmail.com>
  */
-class SimpleBuilder implements BlocksBuilderInterface
+class SimpleStrategy implements BuildStrategyInterface
 {
 	/**
 	 * Blocks factory

@@ -1,8 +1,6 @@
 <?php
 namespace WebBuilder\Persistance;
 
-use WebBuilder\BlocksLoaderInterface;
-
 class FakeLoader implements BlocksLoaderInterface
 {
 	/**
@@ -15,7 +13,7 @@ class FakeLoader implements BlocksLoaderInterface
 	 *
 	 * @param \Database $blockSetsFeeder
 	 */
-	public function __construct( array $instances )
+	public function __construct(array $instances)
 	{
 		$this->instances = $instances;
 	}

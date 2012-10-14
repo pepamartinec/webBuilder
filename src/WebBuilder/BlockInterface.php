@@ -8,7 +8,7 @@ namespace WebBuilder;
  *
  * @author Josef Martinec <joker806@gmail.com>
  */
-interface WebBlockInterface
+interface BlockInterface
 {
 
 // ================= RENDER DATA MAPPING =================

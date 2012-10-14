@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\DataDependencies;
+namespace WebBuilder\DataDependency;
 
 use Inspirio\Database\cDatabase;
 

@@ -1,9 +1,7 @@
 <?php
-namespace WebBuilder\Builders;
+namespace WebBuilder\BuildStrategy;
 
 use WebBuilder\BlockInstance;
-
-use inspirio\BuilderException;
 
 /**
  * Thrown when circular data dependency between some blocks is found.

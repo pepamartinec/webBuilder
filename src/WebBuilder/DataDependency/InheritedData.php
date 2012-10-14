@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder\DataDependencies;
+namespace WebBuilder\DataDependency;
 
 use WebBuilder\BlockInstance;
 use WebBuilder\DataDependencyInterface;

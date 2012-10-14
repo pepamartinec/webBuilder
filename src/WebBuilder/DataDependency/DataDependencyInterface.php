@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder;
+namespace WebBuilder\DataDependency;
 
 interface DataDependencyInterface
 {

@@ -19,9 +19,9 @@ class WebBuilder
 	private $blockLoader;
 
 	/**
-	 * @var WebBlocksFactoryInterface
+	 * @var WebBlocksFactoryInterface[]
 	 */
-	private $blockFactory;
+	private $blockFactories;
 
 	/**
 	 * @var bool
@@ -48,10 +48,11 @@ class WebBuilder
 	 *
 	 * @param \Database $database
 	 */
-	public function __construct(BlocksLoaderInterface $blockLoader, WebBlocksFactoryInterface $blockFactory, array $config = null)
+	public function __construct(BlocksLoaderInterface $blockLoader, array $config = null)
 	{
+	    $this->blockFactories = array();
+
 		$this->blockLoader  = $blockLoader;
-		$this->blockFactory = $blockFactory;
 
 		// TODO dependency injection of the Twig
 
@@ -76,6 +77,18 @@ class WebBuilder
 		));
 
 		$this->twig->addExtension(new Twig\WebBuilderExtension($this));
+	}
+
+	/**
+	 * Registers the block factory
+	 *
+	 * @param BlockFactoryInterface $factory
+	 * @return WebBuilder
+	 */
+	public function addBlockFactory(BlockFactoryInterface $factory)
+	{
+        $this->blockFactories[] = $factory;
+        return $this;
 	}
 
 	/**

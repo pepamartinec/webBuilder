@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder;
+namespace WebBuilder\Persistance;
 
 use WebBuilder\DataObjects\BlockSet;
 

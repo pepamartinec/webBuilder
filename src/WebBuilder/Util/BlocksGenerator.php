@@ -1,5 +1,5 @@
 <?php
-namespace WebBuilder;
+namespace WebBuilder\Util;
 
 use WebBuilder\Util\CodeAnalysis\TwigAnalysis\TemplateReflection;
 

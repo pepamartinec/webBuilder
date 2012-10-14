@@ -1,11 +1,11 @@
 <?php
-namespace WebBuilder\Builders;
+namespace WebBuilder\BuildStrategy;
 
-use WebBuilder\BlocksBuilderInterface;
+use WebBuilder\BuildStrategyInterface;
 use WebBuilder\BlockInstance;
 use WebBuilder\WebBlocksFactoryInterface;
 
-class CrossDependenciesBuilder implements BlocksBuilderInterface
+class CrossDependenciesStrategy implements BuildStrategyInterface
 {
 	const S_FRESH = 1;
 	const S_INIT  = 2;

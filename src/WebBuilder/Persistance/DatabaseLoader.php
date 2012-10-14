@@ -10,7 +10,6 @@ use WebBuilder\DataDependencies\InheritedData;
 use WebBuilder\DataDependencies\ConstantData;
 use WebBuilder\BlockInstance;
 use WebBuilder\DataObjects\BlockSet;
-use WebBuilder\BlocksLoaderInterface;
 
 class DatabaseLoader implements BlocksLoaderInterface
 {
@@ -56,29 +55,32 @@ class DatabaseLoader implements BlocksLoaderInterface
 	/**
 	 * Loads the block instances of the blockSet
 	 *
-	 * @param int $blockSetID
+	 * @param int $blockSetId
 	 * @return array
 	 *
-	 * @throws InvalidBlockSetException
+	 * @throws \InvalidArgumentException when invalid argument type is supplied
+	 * @throws \InvalidArgumentException when invalid argument type is supplied
 	 */
-	protected function fetchBlockInstances( $blockSetID )
+	protected function fetchBlockInstances($blockSetId)
 	{
-		$blockSetID = (int)$blockSetID;
+	    if (!filter_var($blockSetId, FILTER_VALIDATE_INT)) {
+	        $type = gettype($blockSetId);
+	        throw new \InvalidArgumentException("Invalid \$blockSetId parameter type. {$blockSetId}({$type}) given, integer expected.");
+	    }
 
 		// load the parent first
-		$sql = "SELECT parent_ID FROM block_sets WHERE ID = {$blockSetID}";
+		$sql = "SELECT parent_ID FROM block_sets WHERE ID = {$blockSetId}";
 		$this->database->query( $sql );
 		$resultSet = $this->database->fetchArray();
 
-		if( $resultSet == null ) {
-			throw new InvalidBlockSetException();
+		if ($resultSet == null) {
+			throw new \RuntimeException("Invalid \$blockSetId value({$blockSetId}. No matching block set found.");
 		}
 
 		$result = $resultSet[0];
 
-		if( $result['parent_ID'] ) {
-			$instances = $this->fetchBlockInstances( $result['parent_ID'] );
-
+		if ($result['parent_ID']) {
+			$instances = $this->fetchBlockInstances($result['parent_ID']);
 		} else {
 			$instances = array();
 		}
@@ -114,16 +116,16 @@ class DatabaseLoader implements BlocksLoaderInterface
 
 		$result = $this->database->fetchArray();
 
-		foreach( $result as $r ) {
+		foreach ($result as $r) {
 			$instanceID = (int)$r['instance_ID'];
-			$parentID   = (int)$r['parent_instance_ID'];
+			$parentId   = (int)$r['parent_instance_ID'];
 
 			// touch block instance
-			if( isset( $instances[ $instanceID ] ) === false ) {
-				$instances[ $instanceID ] = new BlockInstance( $instanceID );
+			if (isset($instances[$instanceID]) === false) {
+				$instances[$instanceID] = new BlockInstance($instanceID);
 			}
 
-			$block = $instances[ $instanceID ];
+			$block = $instances[$instanceID];
 
 			$block->blockSetID   = $blockSetID;
 			$block->blockID      = (int)$r['block_ID'];
@@ -132,22 +134,22 @@ class DatabaseLoader implements BlocksLoaderInterface
 			$block->templateFile = $r['template_filename'];
 
 			// block instance has parent block instance defined
-			if( $parentID ) {
+			if ($parentId) {
 				// touch parent block instance
-				if( isset( $instances[ $parentID ] ) === false ) {
-					$instances[ $parentID ] = new BlockInstance( $parentID );
+				if (!isset($instances[$parentId])) {
+					$instances[$parentId] = new BlockInstance($parentId);
 				}
 
-				$parent = $instances[ $parentID ];
-				$parent->addChild( $block, $r['parent_slot_name'], $r['parent_slot_position'] );
+				$parent = $instances[$parentId];
+				$parent->addChild($block, $r['parent_slot_name'], $r['parent_slot_position']);
 
 			} else {
 				$block->parent = null;
 			}
 
-			$block->dataDependencies += $this->fetchInstanceDataConstant( $block->ID );
-			$block->dataDependencies += $this->fetchInstanceDataInherited( $block, $instances );
-			$block->dataDependencies += $this->fetchInstanceDataRequirements( $block );
+			$block->dataDependencies += $this->fetchInstanceDataConstant($block->ID);
+			$block->dataDependencies += $this->fetchInstanceDataInherited($block, $instances);
+			$block->dataDependencies += $this->fetchInstanceDataRequirements($block);
 		}
 
 		return $instances;

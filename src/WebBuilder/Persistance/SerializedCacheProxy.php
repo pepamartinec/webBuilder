@@ -2,9 +2,7 @@
 namespace WebBuilder\Persistance;
 
 use Inspirio\Database\cDBFeederBase;
-
 use WebBuilder\DataObjects\BlockSet;
-use WebBuilder\BlocksLoaderInterface;
 
 class SerializedCacheProxy implements BlocksLoaderInterface
 {
